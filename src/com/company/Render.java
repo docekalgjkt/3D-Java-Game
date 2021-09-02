@@ -35,8 +35,22 @@ public class Render {
             {1, 1, 1, 1, 1, 1, 1}
     };
 
+    private final String[] map0 = new String[] {
+            ".....",
+            ".....",
+            ".....",
+            "...#.",
+            ".....",
+    };
+
     public int[][] getMap() {
         return map;
+    }
+
+    public int[][] map() {
+
+
+        return null;
     }
 
     private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;

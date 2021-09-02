@@ -19,7 +19,7 @@ public class Player {
         return y;
     }
 
-    private double speed = 5;
+    private double speed = 40;
 
     private double angle = 0;
     public double getAngle() {
@@ -32,8 +32,8 @@ public class Player {
     }
 
     public void move(int a) {
-        double nextX = Math.round((x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed / 100.0)) * 100) / 100.0;
-        double nextY = Math.round((y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed / 100.0)) * 100) / 100.0;
+        double nextX = Math.round((x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed / 1000.0)) * 100) / 100.0;
+        double nextY = Math.round((y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed / 1000.0)) * 100) / 100.0;
 
         if(Render.getInstance().getMap()[(int)Math.floor(nextY)][(int)Math.floor(nextX)] == 0) {
             x = nextX;
