@@ -1,6 +1,9 @@
 package com.company;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Render {
 
@@ -16,6 +19,7 @@ public class Render {
     //    -Y
     // -X [ ] X
     //     Y
+/*
     private final int[][] map = new int[][] {
             {1, 1, 1, 1, 1, 1, 1},
             {1, 0, 0, 0, 0, 0, 1},
@@ -33,33 +37,83 @@ public class Render {
             {1, 0, 0, 0, 1, 1, 1},
             {1, 0, 0, 0, 1, 1, 1},
             {1, 1, 1, 1, 1, 1, 1}
-    };
+    };*/
 
     private final String[] map0 = new String[] {
-            ".....",
-            ".....",
-            ".....",
-            "...#.",
-            ".....",
-    };
+    //       0    5    10   15   20   25   30   35   40
+            "##########################################", // 0
+            "#c..#.......#...##....##.......###########",
+            "#...#.###.#.#.c....##.....#.#..###########",
+            "#.....#.#.#.....##.#####...............###",
+            "#######.#.########.#...#..#.#..##.####.###",
+            "#...#..............#...#.......##.####.###", // 5
+            "#...#...........##.##.#####.#####.##.....#",
+            "#...#..#######..##...........#######..#..#",
+            "##.##..#.....#..##.#########.#.......###.#",
+            "##.##.....#.....##.####......#.#.###..#..#",
+            "#...............##.#......####.#.###.....#", // 10
+            "#.#####.#.###.####.#.##...####.#.#########",
+            "#...#...#.......##.#.#######...#.#########",
+            "#...#...#.#..#..##.#.##...##.###.#########",
+            "#...#####.#..#..##.#.##......##...########",
+            "#.........#.......c..##...####.....#######", // 15
+            "#############################.......######",
+            "##############################.....#######",
+            "###############################...########",
+            "################################.#########",
+            "##########################################", // 20
+            "##########################################",
+    };//     0    5    10   15   20   25   30   35   40
 
+    public String[] getMap0() {
+        return map0;
+    }
+
+    public String getTile(int y, int x) {
+        return String.valueOf(map0[y].toCharArray()[x]);
+    }
+
+    public void setTile(int y, int x, String what) {
+        StringBuilder sb = new StringBuilder(map0[y]);
+        sb.replace(x, x + 1, what);
+        map0[y] = sb.toString();
+    }
+/*
     public int[][] getMap() {
         return map;
+    }*/
+
+    private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 5 * 4;
+
+    public Creature[] creatures = new Creature[] {
+            new Creature(14.5, 2.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
+            new Creature(18.5, 15.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
+            new Creature(1.5, 1.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png")
+    };
+
+    void setUp() {
+        for (int i = 0; i < creatures.length; i++) {
+            System.out.println((int)Math.floor(creatures[i].getPos()[1]) + ", " + (int)Math.floor(creatures[i].getPos()[0]));
+            System.out.println(getTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0])));
+            setTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0]), "c");
+            System.out.println(getTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0])));
+            System.out.println(creatures[i].getPos()[1] + " + " + creatures[i].getPos()[0]);
+        }
     }
-
-    public int[][] map() {
-
-
-        return null;
-    }
-
-    private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
 
     public void renderWorld() {
+
+        what = new ArrayList<>();
+        indexes = new ArrayList<>();
+
+        creats = new ArrayList<>();
+        cDists = new ArrayList<>();
+        cXPos = new ArrayList<>();
 
         double[] walls = new double[screenWidth];
 
         double fov = 90;
+        double step = 0.05;
 
         for (int x = 0; x < screenWidth; x++) {
 
@@ -67,30 +121,183 @@ public class Render {
 
             boolean hitWall = false;
             double rayDistance = 0;
+            double wallDistance = 0;
 
-            while (!hitWall) {
-                rayDistance += 0.1;
+            int prevX = -1, prevY = -1;
+
+            while (!hitWall && wallDistance <= Player.getInstance().getCamDistance()) {
+                rayDistance += step;
 
                 int rayX = (int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance));
                 int rayY = (int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance));
 
-                if(rayX < 0 || rayY < 0 || rayY >= map.length || rayX >= map[0].length) {
-                    hitWall = true;
-                }
-                else if(map[rayY][rayX] == 1) {
+                wallDistance = Math.cos((rayAngle - Player.getInstance().getAngle()) / 180 * Math.PI) * rayDistance;
+
+                if(rayX == prevX && rayY == prevY) continue;
+
+                if(rayX < 0 || rayY < 0 || rayY >= map0.length || rayX >= map0[rayY].length()) {
                     hitWall = true;
 
-                    if(rayDistance <= Player.getInstance().getCamDistance()) {
-                        walls[x] = rayDistance;
+                    walls[x] = wallDistance;
+                }
+                else {
+                    for (int xx = -1; xx <= 1; xx++) {
+                        for (int yy = -1; yy <= 1; yy++) {
+                            if(rayY + yy < 0 || rayX + xx < 0 || rayY + yy >= map0.length || rayX + xx >= map0[rayY + yy].length()) continue;
+
+                            if(getTile(rayY + yy, rayX + xx).equals("c")) {
+                                Creature c = null;
+                                for (int i = 0; i < creatures.length; i++) {
+                                    if(creatures[i].isOnTile(rayX + xx, rayY + yy)) {
+                                        c = creatures[i];
+                                        break;
+                                    }
+                                }
+                                if(!creats.contains(c) && c != null) {
+                                    double[] cpos = c.getPos();
+                                    cpos[0] -= Player.getInstance().getX();
+                                    cpos[1] -= Player.getInstance().getY();
+
+                                    double angle = Math.atan(cpos[1] / cpos[0]) * 180 / Math.PI + ((cpos[0] < 0) ? 180 : 0);
+
+                                    double playerAngle = Player.getInstance().getAngle();
+                                    if(angle - playerAngle < -180 || angle - playerAngle > 180) {
+                                        if(playerAngle > 180) playerAngle -= 360;
+                                        else playerAngle += 360;
+                                    }
+                                    double angleDif = (angle - playerAngle);
+
+                                    int xPos = (int)Math.floor((angleDif + (fov / 2)) * (screenWidth / fov));
+
+                                    double dist = cpos[0] / Math.cos(angle / 180 * Math.PI);
+
+                                    creats.add(c);
+                                    cDists.add(dist); // Zmenit perspektivu
+                                    cXPos.add(xPos);
+                                }
+                            }
+                        }
+                    }
+
+                    if(getTile(rayY, rayX).equals("#")) {
+                        hitWall = true;
+
+                        rayDistance -= step;
+
+                        double smallStep = 50;
+
+                        while((int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance)) != rayX ||
+                                (int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance)) != rayY) {
+                            rayDistance += step / smallStep;
+                            if(getTile((int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance)), (int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance))).equals("#")) {
+                                break;
+                            }
+                        }
+
+                        wallDistance = Math.cos((rayAngle - Player.getInstance().getAngle()) / 180.0 * Math.PI) * rayDistance;
+
+                        walls[x] = wallDistance;
                     }
                 }
+
+                prevX = rayX;
+                prevY = rayY;
             }
         }
 
-        this.walls = walls;
+        List<Double> walls0 = new ArrayList<>(); // 8, 4, 5, 2, 3
+        List<Integer> order0 = new ArrayList<>();
+
+        for(int w = 0; w < walls.length; w++) {
+            int where = 0;
+            for(int i = 0; i < walls0.size(); i++) {
+                where = i;
+                if(walls[w] >= walls0.get(i)) {
+                    break;
+                }
+            }
+            walls0.add(where, walls[w]); // 4, 5, 8
+            order0.add(where, w); // 1, 2, 0
+        }
+
+        double[] walls1 = new double[walls.length];
+        order = new int[walls.length];
+
+        List<Creature> renderedCreatures = new ArrayList<>();
+
+        for (int i = 0; i < walls1.length; i++) {
+            walls1[i] = walls0.get(i);
+            order[i] = order0.get(i);
+
+            for(int c = 0; c < creats.size(); c++) {
+                if(cDists.get(c) > walls1[i]) {
+                    if(!renderedCreatures.contains(creats.get(c))) {
+                        what.add("creature");
+                        indexes.add(c);
+                        renderedCreatures.add(creats.get(c));
+                    }
+                }
+            }
+
+            what.add("wall");
+            indexes.add(i);
+        }
+
+        for(int c = 0; c < creats.size(); c++) {
+            if(!renderedCreatures.contains(creats.get(c))) {
+                what.add("creature");
+                indexes.add(c);
+                renderedCreatures.add(creats.get(c));
+            }
+        }
+
+        this.walls = walls1;
+    }
+
+    private List<String> what = new ArrayList<>();
+    private List<Integer> indexes = new ArrayList<>();
+    private List<Creature> creats = new ArrayList<>();
+    private List<Double> cDists = new ArrayList<>();
+    private List<Integer> cXPos = new ArrayList<>();
+
+/*
+    public String[] getWhat() {
+        String[] res = new String[what.size()];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = what.get(i);
+        }
+        return res;
+    }
+    public int[] getIndexes() {
+        int[] res = new int[indexes.size()];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = indexes.get(i);
+        }
+        return res;
+    }*/
+
+    public List<String> getWhat() {
+        return what;
+    }
+    public List<Integer> getIndexes() {
+        return indexes;
+    }
+    public List<Creature> getCreats() {
+        return creats;
+    }
+    public List<Double> getCDists() {
+        return cDists;
+    }
+    public List<Integer> getCXPos() {
+        return cXPos;
     }
 
     private double[] walls;
+    private int[] order;
+
+    public int[] getOrder() {
+        return order;
+    }
 
     public double[] getWalls() {
         renderWorld();
