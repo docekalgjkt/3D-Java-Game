@@ -24,7 +24,7 @@ public class Window extends JFrame implements KeyListener {
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        Render.getInstance().setUp();
+        World.getInstance().setUp();
 
         this.update();
         /*i = 0;
@@ -56,26 +56,13 @@ public class Window extends JFrame implements KeyListener {
         g.clearRect(0, 0, getSize().width, getSize().height);
 
         // Ceiling
-        g.setColor(Color.getHSBColor(0, 0, 0.1f));
+        g.setColor(Color.getHSBColor(0, 0, 0.1f)); // 0, 0, 0.1f
         g.fillRect(0, 0, getSize().width, getSize().height / 2);
 
         // Floor
-        g.setColor(Color.getHSBColor(0, 0, 0.2f));
+        g.setColor(Color.getHSBColor(0, 0, 0.2f)); // 0, 0, 0.2f
         g.fillRect(0, getSize().height / 2, getSize().width, getSize().height / 2);
 
-        boolean beholder = false;
-/*
-        for (int i = 0; i < getSize().width; i++) {
-            if(walls[i] == 0) continue;
-
-            int lineHeight = (int)((getSize().height) / walls[i]);
-            //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
-            float shade = 1 - (Math.round(walls[i]) / 10.0f);
-
-            g.setColor(Color.getHSBColor(0, 0, shade < 0 ? 0 : shade));
-            g.fillRect(order[i], getSize().height / 2 - (lineHeight / 2), 1, lineHeight);
-        }
-*/
         for (int i = 0; i < what.size(); i++) {
             switch (what.get(i)) {
                 case "wall": {
@@ -83,9 +70,9 @@ public class Window extends JFrame implements KeyListener {
 
                     int lineHeight = (int)((getSize().height) / walls[indexes.get(i)]);
                     //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
-                    float shade = 1 - (Math.round(walls[indexes.get(i)]) / 10.0f);
+                    float shade = 1 - (Math.round(walls[indexes.get(i)]) / 15.0f);
 
-                    g.setColor(Color.getHSBColor(0, 0, shade < 0 ? 0 : shade));
+                    g.setColor(Color.getHSBColor(/*120f / 360*/0, 0, shade < 0 ? 0 : shade));
                     g.fillRect(order[indexes.get(i)], getSize().height / 2 - (lineHeight / 2), 1, lineHeight);
 
                     break;
@@ -104,6 +91,18 @@ public class Window extends JFrame implements KeyListener {
                 }
             }
         }
+
+        // Draw Weapon
+        int size = (int)Math.floor(getSize().width);
+        g.drawImage(
+                Toolkit.getDefaultToolkit().getImage("images\\Wooden-Bow2x.png"),
+                getSize().width / 2 - (size / 2),
+                getSize().height - (size / 2),
+                size,
+                size / 2,
+                null
+        );
+
 /*
         if(walls[i] != 0) {
             if(walls[i] < 2 && !beholder) {
@@ -208,7 +207,7 @@ public class Window extends JFrame implements KeyListener {
 
     void update() {
         java.util.Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
 
@@ -228,11 +227,12 @@ public class Window extends JFrame implements KeyListener {
                 if((isMoveF || isMoveB || isMoveL || isMoveR) && !(isMoveF && isMoveB) && !(isMoveL && isMoveR))
                     Player.getInstance().move(dir);
 
-                for (int c = 0; c < Render.getInstance().creatures.length; c++) {
-                    if(Render.getInstance().getCreats().contains(Render.getInstance().creatures[c])) Render.getInstance().creatures[c].move();
+                for (int c = 0; c < World.getInstance().creatures0.size(); c++) {
+                    if(Render.getInstance().getCreats().contains(World.getInstance().creatures0.get(c))) World.getInstance().creatures0.get(c).move();
                 }
 
                 repaint();
+
             }
         }, 10, 1000/60);
     }

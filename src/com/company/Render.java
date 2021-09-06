@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Render {
 
+    // region Singleton
+
     private static Render render = null;
 
     public static Render getInstance() {
@@ -16,34 +18,17 @@ public class Render {
         return render;
     }
 
+    // endregion
+
     //    -Y
     // -X [ ] X
     //     Y
 /*
-    private final int[][] map = new int[][] {
-            {1, 1, 1, 1, 1, 1, 1},
-            {1, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 1},
-            {1, 1, 1, 1, 0, 1, 1},
-            {1, 0, 0, 1, 0, 1, 1},
-            {1, 0, 0, 0, 0, 0, 1},
-            {1, 1, 1, 1, 1, 0, 1},
-            {1, 0, 0, 0, 0, 0, 1},
-            {1, 0, 1, 1, 1, 1, 1},
-            {1, 0, 0, 0, 1, 1, 1},
-            {1, 0, 0, 0, 1, 1, 1},
-            {1, 0, 0, 0, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 1}
-    };*/
-
     private final String[] map0 = new String[] {
     //       0    5    10   15   20   25   30   35   40
             "##########################################", // 0
-            "#c..#.......#...##....##.......###########",
-            "#...#.###.#.#.c....##.....#.#..###########",
+            "#...#.......#...##....##.......###########",
+            "#...#.###.#.#......##.....#.#..###########",
             "#.....#.#.#.....##.#####...............###",
             "#######.#.########.#...#..#.#..##.####.###",
             "#...#..............#...#.......##.####.###", // 5
@@ -56,7 +41,7 @@ public class Render {
             "#...#...#.......##.#.#######...#.#########",
             "#...#...#.#..#..##.#.##...##.###.#########",
             "#...#####.#..#..##.#.##......##...########",
-            "#.........#.......c..##...####.....#######", // 15
+            "#.........#..........##...####.....#######", // 15
             "#############################.......######",
             "##############################.....#######",
             "###############################...########",
@@ -77,29 +62,9 @@ public class Render {
         StringBuilder sb = new StringBuilder(map0[y]);
         sb.replace(x, x + 1, what);
         map0[y] = sb.toString();
-    }
-/*
-    public int[][] getMap() {
-        return map;
     }*/
 
     private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 5 * 4;
-
-    public Creature[] creatures = new Creature[] {
-            new Creature(14.5, 2.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(18.5, 15.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(1.5, 1.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png")
-    };
-
-    void setUp() {
-        for (int i = 0; i < creatures.length; i++) {
-            System.out.println((int)Math.floor(creatures[i].getPos()[1]) + ", " + (int)Math.floor(creatures[i].getPos()[0]));
-            System.out.println(getTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0])));
-            setTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0]), "c");
-            System.out.println(getTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0])));
-            System.out.println(creatures[i].getPos()[1] + " + " + creatures[i].getPos()[0]);
-        }
-    }
 
     public void renderWorld() {
 
@@ -135,7 +100,7 @@ public class Render {
 
                 if(rayX == prevX && rayY == prevY) continue;
 
-                if(rayX < 0 || rayY < 0 || rayY >= map0.length || rayX >= map0[rayY].length()) {
+                if(rayX < 0 || rayY < 0 || rayY >= World.getInstance().getMap().length || rayX >= World.getInstance().getMap()[rayY].length()) {
                     hitWall = true;
 
                     walls[x] = wallDistance;
@@ -143,43 +108,52 @@ public class Render {
                 else {
                     for (int xx = -1; xx <= 1; xx++) {
                         for (int yy = -1; yy <= 1; yy++) {
-                            if(rayY + yy < 0 || rayX + xx < 0 || rayY + yy >= map0.length || rayX + xx >= map0[rayY + yy].length()) continue;
+                            if(rayY + yy < 0 || rayX + xx < 0 || rayY + yy >= World.getInstance().getMap().length || rayX + xx >= World.getInstance().getMap()[rayY + yy].length()) continue;
 
-                            if(getTile(rayY + yy, rayX + xx).equals("c")) {
-                                Creature c = null;
-                                for (int i = 0; i < creatures.length; i++) {
-                                    if(creatures[i].isOnTile(rayX + xx, rayY + yy)) {
-                                        c = creatures[i];
-                                        break;
+                            if(World.getInstance().getTile(rayY + yy, rayX + xx).equals("c")) {
+                                List<Creature> c = new ArrayList<>();
+                                for (int i = 0; i < World.getInstance().creatures0.size(); i++) {
+                                    if(World.getInstance().creatures0.get(i).isOnTile(rayX + xx, rayY + yy)) {
+                                        c.add(World.getInstance().creatures0.get(i));
                                     }
                                 }
-                                if(!creats.contains(c) && c != null) {
-                                    double[] cpos = c.getPos();
-                                    cpos[0] -= Player.getInstance().getX();
-                                    cpos[1] -= Player.getInstance().getY();
+                                for (int i = 0; i < c.size(); i++) {
+                                    if(!creats.contains(c.get(i))) {
+                                        double[] cpos = c.get(i).getPos();
+                                        cpos[0] -= Player.getInstance().getX();
+                                        cpos[1] -= Player.getInstance().getY();
 
-                                    double angle = Math.atan(cpos[1] / cpos[0]) * 180 / Math.PI + ((cpos[0] < 0) ? 180 : 0);
+                                        double angle = Math.atan(cpos[1] / cpos[0]) * 180 / Math.PI + ((cpos[0] < 0) ? 180 : 0);
 
-                                    double playerAngle = Player.getInstance().getAngle();
-                                    if(angle - playerAngle < -180 || angle - playerAngle > 180) {
-                                        if(playerAngle > 180) playerAngle -= 360;
-                                        else playerAngle += 360;
+                                        double playerAngle = Player.getInstance().getAngle();
+                                        if(angle - playerAngle < -180 || angle - playerAngle > 180) {
+                                            if(playerAngle > 180) playerAngle -= 360;
+                                            else playerAngle += 360;
+                                        }
+                                        double angleDif = (angle - playerAngle);
+
+                                        int xPos = (int)Math.floor((angleDif + (fov / 2)) * (screenWidth / fov));
+
+                                        double dist = cpos[0] / Math.cos(angle / 180 * Math.PI);
+
+                                        int where = cDists.size();
+
+                                        for (int i1 = 0; i1 < cDists.size(); i1++) {
+                                            if(dist > cDists.get(i1)) {
+                                                where = i1;
+                                            }
+                                        }
+
+                                        creats.add(where, c.get(i));
+                                        cDists.add(where, dist); // Zmenit perspektivu
+                                        cXPos.add(where, xPos);
                                     }
-                                    double angleDif = (angle - playerAngle);
-
-                                    int xPos = (int)Math.floor((angleDif + (fov / 2)) * (screenWidth / fov));
-
-                                    double dist = cpos[0] / Math.cos(angle / 180 * Math.PI);
-
-                                    creats.add(c);
-                                    cDists.add(dist); // Zmenit perspektivu
-                                    cXPos.add(xPos);
                                 }
                             }
                         }
                     }
 
-                    if(getTile(rayY, rayX).equals("#")) {
+                    if(World.getInstance().getTile(rayY, rayX).equals("#")) {
                         hitWall = true;
 
                         rayDistance -= step;
@@ -189,7 +163,7 @@ public class Render {
                         while((int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance)) != rayX ||
                                 (int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance)) != rayY) {
                             rayDistance += step / smallStep;
-                            if(getTile((int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance)), (int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance))).equals("#")) {
+                            if(World.getInstance().getTile((int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance)), (int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance))).equals("#")) {
                                 break;
                             }
                         }

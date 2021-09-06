@@ -2,6 +2,8 @@ package com.company;
 
 public class Player {
 
+    // region Singleton
+
     private static Player player = null;
 
     public static Player getInstance() {
@@ -10,6 +12,9 @@ public class Player {
         }
         return player;
     }
+
+    // endregion
+
 
     private double x = 5.5, y = 1.5;
     public double getX() {
@@ -36,7 +41,7 @@ public class Player {
         return angle;
     }
 
-    private final double camDistance = 10.0;
+    private final double camDistance = 50.0;
     public double getCamDistance() {
         return camDistance;
     }
@@ -45,15 +50,15 @@ public class Player {
         double nextX = Math.round((x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
         double nextY = Math.round((y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
 
-        if(!Render.getInstance().getTile((int)Math.floor(nextY), (int)Math.floor(nextX)).equals("#")) {
+        if(!World.getInstance().getTile((int)Math.floor(nextY), (int)Math.floor(nextX)).equals("#")) {
             x = nextX;
             y = nextY;
         }
         else {
-            if(!Render.getInstance().getTile((int)Math.floor(y), (int)Math.floor(nextX)).equals("#")) {
+            if(!World.getInstance().getTile((int)Math.floor(y), (int)Math.floor(nextX)).equals("#")) {
                 x = nextX;
             }
-            if(!Render.getInstance().getTile((int)Math.floor(nextY), (int)Math.floor(x)).equals("#")) {
+            if(!World.getInstance().getTile((int)Math.floor(nextY), (int)Math.floor(x)).equals("#")) {
                 y = nextY;
             }
         }
