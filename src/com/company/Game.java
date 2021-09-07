@@ -5,28 +5,43 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.*;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
-public class Window extends JFrame implements KeyListener {
+public class Game extends JFrame implements KeyListener {
+
+    // region Singleton
+
+    private static Game game = null;
+
+    public static Game getInstance() {
+        if (game == null) {
+            game = new Game();
+        }
+        return game;
+    }
+
+    // endregion
 
     private Graphics g;
 
-    public Window(){
-        setTitle("Program");
-        //setSize(800, 800);
-        setSize(Toolkit.getDefaultToolkit().getScreenSize().width / 5 * 4, Toolkit.getDefaultToolkit().getScreenSize().height / 5 * 4);
-        setBackground(Color.black);
-        addKeyListener(this);
-        setVisible(true);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    JButton button = new JButton();
 
-        World.getInstance().setUp();
+    public Game(){
+        setTitle("Program");
+        setSize(Toolkit.getDefaultToolkit().getScreenSize().width / 5 * 4, Toolkit.getDefaultToolkit().getScreenSize().height / 5 * 4);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //setUndecorated(true);
+        //setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         this.update();
+        World.getInstance().setUp();
+
+        addKeyListener(this);
+        setVisible(true);
+
         /*i = 0;
         java.util.Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -41,7 +56,7 @@ public class Window extends JFrame implements KeyListener {
     double[] walls;
     int[] order;*/
 
-    public void paint(Graphics g) {
+    public void paint(Graphics g){
         this.g = g;
 
         double[] walls = Render.getInstance().getWalls();
@@ -52,6 +67,8 @@ public class Window extends JFrame implements KeyListener {
         List<Creature> creats = Render.getInstance().getCreats();
         List<Double> cDists = Render.getInstance().getCDists();
         List<Integer> cXPos = Render.getInstance().getCXPos();
+
+        List<Double> wallTexCol = Render.getInstance().getWallTexCol();
 
         g.clearRect(0, 0, getSize().width, getSize().height);
 
@@ -72,8 +89,24 @@ public class Window extends JFrame implements KeyListener {
                     //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
                     float shade = 1 - (Math.round(walls[indexes.get(i)]) / 15.0f);
 
-                    g.setColor(Color.getHSBColor(/*120f / 360*/0, 0, shade < 0 ? 0 : shade));
-                    g.fillRect(order[indexes.get(i)], getSize().height / 2 - (lineHeight / 2), 1, lineHeight);
+                    int y0 = (getSize().height / 2) - (lineHeight / 2);
+                    int x0 = (int)Math.floor((double)World.getInstance().getWTex().getWidth() * wallTexCol.get(order[indexes.get(i)]));
+
+                    int p = World.getInstance().getWTex().getHeight();
+                    double h = (double)lineHeight / p;
+
+                    for (int w = 0; w < p; w++) {
+                        int y1 = (int)Math.floor(y0 + (h * (double)w));
+
+                        int pixel = World.getInstance().getWTex().getRGB(x0, w);
+                        Color color = new Color(pixel, true);
+
+                        g.setColor(color);
+                        g.fillRect(order[indexes.get(i)], y1, 1, (int)Math.floor(h + 1));
+                    }
+
+                    //g.setColor(Color.getHSBColor(0, 0, shade < 0 ? 0 : shade));
+                    //g.fillRect(order[indexes.get(i)], getSize().height / 2 - (lineHeight / 2), 1, lineHeight);
 
                     break;
                 }
@@ -91,17 +124,22 @@ public class Window extends JFrame implements KeyListener {
                 }
             }
         }
-
+/*
         // Draw Weapon
         int size = (int)Math.floor(getSize().width);
-        g.drawImage(
-                Toolkit.getDefaultToolkit().getImage("images\\Wooden-Bow2x.png"),
-                getSize().width / 2 - (size / 2),
-                getSize().height - (size / 2),
-                size,
-                size / 2,
-                null
-        );
+
+        try {
+            g.drawImage(
+                    ImageIO.read(getClass().getClassLoader().getResource("images/Wooden-Bow2x.png")),
+                    getSize().width / 2 - (size / 2),
+                    getSize().height - (size / 2),
+                    size,
+                    size / 2,
+                    null
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
 /*
         if(walls[i] != 0) {
@@ -129,10 +167,17 @@ public class Window extends JFrame implements KeyListener {
         g.drawString(String.valueOf(Player.getInstance().getX()), 50, 50);
         g.drawString(String.valueOf(Player.getInstance().getY()), 100, 50);
         g.drawString(String.valueOf(Player.getInstance().getAngle()), 50, 75);
+
+
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
+        if(e.getKeyCode() == 122) {
+            setUndecorated(!isUndecorated());
+            /*if(isUndecorated())setExtendedState(JFrame.MAXIMIZED_BOTH);
+            else setExtendedState(JFrame.NORMAL);*/
+        }
     }
 
     @Override
@@ -205,7 +250,7 @@ public class Window extends JFrame implements KeyListener {
     boolean isRotateL = false;
     boolean isRotateR = false;
 
-    void update() {
+    void update(){
         java.util.Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override

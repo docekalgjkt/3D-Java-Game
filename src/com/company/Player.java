@@ -16,7 +16,7 @@ public class Player {
     // endregion
 
 
-    private double x = 5.5, y = 1.5;
+    private double x = 1.5, y = 1.5;
     public double getX() {
         return x;
     }
@@ -36,7 +36,7 @@ public class Player {
 
     private boolean sprinting = false;
 
-    private double angle = 45;
+    private double angle = 270;
     public double getAngle() {
         return angle;
     }

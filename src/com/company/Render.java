@@ -75,6 +75,8 @@ public class Render {
         cDists = new ArrayList<>();
         cXPos = new ArrayList<>();
 
+        wallTexCol = new ArrayList<>();
+
         double[] walls = new double[screenWidth];
 
         double fov = 90;
@@ -96,16 +98,17 @@ public class Render {
                 int rayX = (int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance));
                 int rayY = (int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance));
 
-                wallDistance = Math.cos((rayAngle - Player.getInstance().getAngle()) / 180 * Math.PI) * rayDistance;
-
                 if(rayX == prevX && rayY == prevY) continue;
+
+                wallDistance = Math.cos((rayAngle - Player.getInstance().getAngle()) / 180 * Math.PI) * rayDistance;
 
                 if(rayX < 0 || rayY < 0 || rayY >= World.getInstance().getMap().length || rayX >= World.getInstance().getMap()[rayY].length()) {
                     hitWall = true;
 
-                    walls[x] = wallDistance;
+                    walls[x] = 0;
                 }
                 else {
+                    // Entities
                     for (int xx = -1; xx <= 1; xx++) {
                         for (int yy = -1; yy <= 1; yy++) {
                             if(rayY + yy < 0 || rayX + xx < 0 || rayY + yy >= World.getInstance().getMap().length || rayX + xx >= World.getInstance().getMap()[rayY + yy].length()) continue;
@@ -153,6 +156,7 @@ public class Render {
                         }
                     }
 
+                    // Walls
                     if(World.getInstance().getTile(rayY, rayX).equals("#")) {
                         hitWall = true;
 
@@ -164,6 +168,8 @@ public class Render {
                                 (int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance)) != rayY) {
                             rayDistance += step / smallStep;
                             if(World.getInstance().getTile((int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance)), (int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance))).equals("#")) {
+                                rayY = (int)Math.floor(Player.getInstance().getY() + (Math.sin(rayAngle / 180 * Math.PI) * rayDistance));
+                                rayX = (int)Math.floor(Player.getInstance().getX() + (Math.cos(rayAngle / 180 * Math.PI) * rayDistance));
                                 break;
                             }
                         }
@@ -171,6 +177,30 @@ public class Render {
                         wallDistance = Math.cos((rayAngle - Player.getInstance().getAngle()) / 180.0 * Math.PI) * rayDistance;
 
                         walls[x] = wallDistance;
+
+                        int xDif = prevX - rayX;
+                        int yDif = prevY - rayY;
+
+                        double xPos = Player.getInstance().getX() + (Math.cos(rayAngle / 180.0 * Math.PI) * rayDistance);
+                        double yPos = Player.getInstance().getY() + (Math.sin(rayAngle / 180.0 * Math.PI) * rayDistance);
+
+                        double col = 0;
+
+                        if(xDif == 0 || yDif == 0) {
+                            if(xDif < 0) {
+                                col = yPos - rayY;
+                            }
+                            else if(xDif > 0) {
+                                col = 1.0 - (yPos - rayY);
+                            }
+                            else if(yDif < 0) {
+                                col = 1.0 - (xPos - rayX);
+                            }
+                            else if(yDif > 0) {
+                                col = xPos - rayX;
+                            }
+                        }
+                        wallTexCol.add(col);
                     }
                 }
 
@@ -230,25 +260,12 @@ public class Render {
 
     private List<String> what = new ArrayList<>();
     private List<Integer> indexes = new ArrayList<>();
+
     private List<Creature> creats = new ArrayList<>();
     private List<Double> cDists = new ArrayList<>();
     private List<Integer> cXPos = new ArrayList<>();
 
-/*
-    public String[] getWhat() {
-        String[] res = new String[what.size()];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = what.get(i);
-        }
-        return res;
-    }
-    public int[] getIndexes() {
-        int[] res = new int[indexes.size()];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = indexes.get(i);
-        }
-        return res;
-    }*/
+    private List<Double> wallTexCol = new ArrayList<>();
 
     public List<String> getWhat() {
         return what;
@@ -264,6 +281,9 @@ public class Render {
     }
     public List<Integer> getCXPos() {
         return cXPos;
+    }
+    public List<Double> getWallTexCol() {
+        return wallTexCol;
     }
 
     private double[] walls;

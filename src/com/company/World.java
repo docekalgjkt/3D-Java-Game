@@ -1,5 +1,8 @@
 package com.company;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +21,15 @@ public class World {
 
     // endregion
 
+    private String[] defaultWallTexs = new String[] {
+            "WallDefault0"
+    };
+
+    private BufferedImage wTex;
+
+    public BufferedImage getWTex() {
+        return wTex;
+    }
 
     //    -Y
     // -X [ ] X
@@ -25,9 +37,9 @@ public class World {
     private final String[] map = new String[] {
             //       0    5    10   15   20   25   30   35   40
             "##########################################", // 0
-            "#ccc#.......#...##....##.......###########",
-            "#ccc#.###.#.#......##.....#.#..###########",
-            "#ccc..#.#.#.....##.#####...............###",
+            "#...#.......#...##....##.......###########",
+            "#...#.###.#.#......##.....#.#..###########",
+            "#.....#.#.#.....##.#####...............###",
             "#######.#.########.#...#..#.#..##.####.###",
             "#...#..............#...#.......##.####.###", // 5
             "#...#...........##.##.#####.#####.##.....#",
@@ -79,7 +91,7 @@ public class World {
         map[y] = sb.toString();
     }
 
-    void setUp() {
+    void setUp(){
         /*
         for (int i = 0; i < creatures.length; i++) {
             System.out.println((int)Math.floor(creatures[i].getPos()[1]) + ", " + (int)Math.floor(creatures[i].getPos()[0]));
@@ -93,7 +105,6 @@ public class World {
             for (int x = 0; x < map[y].length(); x++) {
                 boolean stored = true;
                 if(getTile(y, x).equals("c")) {
-                    System.out.println("found C");
                     stored = false;
                     for (int i = 0; i < creatures0.size(); i++) {
                         if(creatures0.get(i).isOnTile(x, y)) {
@@ -105,30 +116,18 @@ public class World {
 
                 if(!stored) {
                     creatures0.add(new Creature(x + 0.5, y + 0.5, "Beholder"));
-                    System.out.println((y + 0.5) + " + " + (x + 0.5));
                 }
             }
         }
+
+        try {
+            wTex = ImageIO.read(getClass().getClassLoader().getResource("images/WallDefault0.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-/*
-    public Creature[] creatures = new Creature[] {
-            new Creature(14.5, 2.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(18.5, 15.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(1.5, 1.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
 
-            new Creature(2.5, 1.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(3.5, 1.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(1.5, 2.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(2.5, 2.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(3.5, 2.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(1.5, 3.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(2.5, 3.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-            new Creature(3.5, 3.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"),
-    };*/
-
-    public List<Creature> creatures0 = new ArrayList<>() {{
-        //add(new Creature(2.5, 2.5, "D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png"));
-    }};
+    public List<Creature> creatures0 = new ArrayList<>(); // {{}}
 
     public void creatureMove(int y0, int x0, int y1, int x1) {
         setTile(y1, x1, "c");
