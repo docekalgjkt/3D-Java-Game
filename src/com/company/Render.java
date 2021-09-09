@@ -2,7 +2,6 @@ package com.company;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Render {
@@ -20,51 +19,7 @@ public class Render {
 
     // endregion
 
-    //    -Y
-    // -X [ ] X
-    //     Y
-/*
-    private final String[] map0 = new String[] {
-    //       0    5    10   15   20   25   30   35   40
-            "##########################################", // 0
-            "#...#.......#...##....##.......###########",
-            "#...#.###.#.#......##.....#.#..###########",
-            "#.....#.#.#.....##.#####...............###",
-            "#######.#.########.#...#..#.#..##.####.###",
-            "#...#..............#...#.......##.####.###", // 5
-            "#...#...........##.##.#####.#####.##.....#",
-            "#...#..#######..##...........#######..#..#",
-            "##.##..#.....#..##.#########.#.......###.#",
-            "##.##.....#.....##.####......#.#.###..#..#",
-            "#...............##.#......####.#.###.....#", // 10
-            "#.#####.#.###.####.#.##...####.#.#########",
-            "#...#...#.......##.#.#######...#.#########",
-            "#...#...#.#..#..##.#.##...##.###.#########",
-            "#...#####.#..#..##.#.##......##...########",
-            "#.........#..........##...####.....#######", // 15
-            "#############################.......######",
-            "##############################.....#######",
-            "###############################...########",
-            "################################.#########",
-            "##########################################", // 20
-            "##########################################",
-    };//     0    5    10   15   20   25   30   35   40
-
-    public String[] getMap0() {
-        return map0;
-    }
-
-    public String getTile(int y, int x) {
-        return String.valueOf(map0[y].toCharArray()[x]);
-    }
-
-    public void setTile(int y, int x, String what) {
-        StringBuilder sb = new StringBuilder(map0[y]);
-        sb.replace(x, x + 1, what);
-        map0[y] = sb.toString();
-    }*/
-
-    private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 5 * 4;
+    private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width / Game.getInstance().getScale();
 
     public void renderWorld() {
 
@@ -77,6 +32,8 @@ public class Render {
 
         wallTexCol = new ArrayList<>();
 
+        List<String> wallType = new ArrayList<>();
+
         double[] walls = new double[screenWidth];
 
         double fov = 90;
@@ -84,7 +41,11 @@ public class Render {
 
         for (int x = 0; x < screenWidth; x++) {
 
-            double rayAngle = (Player.getInstance().getAngle() - (fov / 2.0)) + (((double)x / (double) screenWidth) * fov);
+            double screenHalf = Math.tan((fov / 2) / 180 * Math.PI);
+            double seg = screenHalf / (screenWidth / 2.0);
+
+            double a = Math.atan(-Math.tan((fov / 2) / 180 * Math.PI) + (seg * x)) * 180 / Math.PI;
+            double rayAngle = Player.getInstance().getAngle() + a;
 
             boolean hitWall = false;
             double rayDistance = 0;
@@ -115,9 +76,9 @@ public class Render {
 
                             if(World.getInstance().getTile(rayY + yy, rayX + xx).equals("c")) {
                                 List<Creature> c = new ArrayList<>();
-                                for (int i = 0; i < World.getInstance().creatures0.size(); i++) {
-                                    if(World.getInstance().creatures0.get(i).isOnTile(rayX + xx, rayY + yy)) {
-                                        c.add(World.getInstance().creatures0.get(i));
+                                for (int i = 0; i < World.getInstance().getCreatures().size(); i++) {
+                                    if(World.getInstance().getCreatures().get(i).isOnTile(rayX + xx, rayY + yy)) {
+                                        c.add(World.getInstance().getCreatures().get(i));
                                     }
                                 }
                                 for (int i = 0; i < c.size(); i++) {
@@ -126,16 +87,18 @@ public class Render {
                                         cpos[0] -= Player.getInstance().getX();
                                         cpos[1] -= Player.getInstance().getY();
 
-                                        double angle = Math.atan(cpos[1] / cpos[0]) * 180 / Math.PI + ((cpos[0] < 0) ? 180 : 0);
+                                        double angle = (Math.atan(cpos[1] / cpos[0]) * 180 / Math.PI) + ((cpos[0] < 0) ? 180 : 0);
 
-                                        double playerAngle = Player.getInstance().getAngle();
-                                        if(angle - playerAngle < -180 || angle - playerAngle > 180) {
+                                        if(Main.angleDist(angle, Player.getInstance().getAngle()) >= 90) continue;
+
+                                        //double playerAngle = Player.getInstance().getAngle();
+                                        /*if(angle - playerAngle < -180 || angle - playerAngle > 180) {
                                             if(playerAngle > 180) playerAngle -= 360;
                                             else playerAngle += 360;
-                                        }
-                                        double angleDif = (angle - playerAngle);
+                                        }*/
+                                        double angleDif = (angle - Player.getInstance().getAngle());
 
-                                        int xPos = (int)Math.floor((angleDif + (fov / 2)) * (screenWidth / fov));
+                                        int xPos = (int)Math.floor((Math.tan((fov / 2) / 180 * Math.PI) + Math.tan(angleDif / 180 * Math.PI)) * (screenWidth * Game.getInstance().getScale()) / 2);
 
                                         double dist = cpos[0] / Math.cos(angle / 180 * Math.PI);
 
@@ -148,7 +111,7 @@ public class Render {
                                         }
 
                                         creats.add(where, c.get(i));
-                                        cDists.add(where, dist); // Zmenit perspektivu
+                                        cDists.add(where, dist);
                                         cXPos.add(where, xPos);
                                     }
                                 }
@@ -156,8 +119,10 @@ public class Render {
                         }
                     }
 
+
+                    String s = World.getInstance().getTile(rayY, rayX);
                     // Walls
-                    if(World.getInstance().getTile(rayY, rayX).equals("#")) {
+                    if(s.equals("#") || s.equals("+")) {
                         hitWall = true;
 
                         rayDistance -= step;
@@ -184,7 +149,7 @@ public class Render {
                         double xPos = Player.getInstance().getX() + (Math.cos(rayAngle / 180.0 * Math.PI) * rayDistance);
                         double yPos = Player.getInstance().getY() + (Math.sin(rayAngle / 180.0 * Math.PI) * rayDistance);
 
-                        double col = 0;
+                        double col = 0.0;
 
                         if(xDif == 0 || yDif == 0) {
                             if(xDif < 0) {
@@ -201,11 +166,17 @@ public class Render {
                             }
                         }
                         wallTexCol.add(col);
+                        wallType.add((s.equals("#") ? "wall" : "door"));
                     }
                 }
 
                 prevX = rayX;
                 prevY = rayY;
+            }
+
+            if(!hitWall && wallDistance > Player.getInstance().getCamDistance()) {
+                walls[x] = 0;
+                wallTexCol.add(0.0);
             }
         }
 
@@ -222,6 +193,10 @@ public class Render {
             }
             walls0.add(where, walls[w]); // 4, 5, 8
             order0.add(where, w); // 1, 2, 0
+
+            String s = wallType.get(w);
+            wallType.remove(w);
+            wallType.add(where, s);
         }
 
         double[] walls1 = new double[walls.length];
@@ -243,7 +218,7 @@ public class Render {
                 }
             }
 
-            what.add("wall");
+            what.add(wallType.get(i));
             indexes.add(i);
         }
 

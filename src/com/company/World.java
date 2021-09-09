@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class World {
 
@@ -21,14 +22,28 @@ public class World {
 
     // endregion
 
-    private String[] defaultWallTexs = new String[] {
-            "WallDefault0"
+    private final String[] wallTexs = new String[] {
+            "awal"
+    };
+
+    private final String[] doorTexs = new String[] {
+            "DungeonWall0"
     };
 
     private BufferedImage wTex;
 
-    public BufferedImage getWTex() {
-        return wTex;
+    private BufferedImage[] dTexs = new BufferedImage[1];
+
+    public BufferedImage getTex(String s) {
+
+        switch (s) {
+            case "#":
+                return wTex;
+            case "+":
+                return dTexs[0];
+        }
+
+        return null;
     }
 
     //    -Y
@@ -41,8 +56,8 @@ public class World {
             "#...#.###.#.#......##.....#.#..###########",
             "#.....#.#.#.....##.#####...............###",
             "#######.#.########.#...#..#.#..##.####.###",
-            "#...#..............#...#.......##.####.###", // 5
-            "#...#...........##.##.#####.#####.##.....#",
+            "#...#..............#...#.......#..####.###", // 5
+            "#...#...........##.##.#####.####..##.....#",
             "#...#..#######..##...........#######..#..#",
             "##.##..#.....#..##.#########.#.......###.#",
             "##.##.....#.....##.####......#.#.###..#..#",
@@ -53,30 +68,10 @@ public class World {
             "#...#####.#..#..##.#.##......##...########",
             "#.........#..........##...####.....#######", // 15
             "#############.###############.......######",
-            "#...........................##.....#######",
-            "#...........................###...########",
-            "#...........................####.#########",
-            "#...........................##############", // 20
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
-            "#...........................##############",
+            "#####.....#.....#.....########.....#######",
+            "####...................########...########",
+            "####...................#########.#########",
+            "#####.....#.....#.....##########.#########", // 20
             "##########################################",
     };//     0    5    10   15   20   25   30   35   40
     public String[] getMap() {
@@ -92,22 +87,13 @@ public class World {
     }
 
     void setUp(){
-        /*
-        for (int i = 0; i < creatures.length; i++) {
-            System.out.println((int)Math.floor(creatures[i].getPos()[1]) + ", " + (int)Math.floor(creatures[i].getPos()[0]));
-            System.out.println(getTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0])));
-            setTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0]), "c");
-            System.out.println(getTile((int)Math.floor(creatures[i].getPos()[1]), (int)Math.floor(creatures[i].getPos()[0])));
-            System.out.println(creatures[i].getPos()[1] + " + " + creatures[i].getPos()[0]);
-        }*/
-
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length(); x++) {
                 boolean stored = true;
                 if(getTile(y, x).equals("c")) {
                     stored = false;
-                    for (int i = 0; i < creatures0.size(); i++) {
-                        if(creatures0.get(i).isOnTile(x, y)) {
+                    for (int i = 0; i < creatures.size(); i++) {
+                        if(creatures.get(i).isOnTile(x, y)) {
                             stored = true;
                             break;
                         }
@@ -115,29 +101,68 @@ public class World {
                 }
 
                 if(!stored) {
-                    creatures0.add(new Creature(x + 0.5, y + 0.5, "Beholder"));
+                    creatures.add(new Creature(x + 0.5, y + 0.5, "Beholder"));
                 }
             }
         }
 
         try {
-            wTex = ImageIO.read(getClass().getClassLoader().getResource("images/WallDefault0.png"));
+            wTex = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
+            dTexs[0] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + doorTexs[0] + ".png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public List<Creature> creatures0 = new ArrayList<>(); // {{}}
+    private List<Creature> creatures = new ArrayList<>(); // {{}}
+
+    public List<Creature> getCreatures() {
+        return creatures;
+    }
 
     public void creatureMove(int y0, int x0, int y1, int x1) {
         setTile(y1, x1, "c");
         boolean canRemove = true;
-        for (int i = 0; i < creatures0.size(); i++) {
-            if(creatures0.get(i).isOnTile(x0, y0)) {
+        for (int i = 0; i < creatures.size(); i++) {
+            if(creatures.get(i).isOnTile(x0, y0)) {
                 canRemove = false;
                 break;
             }
         }
         if(canRemove) setTile(y0, x0, ".");
+    }
+
+    public String getDynamicMap() {
+        StringBuilder res = new StringBuilder();
+
+        int y = (int)Math.floor(Player.getInstance().getY());
+        int x = (int)Math.floor(Player.getInstance().getX());
+
+        StringBuilder sb = new StringBuilder(map[y]);
+        sb.replace(x, x + 1, "@");
+
+        for (int i = 0; i < map.length; i++) {
+            res.append((i == y) ? sb : map[i]).append("\n");
+        }
+
+        return res.toString();
+    }
+
+    public String[] getDynamicMap0() {
+        String[] res = new String[map.length];
+
+        int y = (int)Math.floor(Player.getInstance().getY());
+        int x = (int)Math.floor(Player.getInstance().getX());
+
+        StringBuilder sb = new StringBuilder(map[y]);
+        sb.replace(x, x + 1, "@");
+
+        for (int i = 0; i < map.length; i++) {
+            res[i] = (i == y) ? sb.toString() : map[i];
+            String s = res[i].replaceAll("\\.", " ").replaceAll("#", "+");
+            res[i] = s;
+        }
+
+        return res;
     }
 }

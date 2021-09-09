@@ -1,11 +1,9 @@
 package com.company;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
@@ -27,17 +25,22 @@ public class Game extends JFrame implements KeyListener {
 
     private Graphics g;
 
-    JButton button = new JButton();
+    private final int scale = 5;
+    public int getScale() {
+        return scale;
+    }
+
+    int width = Toolkit.getDefaultToolkit().getScreenSize().width / scale, height = Toolkit.getDefaultToolkit().getScreenSize().height / scale;
 
     public Game(){
         setTitle("Program");
-        setSize(Toolkit.getDefaultToolkit().getScreenSize().width / 5 * 4, Toolkit.getDefaultToolkit().getScreenSize().height / 5 * 4);
+        setSize(Toolkit.getDefaultToolkit().getScreenSize().width / scale, Toolkit.getDefaultToolkit().getScreenSize().height / scale);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        //setUndecorated(true);
-        //setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        this.update();
         World.getInstance().setUp();
+        this.update();
 
         addKeyListener(this);
         setVisible(true);
@@ -72,42 +75,52 @@ public class Game extends JFrame implements KeyListener {
 
         g.clearRect(0, 0, getSize().width, getSize().height);
 
+        int floorOffset = 0; // 50
+
         // Ceiling
-        g.setColor(Color.getHSBColor(0, 0, 0.1f)); // 0, 0, 0.1f
-        g.fillRect(0, 0, getSize().width, getSize().height / 2);
+        g.setColor(Color.getHSBColor(0, 0, 0.0f)); // 0, 0, 0.1f
+        g.fillRect(0, 0, getSize().width, getSize().height / 2 + floorOffset);
 
         // Floor
-        g.setColor(Color.getHSBColor(0, 0, 0.2f)); // 0, 0, 0.2f
-        g.fillRect(0, getSize().height / 2, getSize().width, getSize().height / 2);
+        /*g.setColor(Color.getHSBColor(0, 0, 0.1f));
+        g.fillRect(0, getSize().height / 2 + floorOffset, getSize().width, getSize().height / 2 - floorOffset);*/
+        for (int f = 0; f < 10; f++) {
+            g.setColor(Color.getHSBColor(0, 0, 0.1f * (f / 10.0f)));
+            int offset = getSize().height / 2 / 10;
+            g.fillRect(0, getSize().height / 2 + (offset * f), getSize().width, offset);
+        }
 
         for (int i = 0; i < what.size(); i++) {
             switch (what.get(i)) {
-                case "wall": {
+                case "wall", "door": {
                     if(walls[indexes.get(i)] == 0) continue;
 
-                    int lineHeight = (int)((getSize().height) / walls[indexes.get(i)]);
+                    String texIn = "#";
+                    if ("door".equals(what.get(i))) {
+                        texIn = "+";
+                    }
+
+                    int lineHeight = (int)(height / walls[indexes.get(i)]);
                     //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
-                    float shade = 1 - (Math.round(walls[indexes.get(i)]) / 15.0f);
+                    float shade = 1 - (Math.round(walls[indexes.get(i)]) / 11.0f);
+                    shade = (shade < 0) ? 0 : shade;
 
-                    int y0 = (getSize().height / 2) - (lineHeight / 2);
-                    int x0 = (int)Math.floor((double)World.getInstance().getWTex().getWidth() * wallTexCol.get(order[indexes.get(i)]));
+                    int y0 = (height / 2) - (lineHeight / 2);
+                    int x0 = (int)Math.floor((double)World.getInstance().getTex(texIn).getWidth() * wallTexCol.get(order[indexes.get(i)]));
 
-                    int p = World.getInstance().getWTex().getHeight();
+                    int p = World.getInstance().getTex(texIn).getHeight();
                     double h = (double)lineHeight / p;
 
                     for (int w = 0; w < p; w++) {
-                        int y1 = (int)Math.floor(y0 + (h * (double)w));
+                        int y1 = (int)Math.floor(y0 + (h * w));
 
-                        int pixel = World.getInstance().getWTex().getRGB(x0, w);
-                        Color color = new Color(pixel, true);
+                        int pixel = World.getInstance().getTex(texIn).getRGB(x0, w);
+                        Color color = new Color(pixel, false);
+                        Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
-                        g.setColor(color);
-                        g.fillRect(order[indexes.get(i)], y1, 1, (int)Math.floor(h + 1));
+                        g.setColor(shadedColor);
+                        g.fillRect(order[indexes.get(i)] * scale, y1 * scale, scale, (int)Math.floor(h + 1) * scale);
                     }
-
-                    //g.setColor(Color.getHSBColor(0, 0, shade < 0 ? 0 : shade));
-                    //g.fillRect(order[indexes.get(i)], getSize().height / 2 - (lineHeight / 2), 1, lineHeight);
-
                     break;
                 }
                 case "creature": {
@@ -130,7 +143,7 @@ public class Game extends JFrame implements KeyListener {
 
         try {
             g.drawImage(
-                    ImageIO.read(getClass().getClassLoader().getResource("images/Wooden-Bow2x.png")),
+                    ImageIO.read(getClass().getClassLoader().getResource("images/IMAGE.png")),
                     getSize().width / 2 - (size / 2),
                     getSize().height - (size / 2),
                     size,
@@ -168,6 +181,14 @@ public class Game extends JFrame implements KeyListener {
         g.drawString(String.valueOf(Player.getInstance().getY()), 100, 50);
         g.drawString(String.valueOf(Player.getInstance().getAngle()), 50, 75);
 
+        g.setColor(Color.green);
+        for (int i = 0; i < World.getInstance().getDynamicMap0().length; i++) {
+            g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 10));
+            g.drawString(
+                    World.getInstance().getDynamicMap0()[i],
+                    getSize().width - (World.getInstance().getDynamicMap0()[0].length() * (int)(g.getFont().getSize() / 1.6)),
+                    g.getFont().getSize() + (i * g.getFont().getSize()));
+        }
 
     }
 
@@ -188,23 +209,31 @@ public class Game extends JFrame implements KeyListener {
         if(e.getKeyCode() == 83) {
             isMoveB = true;
         }
-        if(e.getKeyCode() == 37) {
-            isRotateL = true;
+        if(e.getKeyCode() == 81) {
+            isMoveL = true;
         }
-        if(e.getKeyCode() == 39) {
-            isRotateR = true;
+        if(e.getKeyCode() == 69) {
+            isMoveR = true;
         }
 
         if(e.getKeyCode() == 65) {
-            isMoveL = true;
+            isRotateL = true;
         }
         if(e.getKeyCode() == 68) {
-            isMoveR = true;
+            isRotateR = true;
         }
 
         // L Shift
         if(e.getKeyCode() == 16) {
             Player.getInstance().sprint(true);
+        }
+        // Space
+        if(e.getKeyCode() == 32) {
+
+        }
+        // R Ctrl
+        if(e.getKeyCode() == 17) {
+
         }
     }
 
@@ -222,18 +251,18 @@ public class Game extends JFrame implements KeyListener {
         if(e.getKeyCode() == 83) {
             isMoveB = false;
         }
-        if(e.getKeyCode() == 37) {
-            isRotateL = false;
+        if(e.getKeyCode() == 81) {
+            isMoveL = false;
         }
-        if(e.getKeyCode() == 39) {
-            isRotateR = false;
+        if(e.getKeyCode() == 69) {
+            isMoveR = false;
         }
 
         if(e.getKeyCode() == 65) {
-            isMoveL = false;
+            isRotateL = false;
         }
         if(e.getKeyCode() == 68) {
-            isMoveR = false;
+            isRotateR = false;
         }
 
         // L Shift
@@ -250,16 +279,20 @@ public class Game extends JFrame implements KeyListener {
     boolean isRotateL = false;
     boolean isRotateR = false;
 
+    public void start() {
+        update();
+    }
+
     void update(){
         java.util.Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
 
+                int dir = 0;
+
                 if (isRotateL) Player.getInstance().rotate(-1);
                 if (isRotateR) Player.getInstance().rotate(1);
-
-                int dir = 0;
 
                 if(isMoveB) dir = 180;
                 if(isMoveL) dir = 270;
@@ -269,16 +302,22 @@ public class Game extends JFrame implements KeyListener {
                 if(isMoveB && isMoveL) dir = 225;
                 if(isMoveB && isMoveR) dir = 135;
 
-                if((isMoveF || isMoveB || isMoveL || isMoveR) && !(isMoveF && isMoveB) && !(isMoveL && isMoveR))
+                if((isMoveF || isMoveB || isMoveL || isMoveR) &&
+                        !(isMoveF && isMoveB) &&
+                        !(isMoveL && isMoveR)
+                )
                     Player.getInstance().move(dir);
 
-                for (int c = 0; c < World.getInstance().creatures0.size(); c++) {
-                    if(Render.getInstance().getCreats().contains(World.getInstance().creatures0.get(c))) World.getInstance().creatures0.get(c).move();
-                }
+                /*
+                for (int c = 0; c < World.getInstance().getCreatures().size(); c++) {
+                    if(World.getInstance().getCreatures().get(c).distToPlayer() < 10) {
+                        World.getInstance().getCreatures().get(c).move();
+                    }
+                }*/
 
                 repaint();
 
             }
-        }, 10, 1000/60);
+        }, 0, 1000/60);
     }
 }
