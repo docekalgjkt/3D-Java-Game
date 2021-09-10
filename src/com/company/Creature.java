@@ -8,6 +8,9 @@ import java.util.Random;
 
 public class Creature {
 
+    private int health;
+    private int healthMax;
+
     private double x, y;
     private double speed = 5; // 12
 
@@ -25,6 +28,7 @@ public class Creature {
         return img;
     }
 
+
     public Creature(double x, double y, String img) {
         this.x = x; this.y = y;
         mapX = (int)Math.floor(x);
@@ -36,6 +40,7 @@ public class Creature {
         }
         speed += new Random().nextDouble() * 2 - 1;
     }
+
 
     public boolean isOnTile(int x, int y) {
         return (int)Math.floor(this.x) == x && (int)Math.floor(this.y) == y;
@@ -109,5 +114,12 @@ public class Creature {
 
     public double distToPlayer() {
         return Math.abs(x - Player.getInstance().getX()) + Math.abs(y - Player.getInstance().getY());
+    }
+
+    public void getDamage(int dmg) {
+        health -= dmg;
+        if(health <= 0) {
+            World.getInstance().creatureDestroy(this);
+        }
     }
 }

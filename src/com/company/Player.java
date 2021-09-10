@@ -1,5 +1,7 @@
 package com.company;
 
+import java.util.List;
+
 public class Player {
 
     // region Singleton
@@ -24,12 +26,12 @@ public class Player {
         return y;
     }
 
-    private final double speed = 50.0;
+    private final double speed = 35.0;
 
     private double modSpeed() {
         double res = 1;
 
-        res *= (sprinting) ? 1.5 : 1;
+        res *= (sprinting) ? 1.75 : 1;
 
         return res;
     }
@@ -41,9 +43,8 @@ public class Player {
         return angle;
     }
 
-    private final double camDistance = 20.0;
     public double getCamDistance() {
-        return camDistance;
+        return 20.0;
     }
 
     public void move(int a) {
@@ -97,13 +98,13 @@ public class Player {
         }*/
     }
 
+    public void sprint(boolean b) {
+        sprinting = b;
+    }
+
     public void rotate(double dir) {
         angle += 2.5 * dir;
         if(angle >= 360) angle -= 360;
         else if (angle < 0) angle += 360;
-    }
-
-    public void sprint(boolean b) {
-        sprinting = b;
     }
 }

@@ -2,13 +2,13 @@ package com.company;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
 
-public class Game extends JFrame implements KeyListener {
+public class Game extends JFrame implements KeyListener, MouseMotionListener {
 
     // region Singleton
 
@@ -34,7 +34,7 @@ public class Game extends JFrame implements KeyListener {
 
     public Game(){
         setTitle("Program");
-        setSize(Toolkit.getDefaultToolkit().getScreenSize().width / scale, Toolkit.getDefaultToolkit().getScreenSize().height / scale);
+        setSize(Toolkit.getDefaultToolkit().getScreenSize().width * scale, Toolkit.getDefaultToolkit().getScreenSize().height * scale);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -42,7 +42,13 @@ public class Game extends JFrame implements KeyListener {
         World.getInstance().setUp();
         this.update();
 
+        BufferedImage cImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(cImg, new Point(0, 0), "blank");
+        getContentPane().setCursor(cursor);
+
         addKeyListener(this);
+        addMouseMotionListener(this);
+
         setVisible(true);
 
         /*i = 0;
@@ -85,7 +91,7 @@ public class Game extends JFrame implements KeyListener {
         /*g.setColor(Color.getHSBColor(0, 0, 0.1f));
         g.fillRect(0, getSize().height / 2 + floorOffset, getSize().width, getSize().height / 2 - floorOffset);*/
         for (int f = 0; f < 10; f++) {
-            g.setColor(Color.getHSBColor(0, 0, 0.1f * (f / 10.0f)));
+            g.setColor(Color.getHSBColor(0.08333333f, 0.4f, 0.1f * (f / 9.0f)));
             int offset = getSize().height / 2 / 10;
             g.fillRect(0, getSize().height / 2 + (offset * f), getSize().width, offset);
         }
@@ -102,7 +108,7 @@ public class Game extends JFrame implements KeyListener {
 
                     int lineHeight = (int)(height / walls[indexes.get(i)]);
                     //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
-                    float shade = 1 - (Math.round(walls[indexes.get(i)]) / 11.0f);
+                    float shade = 1 - (Math.round(walls[indexes.get(i)]) / 10.0f);
                     shade = (shade < 0) ? 0 : shade;
 
                     int y0 = (height / 2) - (lineHeight / 2);
@@ -111,10 +117,12 @@ public class Game extends JFrame implements KeyListener {
                     int p = World.getInstance().getTex(texIn).getHeight();
                     double h = (double)lineHeight / p;
 
-                    for (int w = 0; w < p; w++) {
-                        int y1 = (int)Math.floor(y0 + (h * w));
+                    double ratio = (p > lineHeight) ? (double) p / lineHeight : 1;
 
-                        int pixel = World.getInstance().getTex(texIn).getRGB(x0, w);
+                    for (int w = 0; w < p / ratio; w++) {
+                        int y1 = (int)Math.floor(y0 + (h * (int)Math.floor(w * ratio + 1)));
+
+                        int pixel = World.getInstance().getTex(texIn).getRGB(x0, (int)Math.floor(w * ratio));
                         Color color = new Color(pixel, false);
                         Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
@@ -125,8 +133,13 @@ public class Game extends JFrame implements KeyListener {
                 }
                 case "creature": {
                     int size = (int)((getSize().height) / cDists.get(indexes.get(i)));
+                    Image img = creats.get(indexes.get(i)).getImg();
+                    for (int i1 = 0; i1 < 6; i1++) {
+                        img.getGraphics().setColor(img.getGraphics().getColor().darker());
+                    }
+
                     g.drawImage(
-                            creats.get(indexes.get(i)).getImg(),
+                            img,
                             cXPos.get(indexes.get(i)) - size / 2,
                             getSize().height / 2 - size / 2,
                             size,
@@ -137,6 +150,7 @@ public class Game extends JFrame implements KeyListener {
                 }
             }
         }
+
 /*
         // Draw Weapon
         int size = (int)Math.floor(getSize().width);
@@ -180,25 +194,22 @@ public class Game extends JFrame implements KeyListener {
         g.drawString(String.valueOf(Player.getInstance().getX()), 50, 50);
         g.drawString(String.valueOf(Player.getInstance().getY()), 100, 50);
         g.drawString(String.valueOf(Player.getInstance().getAngle()), 50, 75);
+        if(!minimap) return;
 
         g.setColor(Color.green);
-        for (int i = 0; i < World.getInstance().getDynamicMap0().length; i++) {
-            g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 10));
+        for (int i = 0; i < World.getInstance().getDynamicMap().length; i++) {
+            g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
             g.drawString(
-                    World.getInstance().getDynamicMap0()[i],
-                    getSize().width - (World.getInstance().getDynamicMap0()[0].length() * (int)(g.getFont().getSize() / 1.6)),
-                    g.getFont().getSize() + (i * g.getFont().getSize()));
+                    World.getInstance().getDynamicMap()[i],
+                    getSize().width - (World.getInstance().getDynamicMap()[0].length() * (int)(g.getFont().getSize() / 1.6)),
+                    g.getFont().getSize() + (i * (g.getFont().getSize() - 5)));
         }
-
     }
+
+    boolean minimap = false;
 
     @Override
     public void keyTyped(KeyEvent e) {
-        if(e.getKeyCode() == 122) {
-            setUndecorated(!isUndecorated());
-            /*if(isUndecorated())setExtendedState(JFrame.MAXIMIZED_BOTH);
-            else setExtendedState(JFrame.NORMAL);*/
-        }
     }
 
     @Override
@@ -209,17 +220,17 @@ public class Game extends JFrame implements KeyListener {
         if(e.getKeyCode() == 83) {
             isMoveB = true;
         }
-        if(e.getKeyCode() == 81) {
+        if(e.getKeyCode() == 65) {
             isMoveL = true;
         }
-        if(e.getKeyCode() == 69) {
+        if(e.getKeyCode() == 68) {
             isMoveR = true;
         }
 
-        if(e.getKeyCode() == 65) {
+        if(e.getKeyCode() == 37) {
             isRotateL = true;
         }
-        if(e.getKeyCode() == 68) {
+        if(e.getKeyCode() == 39) {
             isRotateR = true;
         }
 
@@ -240,8 +251,8 @@ public class Game extends JFrame implements KeyListener {
     // UP, DOWN, LEFT, RIGHT
     // 38, 40, 37, 39
 
-    //  W,  S,  A,  D
-    // 87, 83, 65, 68
+    //  W,  S,  A,  D,  Q,  E
+    // 87, 83, 65, 68, 81, 69
 
     @Override
     public void keyReleased(KeyEvent e) {
@@ -251,23 +262,29 @@ public class Game extends JFrame implements KeyListener {
         if(e.getKeyCode() == 83) {
             isMoveB = false;
         }
-        if(e.getKeyCode() == 81) {
+        if(e.getKeyCode() == 65) {
             isMoveL = false;
         }
-        if(e.getKeyCode() == 69) {
+        if(e.getKeyCode() == 68) {
             isMoveR = false;
         }
 
-        if(e.getKeyCode() == 65) {
+        if(e.getKeyCode() == 37) {
             isRotateL = false;
         }
-        if(e.getKeyCode() == 68) {
+        if(e.getKeyCode() == 39) {
             isRotateR = false;
         }
 
         // L Shift
         if(e.getKeyCode() == 16) {
             Player.getInstance().sprint(false);
+        }
+        if(e.getKeyCode() == 77) {
+            minimap = !minimap;
+        }
+        if(e.getKeyCode() == 27) {
+            dispose();
         }
     }
 
@@ -308,16 +325,49 @@ public class Game extends JFrame implements KeyListener {
                 )
                     Player.getInstance().move(dir);
 
-                /*
+
                 for (int c = 0; c < World.getInstance().getCreatures().size(); c++) {
                     if(World.getInstance().getCreatures().get(c).distToPlayer() < 10) {
                         World.getInstance().getCreatures().get(c).move();
                     }
-                }*/
+                }
 
                 repaint();
 
             }
         }, 0, 1000/60);
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    int mouseX;
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        System.out.println(e.getX());
+        if(e.getX() == 0 || e.getX() == Toolkit.getDefaultToolkit().getScreenSize().width - 1) {
+            try {
+                Robot robot = new Robot();
+                if(e.getX() == 0){
+                    robot.mouseMove(Toolkit.getDefaultToolkit().getScreenSize().width - 2, e.getY());
+                    mouseX = Toolkit.getDefaultToolkit().getScreenSize().width - 2;
+                }
+                else if(e.getX() == Toolkit.getDefaultToolkit().getScreenSize().width - 1) {
+                    robot.mouseMove(0, e.getY());
+                    mouseX = 0;
+                }
+            } catch (AWTException awtException) {
+                awtException.printStackTrace();
+            }
+
+            return;
+        }
+
+        if(e.getX() > 0 && e.getX() < Toolkit.getDefaultToolkit().getScreenSize().width - 1) {
+            if(e.getX() != mouseX) Player.getInstance().rotate((double) (e.getX() - mouseX) / 12.0);
+            mouseX = e.getX();
+        }
     }
 }

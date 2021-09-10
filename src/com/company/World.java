@@ -55,7 +55,7 @@ public class World {
             "#...#.......#...##....##.......###########",
             "#...#.###.#.#......##.....#.#..###########",
             "#.....#.#.#.....##.#####...............###",
-            "#######.#.########.#...#..#.#..##.####.###",
+            "#.#####+#.########.#...#..#.#..##.####.###",
             "#...#..............#...#.......#..####.###", // 5
             "#...#...........##.##.#####.####..##.....#",
             "#...#..#######..##...........#######..#..#",
@@ -63,15 +63,15 @@ public class World {
             "##.##.....#.....##.####......#.#.###..#..#",
             "#...............##.#......####.#.###.....#", // 10
             "#.#####.#.###.####.#.##...####.#.#########",
-            "#...#...#.......##.#.#######...#.#########",
-            "#...#...#.#..#..##.#.##...##.###.#########",
-            "#...#####.#..#..##.#.##......##...########",
-            "#.........#..........##...####.....#######", // 15
-            "#############.###############.......######",
-            "#####.....#.....#.....########.....#######",
-            "####...................########...########",
-            "####...................#########.#########",
-            "#####.....#.....#.....##########.#########", // 20
+            "#...#...#.......##.#.#######...#.###...###",
+            "#...#...#.#..#..##.#.##...##.###.###...###",
+            "#...#####.#..#..##.#.##......##...##...###",
+            "#.........#..........##...####.....##.####", // 15
+            "##.##########.##########.####.......#.####",
+            "#..##.....#.....#.....##.#####.....##...##",
+            "#.##.......................####...###...##",
+            "#......................###....##.##.....##",
+            "#####.....#.....#.....#######.......######", // 20
             "##########################################",
     };//     0    5    10   15   20   25   30   35   40
     public String[] getMap() {
@@ -120,6 +120,16 @@ public class World {
         return creatures;
     }
 
+    public List<Creature> getCreaturesByPos(int y, int x) {
+        List<Creature> res = new ArrayList<>();
+        for (int i = 0; i < creatures.size(); i++) {
+            if(creatures.get(i).isOnTile(x, y)) {
+                res.add(creatures.get(i));
+            }
+        }
+        return res;
+    }
+
     public void creatureMove(int y0, int x0, int y1, int x1) {
         setTile(y1, x1, "c");
         boolean canRemove = true;
@@ -132,23 +142,11 @@ public class World {
         if(canRemove) setTile(y0, x0, ".");
     }
 
-    public String getDynamicMap() {
-        StringBuilder res = new StringBuilder();
-
-        int y = (int)Math.floor(Player.getInstance().getY());
-        int x = (int)Math.floor(Player.getInstance().getX());
-
-        StringBuilder sb = new StringBuilder(map[y]);
-        sb.replace(x, x + 1, "@");
-
-        for (int i = 0; i < map.length; i++) {
-            res.append((i == y) ? sb : map[i]).append("\n");
-        }
-
-        return res.toString();
+    public void creatureDestroy(Creature c) {
+        creatures.remove(c);
     }
 
-    public String[] getDynamicMap0() {
+    public String[] getDynamicMap() {
         String[] res = new String[map.length];
 
         int y = (int)Math.floor(Player.getInstance().getY());
@@ -159,7 +157,7 @@ public class World {
 
         for (int i = 0; i < map.length; i++) {
             res[i] = (i == y) ? sb.toString() : map[i];
-            String s = res[i].replaceAll("\\.", " ").replaceAll("#", "+");
+            String s = res[i].replaceAll("\\.", " ").replaceAll("\\+", "=").replaceAll("#", "+");
             res[i] = s;
         }
 

@@ -53,6 +53,7 @@ public class Render {
 
             int prevX = -1, prevY = -1;
 
+            // Ray pos increment by step by step (NOT GOOD)
             while (!hitWall && wallDistance <= Player.getInstance().getCamDistance()) {
                 rayDistance += step;
 
@@ -67,6 +68,8 @@ public class Render {
                     hitWall = true;
 
                     walls[x] = 0;
+                    wallTexCol.add(0.0);
+                    wallType.add("out");
                 }
                 else {
                     // Entities
@@ -151,21 +154,19 @@ public class Render {
 
                         double col = 0.0;
 
-                        if(xDif == 0 || yDif == 0) {
-                            if(xDif < 0) {
-                                col = yPos - rayY;
-                            }
-                            else if(xDif > 0) {
-                                col = 1.0 - (yPos - rayY);
-                            }
-                            else if(yDif < 0) {
-                                col = 1.0 - (xPos - rayX);
-                            }
-                            else if(yDif > 0) {
-                                col = xPos - rayX;
-                            }
+                        if(xDif < 0) {
+                            col = yPos - rayY;
                         }
-                        wallTexCol.add(col);
+                        else if(xDif > 0) {
+                            col = 1.0 - (yPos - rayY);
+                        }
+                        else if(yDif < 0) {
+                            col = 1.0 - (xPos - rayX);
+                        }
+                        else if(yDif > 0) {
+                            col = xPos - rayX;
+                        }
+                        wallTexCol.add(Math.abs(col));
                         wallType.add((s.equals("#") ? "wall" : "door"));
                     }
                 }
@@ -177,6 +178,7 @@ public class Render {
             if(!hitWall && wallDistance > Player.getInstance().getCamDistance()) {
                 walls[x] = 0;
                 wallTexCol.add(0.0);
+                wallType.add("far");
             }
         }
 
@@ -231,6 +233,45 @@ public class Render {
         }
 
         this.walls = walls1;
+    }
+
+    public void render() {
+
+        double fov = 90;
+        double step = 0.05;
+
+        what = new ArrayList<>();
+        indexes = new ArrayList<>();
+
+        creats = new ArrayList<>();
+        cDists = new ArrayList<>();
+        cXPos = new ArrayList<>();
+
+        wallTexCol = new ArrayList<>();
+
+        List<String> wallType = new ArrayList<>();
+
+        double[] walls = new double[screenWidth];
+
+        for (int x = 0; x < screenWidth; x++) {
+
+            double screenHalf = Math.tan((fov / 2) / 180 * Math.PI);
+            double seg = screenHalf / (screenWidth / 2.0);
+
+            double a = Math.atan(-Math.tan((fov / 2) / 180 * Math.PI) + (seg * x)) * 180 / Math.PI;
+            double rayAngle = Player.getInstance().getAngle() + a;
+
+            boolean hitWall = false;
+
+            double wallDistance = 0;
+
+            double yPos = Player.getInstance().getY();
+            double xPos = Player.getInstance().getX();
+
+            while(!hitWall && wallDistance <= Player.getInstance().getCamDistance()) {
+
+            }
+        }
     }
 
     private List<String> what = new ArrayList<>();
