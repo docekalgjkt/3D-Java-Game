@@ -238,7 +238,6 @@ public class Render {
     public void render() {
 
         double fov = 90;
-        double step = 0.05;
 
         what = new ArrayList<>();
         indexes = new ArrayList<>();
@@ -262,16 +261,126 @@ public class Render {
             double rayAngle = Player.getInstance().getAngle() + a;
 
             boolean hitWall = false;
-
             double wallDistance = 0;
 
-            double yPos = Player.getInstance().getY();
-            double xPos = Player.getInstance().getX();
+            double posX = Player.getInstance().getX();
+            double posY = Player.getInstance().getY();
+/*
+            double stepX = 1, stepY = 1;
+            double distX = 0, distY = 0;*/
+
+            double stepX = Math.cos(rayAngle / 180 * Math.PI), stepY = Math.sin(rayAngle / 180 * Math.PI);
+            double addX = (stepX > 0) ? 1 : 0, addY = (stepY > 0) ? 1 : 0;
+
+            double distX = Math.abs((Math.floor(posX + addX) - posX) / stepX);
+            double distY = Math.abs((Math.floor(posY + addY) - posY) / stepY);
 
             while(!hitWall && wallDistance <= Player.getInstance().getCamDistance()) {
 
+                if(distX < distY) {
+                    wallDistance += distX;
+/*
+                    posX = Math.floor(posX + addX);
+                    posY = posY + (stepY * (Math.floor(posX + addX) / stepX));*/
+
+                    posX += Math.round(distX / stepX);
+                    posY += distX / stepY;
+                }
+                else {
+                    wallDistance += distY;
+/*
+                    posY = Math.floor(posY + addY);
+                    posX = posX + (stepX * (Math.floor(posY + addY) / stepY));*/
+
+                    posX += distY / stepX;
+                    posY += Math.round(distY / stepY);
+                }
+
+                String s = World.getInstance().getTile((int)Math.floor(posY), (int)Math.floor(posX));
+
+                if(s.equals("#") || s.equals("+")) {
+
+                    hitWall = true;
+
+                    walls[x] = wallDistance;
+
+                    double col = 0.0;
+
+                    if(distX < distY && stepX < 0) {
+                        col = posY - Math.floor(posY);
+                    }
+                    else if(distX < distY && stepX > 0) {
+                        col = 1.0 - (posY - Math.floor(posY));
+                    }
+                    else if(distX >= distY && stepY < 0) {
+                        col = 1.0 - (posX - Math.floor(posX));
+                    }
+                    else if(distX >= distY && stepY > 0) {
+                        col = posX - Math.floor(posX);
+                    }
+                    wallTexCol.add(Math.abs(col));
+                    wallType.add((s.equals("#") ? "wall" : "door"));
+                }
+
+                addX =  (stepX > 0) ? 1 : -1;
+                addY =  (stepY > 0) ? 1 : -1;
+
+                distX = Math.abs((Math.floor(posX + addX) - posX) / stepX);
+                distY = Math.abs((Math.floor(posY + addY) - posY) / stepY);
             }
         }
+
+        List<Double> walls0 = new ArrayList<>(); // 8, 4, 5, 2, 3
+        List<Integer> order0 = new ArrayList<>();
+
+        for(int w = 0; w < walls.length; w++) {
+            int where = 0;
+            for(int i = 0; i < walls0.size(); i++) {
+                where = i;
+                if(walls[w] >= walls0.get(i)) {
+                    break;
+                }
+            }
+            walls0.add(where, walls[w]); // 4, 5, 8
+            order0.add(where, w); // 1, 2, 0
+
+            String s = wallType.get(w);
+            wallType.remove(w);
+            wallType.add(where, s);
+        }
+
+        double[] walls1 = new double[walls.length];
+        order = new int[walls.length];
+
+        List<Creature> renderedCreatures = new ArrayList<>();
+
+        for (int i = 0; i < walls1.length; i++) {
+            walls1[i] = walls0.get(i);
+            order[i] = order0.get(i);
+
+            for(int c = 0; c < creats.size(); c++) {
+                if(cDists.get(c) > walls1[i]) {
+                    if(!renderedCreatures.contains(creats.get(c))) {
+                        what.add("creature");
+                        indexes.add(c);
+                        renderedCreatures.add(creats.get(c));
+                    }
+                }
+            }
+
+            what.add(wallType.get(i));
+            indexes.add(i);
+        }
+
+        for(int c = 0; c < creats.size(); c++) {
+            if(!renderedCreatures.contains(creats.get(c))) {
+                what.add("creature");
+                indexes.add(c);
+                renderedCreatures.add(creats.get(c));
+            }
+        }
+
+        this.walls = walls1;
     }
 
     private List<String> what = new ArrayList<>();

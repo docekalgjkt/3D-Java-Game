@@ -194,6 +194,13 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
         g.drawString(String.valueOf(Player.getInstance().getX()), 50, 50);
         g.drawString(String.valueOf(Player.getInstance().getY()), 100, 50);
         g.drawString(String.valueOf(Player.getInstance().getAngle()), 50, 75);
+
+        // FPS
+        g.setColor(Color.green);
+        g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
+        g.drawString(String.valueOf(1000 / (System.currentTimeMillis() - prevTime)), getSize().width / 2, g.getFont().getSize()/*getSize().height - g.getFont().getSize()*/);
+        prevTime = System.currentTimeMillis();
+
         if(!minimap) return;
 
         g.setColor(Color.green);
@@ -206,6 +213,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
         }
     }
 
+    long prevTime = 0;
     boolean minimap = false;
 
     @Override
