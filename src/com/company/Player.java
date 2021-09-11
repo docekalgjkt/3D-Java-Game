@@ -1,7 +1,5 @@
 package com.company;
 
-import java.util.List;
-
 public class Player {
 
     // region Singleton
@@ -26,8 +24,6 @@ public class Player {
         return y;
     }
 
-    private final double speed = 35.0;
-
     private double modSpeed() {
         double res = 1;
 
@@ -48,6 +44,8 @@ public class Player {
     }
 
     public void move(int a) {
+
+        double speed = 35.0;
 
         double nextX = Math.round((x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
         double nextY = Math.round((y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
@@ -82,20 +80,6 @@ public class Player {
         if(!hitWallY) {
             y = nextY;
         }
-
-        /*
-        if(!World.getInstance().getTile((int)Math.floor(nextY), (int)Math.floor(nextX)).equals("#")) {
-            x = nextX;
-            y = nextY;
-        }
-        else {
-            if(!World.getInstance().getTile((int)Math.floor(y), (int)Math.floor(nextX)).equals("#")) {
-                x = nextX;
-            }
-            if(!World.getInstance().getTile((int)Math.floor(nextY), (int)Math.floor(x)).equals("#")) {
-                y = nextY;
-            }
-        }*/
     }
 
     public void sprint(boolean b) {

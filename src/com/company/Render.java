@@ -84,36 +84,31 @@ public class Render {
                                         c.add(World.getInstance().getCreatures().get(i));
                                     }
                                 }
-                                for (int i = 0; i < c.size(); i++) {
-                                    if(!creats.contains(c.get(i))) {
-                                        double[] cpos = c.get(i).getPos();
+                                for (Creature creature : c) {
+                                    if (!creats.contains(creature)) {
+                                        double[] cpos = creature.getPos();
                                         cpos[0] -= Player.getInstance().getX();
                                         cpos[1] -= Player.getInstance().getY();
 
                                         double angle = (Math.atan(cpos[1] / cpos[0]) * 180 / Math.PI) + ((cpos[0] < 0) ? 180 : 0);
 
-                                        if(Main.angleDist(angle, Player.getInstance().getAngle()) >= 90) continue;
+                                        if (Main.angleDist(angle, Player.getInstance().getAngle()) >= 90) continue;
 
-                                        //double playerAngle = Player.getInstance().getAngle();
-                                        /*if(angle - playerAngle < -180 || angle - playerAngle > 180) {
-                                            if(playerAngle > 180) playerAngle -= 360;
-                                            else playerAngle += 360;
-                                        }*/
                                         double angleDif = (angle - Player.getInstance().getAngle());
 
-                                        int xPos = (int)Math.floor((Math.tan((fov / 2) / 180 * Math.PI) + Math.tan(angleDif / 180 * Math.PI)) * (screenWidth * Game.getInstance().getScale()) / 2);
+                                        int xPos = (int) Math.floor((Math.tan((fov / 2) / 180 * Math.PI) + Math.tan(angleDif / 180 * Math.PI)) * (screenWidth * Game.getInstance().getScale()) / 2);
 
                                         double dist = cpos[0] / Math.cos(angle / 180 * Math.PI);
 
                                         int where = cDists.size();
 
                                         for (int i1 = 0; i1 < cDists.size(); i1++) {
-                                            if(dist > cDists.get(i1)) {
+                                            if (dist > cDists.get(i1)) {
                                                 where = i1;
                                             }
                                         }
 
-                                        creats.add(where, c.get(i));
+                                        creats.add(where, creature);
                                         cDists.add(where, dist);
                                         cXPos.add(where, xPos);
                                     }
@@ -265,9 +260,6 @@ public class Render {
 
             double posX = Player.getInstance().getX();
             double posY = Player.getInstance().getY();
-/*
-            double stepX = 1, stepY = 1;
-            double distX = 0, distY = 0;*/
 
             double stepX = Math.cos(rayAngle / 180 * Math.PI), stepY = Math.sin(rayAngle / 180 * Math.PI);
             double addX = (stepX > 0) ? 1 : 0, addY = (stepY > 0) ? 1 : 0;
@@ -279,18 +271,12 @@ public class Render {
 
                 if(distX < distY) {
                     wallDistance += distX;
-/*
-                    posX = Math.floor(posX + addX);
-                    posY = posY + (stepY * (Math.floor(posX + addX) / stepX));*/
 
                     posX += Math.round(distX / stepX);
                     posY += distX / stepY;
                 }
                 else {
                     wallDistance += distY;
-/*
-                    posY = Math.floor(posY + addY);
-                    posX = posX + (stepX * (Math.floor(posY + addY) / stepY));*/
 
                     posX += distY / stepX;
                     posY += Math.round(distY / stepY);

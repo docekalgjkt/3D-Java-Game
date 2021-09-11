@@ -32,18 +32,16 @@ public class World {
 
     private BufferedImage wTex;
 
-    private BufferedImage[] dTexs = new BufferedImage[1];
+    private final BufferedImage[] dTexs = new BufferedImage[1];
 
     public BufferedImage getTex(String s) {
 
-        switch (s) {
-            case "#":
-                return wTex;
-            case "+":
-                return dTexs[0];
-        }
+        return switch (s) {
+            case "#" -> wTex;
+            case "+" -> dTexs[0];
+            default -> null;
+        };
 
-        return null;
     }
 
     //    -Y
@@ -92,8 +90,8 @@ public class World {
                 boolean stored = true;
                 if(getTile(y, x).equals("c")) {
                     stored = false;
-                    for (int i = 0; i < creatures.size(); i++) {
-                        if(creatures.get(i).isOnTile(x, y)) {
+                    for (Creature creature : creatures) {
+                        if (creature.isOnTile(x, y)) {
                             stored = true;
                             break;
                         }
@@ -114,27 +112,17 @@ public class World {
         }
     }
 
-    private List<Creature> creatures = new ArrayList<>(); // {{}}
+    private final List<Creature> creatures = new ArrayList<>(); // {{}}
 
     public List<Creature> getCreatures() {
         return creatures;
     }
 
-    public List<Creature> getCreaturesByPos(int y, int x) {
-        List<Creature> res = new ArrayList<>();
-        for (int i = 0; i < creatures.size(); i++) {
-            if(creatures.get(i).isOnTile(x, y)) {
-                res.add(creatures.get(i));
-            }
-        }
-        return res;
-    }
-
     public void creatureMove(int y0, int x0, int y1, int x1) {
         setTile(y1, x1, "c");
         boolean canRemove = true;
-        for (int i = 0; i < creatures.size(); i++) {
-            if(creatures.get(i).isOnTile(x0, y0)) {
+        for (Creature creature : creatures) {
+            if (creature.isOnTile(x0, y0)) {
                 canRemove = false;
                 break;
             }

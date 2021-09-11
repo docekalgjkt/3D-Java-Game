@@ -23,14 +23,12 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
 
     // endregion
 
-    private Graphics g;
-
     private final int scale = 5;
     public int getScale() {
         return scale;
     }
 
-    int width = Toolkit.getDefaultToolkit().getScreenSize().width / scale, height = Toolkit.getDefaultToolkit().getScreenSize().height / scale;
+    int height = Toolkit.getDefaultToolkit().getScreenSize().height / scale;
 
     public Game(){
         setTitle("Program");
@@ -50,23 +48,9 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
         addMouseMotionListener(this);
 
         setVisible(true);
-
-        /*i = 0;
-        java.util.Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                repaint();
-            }
-        }, 0, 1);*/
     }
-/*
-    int i;
-    double[] walls;
-    int[] order;*/
 
     public void paint(Graphics g){
-        this.g = g;
 
         double[] walls = Render.getInstance().getWalls();
         int[] order = Render.getInstance().getOrder();
@@ -81,15 +65,11 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
 
         g.clearRect(0, 0, getSize().width, getSize().height);
 
-        int floorOffset = 0; // 50
-
         // Ceiling
         g.setColor(Color.getHSBColor(0, 0, 0.0f)); // 0, 0, 0.1f
-        g.fillRect(0, 0, getSize().width, getSize().height / 2 + floorOffset);
+        g.fillRect(0, 0, getSize().width, getSize().height / 2);
 
         // Floor
-        /*g.setColor(Color.getHSBColor(0, 0, 0.1f));
-        g.fillRect(0, getSize().height / 2 + floorOffset, getSize().width, getSize().height / 2 - floorOffset);*/
         for (int f = 0; f < 10; f++) {
             g.setColor(Color.getHSBColor(0.08333333f, 0.4f, 0.1f * (f / 9.0f)));
             int offset = getSize().height / 2 / 10;
@@ -98,41 +78,40 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
 
         for (int i = 0; i < what.size(); i++) {
             switch (what.get(i)) {
-                case "wall", "door": {
-                    if(walls[indexes.get(i)] == 0) continue;
+                case "wall", "door" -> {
+                    if (walls[indexes.get(i)] == 0) continue;
 
                     String texIn = "#";
                     if ("door".equals(what.get(i))) {
                         texIn = "+";
                     }
 
-                    int lineHeight = (int)(height / walls[indexes.get(i)]);
+                    int lineHeight = (int) (height / walls[indexes.get(i)]);
                     //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
                     float shade = 1 - (Math.round(walls[indexes.get(i)]) / 10.0f);
                     shade = (shade < 0) ? 0 : shade;
 
                     int y0 = (height / 2) - (lineHeight / 2);
-                    int x0 = (int)Math.floor((double)World.getInstance().getTex(texIn).getWidth() * wallTexCol.get(order[indexes.get(i)]));
+                    int x0 = (int) Math.floor((double) World.getInstance().getTex(texIn).getWidth() * wallTexCol.get(order[indexes.get(i)]));
 
                     int p = World.getInstance().getTex(texIn).getHeight();
-                    double h = (double)lineHeight / p;
+                    double h = (double) lineHeight / p;
 
                     double ratio = (p > lineHeight) ? (double) p / lineHeight : 1;
 
                     for (int w = 0; w < p / ratio; w++) {
-                        int y1 = (int)Math.floor(y0 + (h * (int)Math.floor(w * ratio + 1)));
+                        int y1 = (int) Math.floor(y0 + (h * (int) Math.floor(w * ratio + 1)));
 
-                        int pixel = World.getInstance().getTex(texIn).getRGB(x0, (int)Math.floor(w * ratio));
+                        int pixel = World.getInstance().getTex(texIn).getRGB(x0, (int) Math.floor(w * ratio));
                         Color color = new Color(pixel, false);
                         Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
                         g.setColor(shadedColor);
-                        g.fillRect(order[indexes.get(i)] * scale, y1 * scale, scale, (int)Math.floor(h + 1) * scale);
+                        g.fillRect(order[indexes.get(i)] * scale, y1 * scale, scale, (int) Math.floor(h + 1) * scale);
                     }
-                    break;
                 }
-                case "creature": {
-                    int size = (int)((getSize().height) / cDists.get(indexes.get(i)));
+                case "creature" -> {
+                    int size = (int) ((getSize().height) / cDists.get(indexes.get(i)));
                     Image img = creats.get(indexes.get(i)).getImg();
                     for (int i1 = 0; i1 < 6; i1++) {
                         img.getGraphics().setColor(img.getGraphics().getColor().darker());
@@ -146,49 +125,9 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
                             size,
                             null
                     );
-                    break;
                 }
             }
         }
-
-/*
-        // Draw Weapon
-        int size = (int)Math.floor(getSize().width);
-
-        try {
-            g.drawImage(
-                    ImageIO.read(getClass().getClassLoader().getResource("images/IMAGE.png")),
-                    getSize().width / 2 - (size / 2),
-                    getSize().height - (size / 2),
-                    size,
-                    size / 2,
-                    null
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-/*
-        if(walls[i] != 0) {
-            if(walls[i] < 2 && !beholder) {
-                Image img = Toolkit.getDefaultToolkit().getImage("D:\\BOOOM\\IntelliJ\\3D-rendering\\images\\Beholder.png");
-                g.drawImage(img, getSize().width / 2 - 250, getSize().height / 2 - 250, 500, 500, null);
-                beholder = true;
-            }
-
-            int lineHeight = (int)((getSize().height) / walls[i]);
-            //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
-            float shade = 1 - (Math.round(walls[i]) / 10.0f);
-
-            g.setColor(Color.getHSBColor(0, 0, shade < 0 ? 0 : shade));
-            g.fillRect(order[i], getSize().height / 2 - (lineHeight / 2), 1, lineHeight);
-        }
-
-        i++;
-
-        if(i == getSize().width) {
-            i = 0;
-        }*/
 
         g.setColor(Color.blue);
         g.drawString(String.valueOf(Player.getInstance().getX()), 50, 50);
@@ -246,14 +185,6 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
         if(e.getKeyCode() == 16) {
             Player.getInstance().sprint(true);
         }
-        // Space
-        if(e.getKeyCode() == 32) {
-
-        }
-        // R Ctrl
-        if(e.getKeyCode() == 17) {
-
-        }
     }
 
     // UP, DOWN, LEFT, RIGHT
@@ -303,10 +234,6 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
 
     boolean isRotateL = false;
     boolean isRotateR = false;
-
-    public void start() {
-        update();
-    }
 
     void update(){
         java.util.Timer timer = new Timer();

@@ -9,19 +9,9 @@ import java.util.Random;
 public class Creature {
 
     private int health;
-    private int healthMax;
 
     private double x, y;
     private double speed = 5; // 12
-
-    private int xPos;
-
-    public int getxPos() {
-        return xPos;
-    }
-    public void setxPos(int xPos) {
-        this.xPos = xPos;
-    }
 
     private Image img;
     public Image getImg() {
@@ -60,19 +50,6 @@ public class Creature {
 
         double nextX = Math.round((x + Math.cos(angle / 180.0 * Math.PI) * (speed / 1000.0)) * 1000) / 1000.0;
         double nextY = Math.round((y + Math.sin(angle / 180.0 * Math.PI) * (speed / 1000.0)) * 1000) / 1000.0;
-/*
-        if(!World.getInstance().getTile((int)Math.floor(nextY), (int)Math.floor(nextX)).equals("#")) {
-            x = nextX;
-            y = nextY;
-        }
-        else {
-            if(!World.getInstance().getTile((int)Math.floor(y), (int)Math.floor(nextX)).equals("#")) {
-                x = nextX;
-            }
-            if(!World.getInstance().getTile((int)Math.floor(nextY), (int)Math.floor(x)).equals("#")) {
-                y = nextY;
-            }
-        }*/
 
         boolean hitWallX = false;
         boolean hitWallY = false;
