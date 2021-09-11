@@ -31,6 +31,8 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
     int height = Toolkit.getDefaultToolkit().getScreenSize().height / scale;
 
     public Game(){
+        if(game == null) game = this;
+
         setTitle("Program");
         setSize(Toolkit.getDefaultToolkit().getScreenSize().width * scale, Toolkit.getDefaultToolkit().getScreenSize().height * scale);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
