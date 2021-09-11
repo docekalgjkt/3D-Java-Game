@@ -198,7 +198,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener {
         // FPS
         g.setColor(Color.green);
         g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
-        g.drawString(String.valueOf(1000 / (System.currentTimeMillis() - prevTime)), getSize().width / 2, g.getFont().getSize()/*getSize().height - g.getFont().getSize()*/);
+        g.drawString("FPS: " + (1000 / (System.currentTimeMillis() - prevTime)), getSize().width / 2, g.getFont().getSize()/*getSize().height - g.getFont().getSize()*/);
         prevTime = System.currentTimeMillis();
 
         if(!minimap) return;
