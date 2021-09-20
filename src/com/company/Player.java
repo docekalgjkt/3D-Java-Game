@@ -1,13 +1,18 @@
 package com.company;
 
-public class Player {
+import javax.naming.ldap.ExtendedRequest;
+
+public class Player
+{
 
     // region Singleton
 
     private static Player player = null;
 
-    public static Player getInstance() {
-        if (player == null) {
+    public static Player getInstance()
+    {
+        if (player == null)
+        {
             player = new Player();
         }
         return player;
@@ -16,15 +21,26 @@ public class Player {
     // endregion
 
 
-    private double x = 5.5, y = 1.5;
-    public double getX() {
+    private double x = 1.5;
+    private double y = 1.5;
+    private double angle = 0;
+
+    private double hitbox = 0.2;
+
+    private boolean sprinting = false;
+
+    public double getX()
+    {
         return x;
     }
-    public double getY() {
+
+    public double getY()
+    {
         return y;
     }
 
-    private double modSpeed() {
+    private double modSpeed()
+    {
         double res = 1;
 
         res *= (sprinting) ? 1.75 : 1;
@@ -32,63 +48,171 @@ public class Player {
         return res;
     }
 
-    private boolean sprinting = false;
-
-    private double angle = 0;
-    public double getAngle() {
+    public double getAngle()
+    {
         return angle;
     }
 
-    public double getCamDistance() {
-        return 20.0;
+    public double getCamDistance()
+    {
+        return 200.0;
     }
 
-    public void move(int a) {
+    public void move(int a)
+    {
+        double speed = 30.0;
 
-        double speed = 35.0;
+        double nextX = x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / (600));
+        //double nextX = Math.round((x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
+        //double nextY = Math.round((y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
+        double nextY = y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / (600));
 
-        double nextX = Math.round((x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
-        double nextY = Math.round((y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
 
-        boolean hitWallX = false;
-        boolean hitWallY = false;
+        x = nextX;
+        y = nextY;
 
-        double hitBoxRange = 0.2;
-        for (int xx = 0; xx < 2; xx++) {
-            if(World.getInstance().getTile((int)Math.floor(y), (int)Math.floor(x + Math.cos((180.0 * xx) / 180.0 * Math.PI) * hitBoxRange)).equals("#")) {
-                if(Main.angleDist(angle + a, (180.0 * xx)) < 90) hitWallX = true;
+        // Box Hitbox Calculation
+
+        double xr = Math.floor(x + 1) - x;
+        double xl = x - Math.floor(x);
+
+        double yr = Math.floor(y + 1) - y;
+        double yl = y - Math.floor(y);
+
+        if (xr < hitbox)
+        {
+            boolean onlyCorner = true;
+
+            if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x) + 1).equals("#"))
+            {
+                x -= hitbox - xr;
+                onlyCorner = false;
             }
-        }
-        for (int yy = 0; yy < 2; yy++) {
-            if(World.getInstance().getTile((int)Math.floor(y + Math.sin((90 + (180.0 * yy)) / 180.0 * Math.PI) * hitBoxRange), (int)Math.floor(x)).equals("#")) {
-                if(Main.angleDist(angle + a, (90 + (180.0 * yy))) < 90) hitWallY = true;
+            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
+            {
+                y -= hitbox - yr;
+                onlyCorner = false;
             }
-        }
+            else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
+            {
+                y += hitbox - yl;
+                onlyCorner = false;
+            }
 
-        for (int i = 0; i < 4; i++) {
-            if(World.getInstance().getTile((int)Math.floor(y + Math.sin((double)(45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange), (int)Math.floor(x + Math.cos((double)(45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange)).equals("#")) {
-                if(Main.angleDist(angle + a, 45 + (i * 90)) < 45) {
-                    hitWallX = true;
-                    hitWallY = true;
+            if (onlyCorner)
+            {
+                if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x) + 1).equals("#"))
+                {
+                    if (xr > yr)
+                    {
+                        x -= hitbox - xr;
+                    }
+                    else if (xr < yr)
+                    {
+                        y -= hitbox - yr;
+                    }
+                    else
+                    {
+                        x -= hitbox - xr;
+                        y -= hitbox - yr;
+                    }
+                }
+                else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x) + 1).equals("#"))
+                {
+                    if (xr > yl)
+                    {
+                        x -= hitbox - xr;
+                    }
+                    else if (xr < yl)
+                    {
+                        y += hitbox - yl;
+                    }
+                    else
+                    {
+                        x -= hitbox - xr;
+                        y += hitbox - yl;
+                    }
                 }
             }
         }
+        else if (xl < hitbox)
+        {
+            boolean onlyCorner = true;
 
-        if(!hitWallX) {
-            x = nextX;
+            if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x) - 1).equals("#"))
+            {
+                x += hitbox - xl;
+                onlyCorner = false;
+            }
+            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
+            {
+                y -= hitbox - yr;
+                onlyCorner = false;
+            }
+            else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
+            {
+                y += hitbox - yl;
+                onlyCorner = false;
+            }
+
+            if (onlyCorner)
+            {
+                if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x) - 1).equals("#"))
+                {
+                    if (xl > yr)
+                    {
+                        x += hitbox - xl;
+                    }
+                    else if (xl < yr)
+                    {
+                        y -= hitbox - yr;
+                    }
+                    else
+                    {
+                        x += hitbox - xl;
+                        y -= hitbox - yr;
+                    }
+                }
+                else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x) - 1).equals("#"))
+                {
+                    if (xl > yl)
+                    {
+                        x += hitbox - xl;
+                    }
+                    else if (xl < yl)
+                    {
+                        y += hitbox - yl;
+                    }
+                    else
+                    {
+                        x += hitbox - xl;
+                        y += hitbox - yl;
+                    }
+                }
+            }
         }
-        if(!hitWallY) {
-            y = nextY;
+        else
+        {
+            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
+            {
+                y -= hitbox - yr;
+            }
+            if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
+            {
+                y += hitbox - yl;
+            }
         }
     }
 
-    public void sprint(boolean b) {
+    public void sprint(boolean b)
+    {
         sprinting = b;
     }
 
-    public void rotate(double dir) {
+    public void rotate(double dir)
+    {
         angle += 2.5 * dir;
-        if(angle >= 360) angle -= 360;
+        if (angle >= 360) angle -= 360;
         else if (angle < 0) angle += 360;
     }
 }
