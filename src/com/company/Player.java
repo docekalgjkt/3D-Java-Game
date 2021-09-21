@@ -215,4 +215,20 @@ public class Player
         if (angle >= 360) angle -= 360;
         else if (angle < 0) angle += 360;
     }
+
+    public void attack()
+    {
+        for (Creature c : World.getInstance().getCreatures())
+        {
+            if (c.distToPlayer() <= 4.0)
+            {
+                int sCenter = Game.getInstance().getSize().width / 2;
+
+                if (c.getXPos() >= (sCenter - (sCenter * 0.15)) && c.getXPos() <= (sCenter + (sCenter * 0.15)))
+                {
+                    c.getDamage(1);
+                }
+            }
+        }
+    }
 }

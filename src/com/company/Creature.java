@@ -9,7 +9,7 @@ import java.util.Random;
 public class Creature
 {
 
-    private int health;
+    private int health = 1;
 
     private double x, y;
     private double speed = 5; // 12
@@ -28,6 +28,7 @@ public class Creature
         this.y = y;
         mapX = (int) Math.floor(x);
         mapY = (int) Math.floor(y);
+
         try
         {
             this.img = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + ".png")));
@@ -35,6 +36,7 @@ public class Creature
         {
             e.printStackTrace();
         }
+
         speed += new Random().nextDouble() * 2 - 1;
         speed = 0;
     }
@@ -51,6 +53,17 @@ public class Creature
     }
 
     public int mapX, mapY;
+    private int xPos;
+
+    public int getXPos()
+    {
+        return xPos;
+    }
+
+    public void setXPos(int xPos)
+    {
+        this.xPos = xPos;
+    }
 
     public int[] getTilePos()
     {
@@ -118,7 +131,8 @@ public class Creature
 
     public double distToPlayer()
     {
-        return Math.abs(x - Player.getInstance().getX()) + Math.abs(y - Player.getInstance().getY());
+        return (x - Player.getInstance().getX()) * (x - Player.getInstance().getX()) + (y - Player.getInstance().getY()) * (y - Player.getInstance().getY());
+        //return Math.abs() + Math.abs(y - Player.getInstance().getY());
     }
 
     public void getDamage(int dmg)

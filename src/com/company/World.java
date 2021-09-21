@@ -56,7 +56,7 @@ public class World
             "#.......#",
             "#.......#####",
             "#.......#...#",
-            "#...#.......#",
+            "#...#..c....#",
             "#.......#...#",
             "#.......###.#",
             "#.......#.#.#",
@@ -189,6 +189,7 @@ public class World
 
     public void creatureDestroy(Creature c)
     {
+        setTile(c.getTilePos()[1], c.getTilePos()[0], ".");
         creatures.remove(c);
     }
 

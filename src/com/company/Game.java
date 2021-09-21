@@ -132,10 +132,13 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 case "creature" -> {
                     int size = (int) ((getSize().height) / cDists.get(indexes.get(i)));
                     Image img = creats.get(indexes.get(i)).getImg();
+
                     for (int i1 = 0; i1 < 6; i1++)
                     {
                         img.getGraphics().setColor(img.getGraphics().getColor().darker());
                     }
+
+                    creats.get(indexes.get(i)).setXPos(cXPos.get(indexes.get(i)));
 
                     g.drawImage(
                             img,
@@ -219,6 +222,10 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         if (e.getKeyCode() == 16)
         {
             Player.getInstance().sprint(true);
+        }
+        if (e.getKeyCode() == 32)
+        {
+            Player.getInstance().attack();
         }
     }
 
@@ -310,7 +317,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
 
                 for (int c = 0; c < World.getInstance().getCreatures().size(); c++)
                 {
-                    if (World.getInstance().getCreatures().get(c).distToPlayer() < 10)
+                    if (World.getInstance().getCreatures().get(c).distToPlayer() < 25)
                     {
                         World.getInstance().getCreatures().get(c).move();
                     }
