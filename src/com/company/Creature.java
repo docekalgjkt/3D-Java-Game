@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
 
-public class Creature {
+public class Creature
+{
 
     private int health;
 
@@ -14,34 +15,50 @@ public class Creature {
     private double speed = 5; // 12
 
     private Image img;
-    public Image getImg() {
+
+    public Image getImg()
+    {
         return img;
     }
 
 
-    public Creature(double x, double y, String img) {
-        this.x = x; this.y = y;
-        mapX = (int)Math.floor(x);
-        mapY = (int)Math.floor(y);
-        try {
+    public Creature(double x, double y, String img)
+    {
+        this.x = x;
+        this.y = y;
+        mapX = (int) Math.floor(x);
+        mapY = (int) Math.floor(y);
+        try
+        {
             this.img = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + ".png")));
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
         speed += new Random().nextDouble() * 2 - 1;
+        speed = 0;
     }
 
 
-    public boolean isOnTile(int x, int y) {
-        return (int)Math.floor(this.x) == x && (int)Math.floor(this.y) == y;
+    public boolean isOnTile(int x, int y)
+    {
+        return (int) Math.floor(this.x) == x && (int) Math.floor(this.y) == y;
     }
 
-    public double[] getPos() {
-        return new double[] {x, y};
+    public double[] getPos()
+    {
+        return new double[]{x, y};
     }
+
     public int mapX, mapY;
 
-    public void move() {
+    public int[] getTilePos()
+    {
+        return new int[]{mapX, mapY};
+    }
+
+    public void move()
+    {
 
         double xDif = Player.getInstance().getX() - x;
         double yDif = Player.getInstance().getY() - y;
@@ -55,47 +72,60 @@ public class Creature {
         boolean hitWallY = false;
 
         double hitBoxRange = 0.2;
-        for (int xx = 0; xx < 2; xx++) {
-            if(World.getInstance().getTile((int)Math.floor(y), (int)Math.floor(x + Math.cos((180.0 * xx) / 180.0 * Math.PI) * hitBoxRange)).equals("#")) {
-                if(Main.angleDist(angle, (180.0 * xx)) < 90) hitWallX = true;
+        for (int xx = 0; xx < 2; xx++)
+        {
+            if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x + Math.cos((180.0 * xx) / 180.0 * Math.PI) * hitBoxRange)).equals("#"))
+            {
+                if (Main.angleDist(angle, (180.0 * xx)) < 90) hitWallX = true;
             }
         }
-        for (int yy = 0; yy < 2; yy++) {
-            if(World.getInstance().getTile((int)Math.floor(y + Math.sin((90 + (180.0 * yy)) / 180.0 * Math.PI) * hitBoxRange), (int)Math.floor(x)).equals("#")) {
-                if(Main.angleDist(angle, (90 + (180.0 * yy))) < 90) hitWallY = true;
+        for (int yy = 0; yy < 2; yy++)
+        {
+            if (World.getInstance().getTile((int) Math.floor(y + Math.sin((90 + (180.0 * yy)) / 180.0 * Math.PI) * hitBoxRange), (int) Math.floor(x)).equals("#"))
+            {
+                if (Main.angleDist(angle, (90 + (180.0 * yy))) < 90) hitWallY = true;
             }
         }
 
-        for (int i = 0; i < 4; i++) {
-            if(World.getInstance().getTile((int)Math.floor(y + Math.sin((double)(45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange), (int)Math.floor(x + Math.cos((double)(45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange)).equals("#")) {
-                if(Main.angleDist(angle, 45 + (i * 90)) < 45) {
+        for (int i = 0; i < 4; i++)
+        {
+            if (World.getInstance().getTile((int) Math.floor(y + Math.sin((double) (45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange), (int) Math.floor(x + Math.cos((double) (45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange)).equals("#"))
+            {
+                if (Main.angleDist(angle, 45 + (i * 90)) < 45)
+                {
                     hitWallX = true;
                     hitWallY = true;
                 }
             }
         }
 
-        if(!hitWallX) {
+        if (!hitWallX)
+        {
             x = nextX;
         }
-        if(!hitWallY) {
+        if (!hitWallY)
+        {
             y = nextY;
         }
 
-        if((int)Math.floor(x) != mapX || (int)Math.floor(y) != mapY) {
-            World.getInstance().creatureMove(mapY, mapX, (int)Math.floor(y), (int)Math.floor(x));
-            mapX = (int)Math.floor(x);
-            mapY = (int)Math.floor(y);
+        if ((int) Math.floor(x) != mapX || (int) Math.floor(y) != mapY)
+        {
+            World.getInstance().creatureMove(mapY, mapX, (int) Math.floor(y), (int) Math.floor(x));
+            mapX = (int) Math.floor(x);
+            mapY = (int) Math.floor(y);
         }
     }
 
-    public double distToPlayer() {
+    public double distToPlayer()
+    {
         return Math.abs(x - Player.getInstance().getX()) + Math.abs(y - Player.getInstance().getY());
     }
 
-    public void getDamage(int dmg) {
+    public void getDamage(int dmg)
+    {
         health -= dmg;
-        if(health <= 0) {
+        if (health <= 0)
+        {
             World.getInstance().creatureDestroy(this);
         }
     }

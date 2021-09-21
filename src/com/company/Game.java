@@ -33,17 +33,19 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         return scale;
     }
 
-    int height = Toolkit.getDefaultToolkit().getScreenSize().height / scale;
+    int height/* = Toolkit.getDefaultToolkit().getScreenSize().height / scale*/;
 
     public Game()
     {
         if (game == null) game = this;
 
         setTitle("Program");
-        setSize(Toolkit.getDefaultToolkit().getScreenSize().width * scale, Toolkit.getDefaultToolkit().getScreenSize().height * scale);
+        setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        height = getSize().height / scale;
 
         World.getInstance().setUp();
         this.update();
@@ -60,7 +62,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
 
     public void paint(Graphics g)
     {
-        Render.getInstance().renderAccurate();
+        Render.getInstance().renderAccurate(Toolkit.getDefaultToolkit().getScreenSize().width / scale);
 
         double[] walls = Render.getInstance().getWalls();
         int[] order = Render.getInstance().getOrder();
@@ -166,13 +168,13 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
             g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
             g.drawString(
                     World.getInstance().getDynamicMap()[i],
-                    getSize().width - (World.getInstance().getDynamicMap()[0].length() * (int) (g.getFont().getSize() / 1.6)),
-                    g.getFont().getSize() + (i * (g.getFont().getSize() - 5)));
+                    getSize().width - (World.getInstance().getDynamicMap()[0].length() * (int) (g.getFont().getSize() / 1.6)) - 25,
+                    g.getFont().getSize() + (i * (g.getFont().getSize() - 3)) + 25);
         }
     }
 
     long prevTime = 0;
-    boolean minimap = false;
+    boolean minimap = true;
 
     public double getFPS()
     {

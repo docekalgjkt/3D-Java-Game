@@ -52,13 +52,20 @@ public class World
     // -X [ ] X
     //     Y
     private final String[] map = new String[]{
-            "#######",
-            "#.....#",
-            "#.....#",
-            "#..#..#",
-            "#.....#",
-            "#.....#",
-            "#######",
+            "#########....",
+            "#.......#",
+            "#.......#####",
+            "#.......#...#",
+            "#...#.......#",
+            "#.......#...#",
+            "#.......###.#",
+            "#.......#.#.#",
+            "##.########.#",
+            "#....#......#",
+            "#....#...####",
+            "#....#...#",
+            "#......###",
+            "########",
             };
 
     /*
@@ -110,6 +117,9 @@ public class World
 
     void setUp()
     {
+        /*creatures.add(new Creature(6.5, 6.5, "Beholder"));
+        creatures.add(new Creature(6.5, 5.5, "Beholder"));*/
+
         for (int y = 0; y < map.length; y++)
         {
             for (int x = 0; x < map[y].length(); x++)
@@ -118,9 +128,9 @@ public class World
                 if (getTile(y, x).equals("c"))
                 {
                     stored = false;
-                    for (Creature creature : creatures)
+                    for (int i = 0; i < creatures.size(); i++)
                     {
-                        if (creature.isOnTile(x, y))
+                        if (creatures.get(i).isOnTile(x, y))
                         {
                             stored = true;
                             break;
@@ -135,6 +145,16 @@ public class World
             }
         }
 
+        for (int i = 0; i < creatures.size(); i++)
+        {
+            System.out.println("Enemy");
+            Creature c = creatures.get(i);
+            if (!getTile(c.getTilePos()[1], c.getTilePos()[0]).equals("c") && getTile(c.getTilePos()[1], c.getTilePos()[0]).equals("."))
+            {
+                setTile(c.getTilePos()[1], c.getTilePos()[0], "c");
+            }
+        }
+
         try
         {
             wTex = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
@@ -145,7 +165,7 @@ public class World
         }
     }
 
-    private final List<Creature> creatures = new ArrayList<>(); // {{}}
+    private final List<Creature> creatures = new ArrayList<>();
 
     public List<Creature> getCreatures()
     {
@@ -180,12 +200,32 @@ public class World
         int x = (int) Math.floor(Player.getInstance().getX());
 
         StringBuilder sb = new StringBuilder(map[y]);
-        sb.replace(x, x + 1, "@");
+        String p;
+        double a = Player.getInstance().getAngle();
+
+        if (a > 315 || a <= 45)
+        {
+            p = ">";
+        }
+        else if (a > 45 && a <= 135)
+        {
+            p = "V";
+        }
+        else if (a > 135 && a <= 225)
+        {
+            p = "<";
+        }
+        else
+        {
+            p = "A";
+        }
+
+        sb.replace(x, x + 1, p);
 
         for (int i = 0; i < map.length; i++)
         {
             res[i] = (i == y) ? sb.toString() : map[i];
-            String s = res[i].replaceAll("\\.", " ").replaceAll("\\+", "=").replaceAll("#", "*");
+            String s = res[i].replaceAll("\\.", " ").replaceAll("\\+", "-").replaceAll("#", "*");
             res[i] = s;
         }
 

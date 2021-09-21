@@ -1,6 +1,5 @@
 package com.company;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +20,10 @@ public class Render
     }
 
     // endregion
-
-    private final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width / Game.getInstance().getScale();
-
-    public void renderEasy()
+/*
+    public void renderEasy(int screenWidth)
     {
+
         what = new ArrayList<>();
         indexes = new ArrayList<>();
 
@@ -262,8 +260,8 @@ public class Render
 
         this.walls = walls1;
     }
-
-    public void renderAccurate()
+*/
+    public void renderAccurate(int screenWidth)
     {
         what = new ArrayList<>();
         indexes = new ArrayList<>();
@@ -395,6 +393,68 @@ public class Render
 
                         distX = Math.abs(X / Math.cos(rayAngle));
                         distY = Math.abs(Y / Math.sin(rayAngle));
+                    }
+                }
+
+                if (!hit)
+                {
+                    // Entities
+
+                    int rayX = (int) Math.floor(curX);
+                    int rayY = (int) Math.floor(curY);
+
+                    for (int xx = -1; xx <= 1; xx++)
+                    {
+                        for (int yy = -1; yy <= 1; yy++)
+                        {
+                            if (rayY + yy < 0 || rayX + xx < 0 || rayY + yy >= World.getInstance().getMap().length || rayX + xx >= World.getInstance().getMap()[rayY + yy].length())
+                                continue;
+
+                            if (World.getInstance().getTile(rayY + yy, rayX + xx).equals("c"))
+                            {
+                                List<Creature> c = new ArrayList<>();
+                                for (int i = 0; i < World.getInstance().getCreatures().size(); i++)
+                                {
+                                    if (World.getInstance().getCreatures().get(i).isOnTile(rayX + xx, rayY + yy))
+                                    {
+                                        c.add(World.getInstance().getCreatures().get(i));
+                                    }
+                                }
+                                for (Creature creature : c)
+                                {
+                                    if (!creats.contains(creature))
+                                    {
+                                        double[] cpos = creature.getPos();
+                                        cpos[0] -= Player.getInstance().getX();
+                                        cpos[1] -= Player.getInstance().getY();
+
+                                        double angle = (Math.atan(cpos[1] / cpos[0]) * 180 / Math.PI) + ((cpos[0] < 0) ? 180 : 0);
+
+                                        if (Main.angleDist(angle, Player.getInstance().getAngle()) >= 90) continue;
+
+                                        double angleDif = (angle - Player.getInstance().getAngle());
+
+                                        int xPos = (int) Math.floor((Math.tan((fov / 2) / 180 * Math.PI) + Math.tan(angleDif / 180 * Math.PI)) * (screenWidth * Game.getInstance().getScale()) / 2);
+
+                                        double distFromPlayer = Math.abs(cpos[0] / Math.cos(angle / 180 * Math.PI));
+
+                                        int where = cDists.size();
+
+                                        for (int i1 = 0; i1 < cDists.size(); i1++)
+                                        {
+                                            if (dist > cDists.get(i1))
+                                            {
+                                                where = i1;
+                                            }
+                                        }
+
+                                        creats.add(where, creature);
+                                        cDists.add(where, distFromPlayer);
+                                        cXPos.add(where, xPos);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
