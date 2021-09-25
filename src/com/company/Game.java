@@ -26,14 +26,15 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
 
     // endregion
 
-    private final int scale = 4; // 5
+    private final int scale = 5; // 5
 
     public int getScale()
     {
         return scale;
     }
 
-    int height/* = Toolkit.getDefaultToolkit().getScreenSize().height / scale*/;
+    int height;
+    int width;
 
     public Game()
     {
@@ -46,6 +47,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         //setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         height = getSize().height / scale;
+        width = getSize().width / scale;
 
         World.getInstance().setUp();
         this.update();
@@ -62,19 +64,12 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
 
     public void paint(Graphics g)
     {
-        Render.getInstance().renderAccurate(Toolkit.getDefaultToolkit().getScreenSize().width / scale);
+        Render.getInstance().render(Toolkit.getDefaultToolkit().getScreenSize().width / scale);
 
         double[] walls = Render.getInstance().getWalls();
-        int[] order = Render.getInstance().getOrder();
-        List<String> what = Render.getInstance().getWhat();
-        List<Integer> indexes = Render.getInstance().getIndexes();
+        double[] texs = Render.getInstance().getTexs();
 
-        List<Creature> creats = Render.getInstance().getCreats();
-        List<Double> cDists = Render.getInstance().getCDists();
-        List<Integer> cXPos = Render.getInstance().getCXPos();
-
-        List<Double> wallTexCol = Render.getInstance().getWallTexCol();
-
+        // Screen Reset
         g.clearRect(0, 0, getSize().width, getSize().height);
 
         // Ceiling
@@ -89,78 +84,75 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
             g.fillRect(0, getSize().height / 2 + (offset * f), getSize().width, offset);
         }
 
-        for (int i = 0; i < what.size(); i++)
+        for (int i = 0; i < walls.length; i++)
         {
-            switch (what.get(i))
+            if (walls[i] == 0) continue;
+
+            int lineHeight = (int) (height / walls[i]);
+            //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
+            float shade = 1 - (Math.round(walls[i]) / /*10.0f*/ (float) Player.getInstance().getCamDistance());
+            shade = (shade < 0) ? 0 : shade;
+
+            int y0 = (height / 2) - (lineHeight / 2);
+            int x0 = (int) Math.floor((double) World.getInstance().getTex("#").getWidth() * texs[i]);
+
+            int p = World.getInstance().getTex("#").getHeight();
+            double h = (double) lineHeight / p;
+
+            double ratio = (p > lineHeight) ? (double) p / lineHeight : 1;
+
+            for (int w = 0; w < p / ratio; w++)
             {
-                case "wall", "door" -> {
-                    if (walls[indexes.get(i)] == 0) continue;
+                int y1 = (int) Math.floor(y0 + (h * (int) Math.floor(w * ratio + 1)));
 
-                    String texIn = "#";
-                    if ("door".equals(what.get(i)))
-                    {
-                        texIn = "+";
-                    }
+                int pixel = World.getInstance().getTex("#").getRGB(x0, (int) Math.floor(w * ratio));
+                Color color = new Color(pixel, false);
+                Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
-                    int lineHeight = (int) (height / walls[indexes.get(i)]);
-                    //float shade = 1 - ((float)walls[i] * 2 / (float) Player.getInstance().getCamDistance());
-                    float shade = 1 - (Math.round(walls[indexes.get(i)]) / /*10.0f*/ (float) Player.getInstance().getCamDistance());
+                g.setColor(shadedColor);
+                g.fillRect(i * scale, y1 * scale, scale, (int) Math.floor(h + 1) * scale);
+            }
+        }
+
+        List<Object> objects = World.getInstance().getObjects();
+        for (Object object : objects)
+        {
+            if (!object.getToRender() || object.distToPlayer() <= 0.25) continue;
+
+            int size = (int) (height / object.distToPlayerTan());
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int posX = -(size / 2) + x + (int) (object.getXPos() * width);
+                    int posY = -(size / 2) + y + (height / 2);
+
+                    if (posX < 0 || posX >= walls.length || (walls[posX] < object.distToPlayerTan() && walls[posX] != 0))
+                        continue;
+
+                    double imgW = object.getImg().getWidth() * ((double) x / size);
+                    double imgH = object.getImg().getHeight() * ((double) y / size);
+
+                    int pixel = object.getImg().getRGB((int) imgW, (int) imgH);
+                    if (pixel == 0) continue;
+
+                    float shade = 1 - (Math.round(object.distToPlayerTan()) / (float) Player.getInstance().getCamDistance());
                     shade = (shade < 0) ? 0 : shade;
 
-                    int y0 = (height / 2) - (lineHeight / 2);
-                    int x0 = (int) Math.floor((double) World.getInstance().getTex(texIn).getWidth() * wallTexCol.get(order[indexes.get(i)]));
+                    Color color = new Color(pixel, false);
+                    Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
-                    int p = World.getInstance().getTex(texIn).getHeight();
-                    double h = (double) lineHeight / p;
-
-                    double ratio = (p > lineHeight) ? (double) p / lineHeight : 1;
-
-                    for (int w = 0; w < p / ratio; w++)
-                    {
-                        int y1 = (int) Math.floor(y0 + (h * (int) Math.floor(w * ratio + 1)));
-
-                        int pixel = World.getInstance().getTex(texIn).getRGB(x0, (int) Math.floor(w * ratio));
-                        Color color = new Color(pixel, false);
-                        Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
-
-                        g.setColor(shadedColor);
-                        g.fillRect(order[indexes.get(i)] * scale, y1 * scale, scale, (int) Math.floor(h + 1) * scale);
-                    }
-                    //g.setColor(Color.getHSBColor(0, 0, shade));
-                    //g.fillRect(order[indexes.get(i)] * scale, y0 * scale, scale, lineHeight * scale);
-                }
-                case "creature" -> {
-                    int size = (int) ((getSize().height) / cDists.get(indexes.get(i)));
-                    Image img = creats.get(indexes.get(i)).getImg();
-
-                    for (int i1 = 0; i1 < 6; i1++)
-                    {
-                        img.getGraphics().setColor(img.getGraphics().getColor().darker());
-                    }
-
-                    creats.get(indexes.get(i)).setXPos(cXPos.get(indexes.get(i)));
-
-                    g.drawImage(
-                            img,
-                            cXPos.get(indexes.get(i)) - size / 2,
-                            getSize().height / 2 - size / 2,
-                            size,
-                            size,
-                            null
-                    );
+                    g.setColor(shadedColor);
+                    g.fillRect(posX * scale, posY * scale, scale, scale);
                 }
             }
         }
-/*
-        g.setColor(Color.blue);
-        g.drawString(String.valueOf(Player.getInstance().getX()), 50, 50);
-        g.drawString(String.valueOf(Player.getInstance().getY()), 100, 50);
-        g.drawString(String.valueOf(Player.getInstance().getAngle()), 50, 75);
-*/
+
         // FPS
         g.setColor(Color.green);
         g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
-        g.drawString("FPS: " + Math.floor(getFPS()), getSize().width / 2, g.getFont().getSize()/*getSize().height - g.getFont().getSize()*/);
+        g.drawString("FPS: " + Math.floor(getFPS()), getSize().width / 2, g.getFont().getSize());
         prevTime = System.currentTimeMillis();
 
         if (!minimap) return;
@@ -314,18 +306,16 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 )
                     Player.getInstance().move(dir);
 
-
-                for (int c = 0; c < World.getInstance().getCreatures().size(); c++)
+                List<Object> objects = World.getInstance().getObjects();
+                for (int o = 0; o < objects.size(); o++)
                 {
-                    if (World.getInstance().getCreatures().get(c).distToPlayer() < 25)
+                    if (objects.get(o).distToPlayer() < 25 && objects.get(o).getSpeed() != 0)
                     {
-                        World.getInstance().getCreatures().get(c).move();
+                        objects.get(o).move();
                     }
                 }
 
                 repaint();
-                //prevTime = System.currentTimeMillis();
-
             }
         }, 0, 1000 / 60);
     }

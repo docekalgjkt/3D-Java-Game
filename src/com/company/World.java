@@ -26,7 +26,7 @@ public class World
     // endregion
 
     private final String[] wallTexs = new String[]{
-            "awal"
+            "DungeonWall0"
     };
 
     private final String[] doorTexs = new String[]{
@@ -52,51 +52,23 @@ public class World
     // -X [ ] X
     //     Y
     private final String[] map = new String[]{
-            "#########....",
+            //    5    10   15
+            "#########",        // 0
             "#.......#",
             "#.......#####",
-            "#.......#...#",
-            "#...#..c....#",
-            "#.......#...#",
+            "#.......#..o#",
+            "#...#..o....#",
+            "#.......#...#",    // 5
             "#.......###.#",
-            "#.......#.#.#",
+            "#o....oo#.#.#",
             "##.########.#",
-            "#....#......#",
-            "#....#...####",
-            "#....#...#",
+            "#....#o.....#",
+            "#....#...####",    // 10
+            "#....#..o#",
             "#......###",
             "########",
-            };
-
-    /*
-
-    {
-            //    5    10   15   20   25   30   35   40
-            "##########################################", // 0
-            "#...#.......#...##....##.......###########",
-            "#...#.###.#.#......##.....#.#..###########",
-            "#.....#.#.#.....##.#####...............###",
-            "#.#######.########.#...#..#.#..##.####.###",
-            "#...#..............#...#.......#..####.###", // 5
-            "#...#...........##.##.#####.####..##.....#",
-            "#...#..#######..##...........#######..#..#",
-            "##.##..#.....#..##.#########.#.......###.#",
-            "##.##.....#.....##.####......#.#.###..#..#",
-            "#...............##.#......####.#.###.....#", // 10
-            "#.#####.#.###.####.#.##...####.#.#########",
-            "#...#...#.......##.#.#######...#.###...###",
-            "#...#...#.#..#..##.#.##...##.###.###...###",
-            "#...#####.#..#..##.#.##......##...##...###",
-            "#.........#..........##...####.....##.####", // 15
-            "##.##########.##########.####.......#.####",
-            "#..##.....#.....#.....##.#####.....##...##",
-            "#.##.......................####...###...##",
-            "#......................###....##.##.....##",
-            "#####.....#.....#.....#######.......######", // 20
-            "##########################################",
-    };//     0    5    10   15   20   25   30   35   40
-
-    */
+            //    5    10   15
+    };
 
     public String[] getMap()
     {
@@ -117,41 +89,12 @@ public class World
 
     void setUp()
     {
-        /*creatures.add(new Creature(6.5, 6.5, "Beholder"));
-        creatures.add(new Creature(6.5, 5.5, "Beholder"));*/
-
-        for (int y = 0; y < map.length; y++)
+        for (int i = 0; i < objects.size(); i++)
         {
-            for (int x = 0; x < map[y].length(); x++)
+            Object c = objects.get(i);
+            if (!getTile(c.getTilePos()[1], c.getTilePos()[0]).equals("o") && getTile(c.getTilePos()[1], c.getTilePos()[0]).equals("."))
             {
-                boolean stored = true;
-                if (getTile(y, x).equals("c"))
-                {
-                    stored = false;
-                    for (int i = 0; i < creatures.size(); i++)
-                    {
-                        if (creatures.get(i).isOnTile(x, y))
-                        {
-                            stored = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!stored)
-                {
-                    creatures.add(new Creature(x + 0.5, y + 0.5, "Beholder"));
-                }
-            }
-        }
-
-        for (int i = 0; i < creatures.size(); i++)
-        {
-            System.out.println("Enemy");
-            Creature c = creatures.get(i);
-            if (!getTile(c.getTilePos()[1], c.getTilePos()[0]).equals("c") && getTile(c.getTilePos()[1], c.getTilePos()[0]).equals("."))
-            {
-                setTile(c.getTilePos()[1], c.getTilePos()[0], "c");
+                setTile(c.getTilePos()[1], c.getTilePos()[0], "o");
             }
         }
 
@@ -165,20 +108,29 @@ public class World
         }
     }
 
-    private final List<Creature> creatures = new ArrayList<>();
-
-    public List<Creature> getCreatures()
+    private final List<Object> objects = new ArrayList<>()
     {
-        return creatures;
+        {
+            new Object(7.5, 4.5, "Beholder");
+
+            new Object(1.5, 7.5, "Barrel");
+            new Object(6.5, 7.5, "Barrel");
+            new Object(7.5, 7.5, "Barrel");
+        }
+    };
+
+    public List<Object> getObjects()
+    {
+        return objects;
     }
 
-    public void creatureMove(int y0, int x0, int y1, int x1)
+    public void objectMove(int y0, int x0, int y1, int x1)
     {
         setTile(y1, x1, "c");
         boolean canRemove = true;
-        for (Creature creature : creatures)
+        for (Object object : objects)
         {
-            if (creature.isOnTile(x0, y0))
+            if (object.isOnTile(x0, y0))
             {
                 canRemove = false;
                 break;
@@ -187,10 +139,10 @@ public class World
         if (canRemove) setTile(y0, x0, ".");
     }
 
-    public void creatureDestroy(Creature c)
+    public void objectDestroy(Object c)
     {
         setTile(c.getTilePos()[1], c.getTilePos()[0], ".");
-        creatures.remove(c);
+        objects.remove(c);
     }
 
     public String[] getDynamicMap()

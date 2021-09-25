@@ -1,7 +1,5 @@
 package com.company;
 
-import javax.naming.ldap.ExtendedRequest;
-
 public class Player
 {
 
@@ -55,7 +53,7 @@ public class Player
 
     public double getCamDistance()
     {
-        return 200.0;
+        return 10.0;
     }
 
     public void move(int a)
@@ -218,15 +216,16 @@ public class Player
 
     public void attack()
     {
-        for (Creature c : World.getInstance().getCreatures())
+        for (Object c : World.getInstance().getObjects())
         {
-            if (c.distToPlayer() <= 4.0)
+            if (c.distToPlayer() <= 10 * 10)
             {
-                int sCenter = Game.getInstance().getSize().width / 2;
+                double radius = 0.05;
 
-                if (c.getXPos() >= (sCenter - (sCenter * 0.15)) && c.getXPos() <= (sCenter + (sCenter * 0.15)))
+                if (Math.abs(c.getXPos() - 0.5) < radius)
                 {
                     c.getDamage(1);
+                    break;
                 }
             }
         }

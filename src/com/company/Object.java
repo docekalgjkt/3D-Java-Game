@@ -1,28 +1,63 @@
 package com.company;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
 
-public class Creature
+public class Object
 {
-
     private int health = 1;
 
     private double x, y;
     private double speed = 5; // 12
 
-    private Image img;
+    public double getSpeed()
+    {
+        return speed;
+    }
 
-    public Image getImg()
+    public int mapX, mapY;
+
+    public int[] getTilePos()
+    {
+        return new int[]{mapX, mapY};
+    }
+
+    private double xPos;
+
+    public double getXPos()
+    {
+        return xPos;
+    }
+
+    public void setXPos(double xPos)
+    {
+        this.xPos = xPos;
+    }
+
+    private boolean toRender;
+
+    public boolean getToRender()
+    {
+        return toRender;
+    }
+
+    public void setToRender(boolean b)
+    {
+        toRender = b;
+    }
+
+    private BufferedImage img;
+
+    public BufferedImage getImg()
     {
         return img;
     }
 
 
-    public Creature(double x, double y, String img)
+    public Object(double x, double y, String img)
     {
         this.x = x;
         this.y = y;
@@ -38,7 +73,6 @@ public class Creature
         }
 
         speed += new Random().nextDouble() * 2 - 1;
-        speed = 0;
     }
 
 
@@ -52,23 +86,6 @@ public class Creature
         return new double[]{x, y};
     }
 
-    public int mapX, mapY;
-    private int xPos;
-
-    public int getXPos()
-    {
-        return xPos;
-    }
-
-    public void setXPos(int xPos)
-    {
-        this.xPos = xPos;
-    }
-
-    public int[] getTilePos()
-    {
-        return new int[]{mapX, mapY};
-    }
 
     public void move()
     {
@@ -84,19 +101,19 @@ public class Creature
         boolean hitWallX = false;
         boolean hitWallY = false;
 
-        double hitBoxRange = 0.2;
+        double hitBoxRange = 0.5;
         for (int xx = 0; xx < 2; xx++)
         {
             if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x + Math.cos((180.0 * xx) / 180.0 * Math.PI) * hitBoxRange)).equals("#"))
             {
-                if (Main.angleDist(angle, (180.0 * xx)) < 90) hitWallX = true;
+                if (Math.abs(Main.angleDist(angle, (180.0 * xx))) < 90) hitWallX = true;
             }
         }
         for (int yy = 0; yy < 2; yy++)
         {
             if (World.getInstance().getTile((int) Math.floor(y + Math.sin((90 + (180.0 * yy)) / 180.0 * Math.PI) * hitBoxRange), (int) Math.floor(x)).equals("#"))
             {
-                if (Main.angleDist(angle, (90 + (180.0 * yy))) < 90) hitWallY = true;
+                if (Math.abs(Main.angleDist(angle, (90 + (180.0 * yy)))) < 90) hitWallY = true;
             }
         }
 
@@ -104,7 +121,7 @@ public class Creature
         {
             if (World.getInstance().getTile((int) Math.floor(y + Math.sin((double) (45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange), (int) Math.floor(x + Math.cos((double) (45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange)).equals("#"))
             {
-                if (Main.angleDist(angle, 45 + (i * 90)) < 45)
+                if (Math.abs(Main.angleDist(angle, 45 + (i * 90))) < 45)
                 {
                     hitWallX = true;
                     hitWallY = true;
@@ -123,7 +140,7 @@ public class Creature
 
         if ((int) Math.floor(x) != mapX || (int) Math.floor(y) != mapY)
         {
-            World.getInstance().creatureMove(mapY, mapX, (int) Math.floor(y), (int) Math.floor(x));
+            World.getInstance().objectMove(mapY, mapX, (int) Math.floor(y), (int) Math.floor(x));
             mapX = (int) Math.floor(x);
             mapY = (int) Math.floor(y);
         }
@@ -132,7 +149,16 @@ public class Creature
     public double distToPlayer()
     {
         return (x - Player.getInstance().getX()) * (x - Player.getInstance().getX()) + (y - Player.getInstance().getY()) * (y - Player.getInstance().getY());
-        //return Math.abs() + Math.abs(y - Player.getInstance().getY());
+    }
+
+    public double distToPlayerTan()
+    {
+        double angle = (xPos * 90) - 45;
+        double pos = Math.abs(Math.cos(angle / 180 * Math.PI));
+
+        if (xPos < 0 || xPos > 1) pos = Math.cos(45.0 / 180 * Math.PI);
+
+        return Math.sqrt(distToPlayer()) * pos;
     }
 
     public void getDamage(int dmg)
@@ -140,7 +166,7 @@ public class Creature
         health -= dmg;
         if (health <= 0)
         {
-            World.getInstance().creatureDestroy(this);
+            World.getInstance().objectDestroy(this);
         }
     }
 }
