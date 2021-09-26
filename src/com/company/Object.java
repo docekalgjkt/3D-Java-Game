@@ -3,29 +3,50 @@ package com.company;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class Object
 {
     private int health = 1;
 
     private double x, y;
-    private double speed = 5; // 12
+    private double speed; // 12
 
-    public double getSpeed()
-    {
-        return speed;
-    }
+    private double angle;
 
     public int mapX, mapY;
+
+    private double xPos;
+    private double yPos;
+
+    private boolean renderd;
+    private boolean pickable;
+    private boolean destroyable;
+    private boolean alive;
+    private boolean lit;
+
+    private BufferedImage myImage;
+
+    private BufferedImage imgDefault;
+    private BufferedImage imgDestroyed;
+    private BufferedImage imgDamaged;
+    private BufferedImage[] imgMove;
+
+    public double[] getPos()
+    {
+        return new double[]{x, y};
+    }
 
     public int[] getTilePos()
     {
         return new int[]{mapX, mapY};
     }
 
-    private double xPos;
+    public double getSpeed()
+    {
+        return speed;
+    }
 
     public double getXPos()
     {
@@ -37,42 +58,97 @@ public class Object
         this.xPos = xPos;
     }
 
-    private boolean toRender;
-
-    public boolean getToRender()
+    public double getYPos()
     {
-        return toRender;
-    }
-
-    public void setToRender(boolean b)
-    {
-        toRender = b;
-    }
-
-    private BufferedImage img;
-
-    public BufferedImage getImg()
-    {
-        return img;
+        return yPos;
     }
 
 
-    public Object(double x, double y, String img)
+    public boolean isRenderd()
+    {
+        return renderd;
+    }
+
+    public boolean isDestroyable()
+    {
+        return destroyable;
+    }
+
+    public boolean isPickable()
+    {
+        return pickable;
+    }
+
+    public boolean isDestroyed()
+    {
+        return health == 0;
+    }
+
+    public boolean isAlive()
+    {
+        return alive;
+    }
+
+    public boolean isLit()
+    {
+        return lit;
+    }
+
+
+    public BufferedImage getMyImage()
+    {
+        return myImage;
+    }
+
+
+    public void setRenderd(boolean b)
+    {
+        renderd = b;
+    }
+
+    public void setLit(boolean lit)
+    {
+        this.lit = lit;
+    }
+
+    public void setAngle(double a)
+    {
+        angle = a;
+    }
+
+    // -----
+
+    public Object(double x, double y, double yPos, double speed, boolean dest, boolean pick, boolean alive, String img)
     {
         this.x = x;
         this.y = y;
         mapX = (int) Math.floor(x);
         mapY = (int) Math.floor(y);
 
+        this.yPos = yPos;
+        destroyable = dest;
+        pickable = pick;
+        this.alive = alive;
+
         try
         {
-            this.img = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + ".png")));
+            imgDefault = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + ".png")));
+            imgDestroyed = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + "barrel_destroyed" + ".png")));
+            if (alive)
+            {
+                imgMove = new BufferedImage[2];
+                for (int i = 0; i < imgMove.length; i++)
+                {
+                    imgMove[i] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + "_move" + i + ".png")));
+                }
+            }
         } catch (IOException e)
         {
             e.printStackTrace();
         }
 
-        speed += new Random().nextDouble() * 2 - 1;
+        this.speed = speed;
+        myImage = imgDefault;
     }
 
 
@@ -81,22 +157,18 @@ public class Object
         return (int) Math.floor(this.x) == x && (int) Math.floor(this.y) == y;
     }
 
-    public double[] getPos()
+    public void walk()
     {
-        return new double[]{x, y};
-    }
-
-
-    public void move()
-    {
-
         double xDif = Player.getInstance().getX() - x;
         double yDif = Player.getInstance().getY() - y;
 
-        double angle = Math.atan(yDif / xDif) * 180 / Math.PI + ((xDif < 0) ? 180 : 0);
-
+        angle = Math.atan(yDif / xDif) * 180 / Math.PI + ((xDif < 0) ? 180 : 0);
+/*
         double nextX = Math.round((x + Math.cos(angle / 180.0 * Math.PI) * (speed / 1000.0)) * 1000) / 1000.0;
-        double nextY = Math.round((y + Math.sin(angle / 180.0 * Math.PI) * (speed / 1000.0)) * 1000) / 1000.0;
+        double nextY = Math.round((y + Math.sin(angle / 180.0 * Math.PI) * (speed / 1000.0)) * 1000) / 1000.0;*/
+
+        double nextX = x + Math.cos(angle / 180.0 * Math.PI) * (speed / (600));
+        double nextY = y + Math.cos(angle / 180.0 * Math.PI) * (speed / (600));
 
         boolean hitWallX = false;
         boolean hitWallY = false;
@@ -137,12 +209,33 @@ public class Object
         {
             y = nextY;
         }
+    }
 
-        if ((int) Math.floor(x) != mapX || (int) Math.floor(y) != mapY)
+    public void move()
+    {
+        double nextX = x + Math.cos(angle / 180.0 * Math.PI) * (speed / (600));
+        double nextY = y + Math.sin(angle / 180.0 * Math.PI) * (speed / (600));
+
+        x = nextX;
+        y = nextY;
+
+        if (World.getInstance().getTile((int) y, (int) x).equals("#"))
         {
-            World.getInstance().objectMove(mapY, mapX, (int) Math.floor(y), (int) Math.floor(x));
-            mapX = (int) Math.floor(x);
-            mapY = (int) Math.floor(y);
+            World.getInstance().destroyObject(this);
+        }
+
+        List<Object> objects = World.getInstance().getObjects();
+        for (Object o : objects)
+        {
+            if (!o.isDestroyable() || o.isDestroyed()) continue;
+
+            double dist = (x - o.getPos()[0]) * (x - o.getPos()[0]) + (y - o.getPos()[1]) * (y - o.getPos()[1]);
+            if (dist <= 0.4 * 0.4)
+            {
+                o.getDamage(1);
+                World.getInstance().destroyObject(this);
+                break;
+            }
         }
     }
 
@@ -164,9 +257,16 @@ public class Object
     public void getDamage(int dmg)
     {
         health -= dmg;
+
         if (health <= 0)
         {
-            World.getInstance().objectDestroy(this);
+            getDestroyed();
         }
+    }
+
+    private void getDestroyed()
+    {
+        health = 0;
+        myImage = imgDestroyed;
     }
 }

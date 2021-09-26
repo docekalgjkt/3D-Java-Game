@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class World
 {
@@ -26,11 +27,11 @@ public class World
     // endregion
 
     private final String[] wallTexs = new String[]{
-            "DungeonWall0"
+            "wall"
     };
 
     private final String[] doorTexs = new String[]{
-            "DungeonWall0"
+            "wall"
     };
 
     private BufferedImage wTex;
@@ -51,20 +52,20 @@ public class World
     //    -Y
     // -X [ ] X
     //     Y
-    private final String[] map = new String[]{
+    private String[] map = new String[]{
             //    5    10   15
             "#########",        // 0
             "#.......#",
             "#.......#####",
-            "#.......#..o#",
-            "#...#..o....#",
+            "#.......#...#",
+            "#...#.......#",
             "#.......#...#",    // 5
             "#.......###.#",
-            "#o....oo#.#.#",
+            "#.......#.#.#",
             "##.########.#",
-            "#....#o.....#",
+            "#....#......#",
             "#....#...####",    // 10
-            "#....#..o#",
+            "#....#...#",
             "#......###",
             "########",
             //    5    10   15
@@ -89,15 +90,46 @@ public class World
 
     void setUp()
     {
-        for (int i = 0; i < objects.size(); i++)
-        {
-            Object c = objects.get(i);
-            if (!getTile(c.getTilePos()[1], c.getTilePos()[0]).equals("o") && getTile(c.getTilePos()[1], c.getTilePos()[0]).equals("."))
-            {
-                setTile(c.getTilePos()[1], c.getTilePos()[0], "o");
-            }
-        }
+        /*map = new String[150];
 
+        for (int i = 0; i < map.length; i++)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("#");
+
+            for (int i1 = 1; i1 < map.length; i1++)
+            {
+                if (i == 0 || i == map.length - 1)
+                {
+                    sb.append("#");
+                }
+                else
+                {
+                    if (new Random().nextDouble() < 0.1)
+                    {
+                        sb.append("#");
+                    }
+                    else
+                    {
+                        sb.append(".");
+                    }
+                }
+            }
+
+            sb.append("#");
+
+            map[i] = sb.toString();
+        }*/
+
+        objects.add(new Object(7.5, 4.5, 0.5, 0, true, false, true, "wraith"));
+
+        objects.add(new Object(1.5, 7.5, 0.4, 0, true, false, false, "barrel"));
+        objects.add(new Object(6.5, 7.5, 0.4, 0, true, false, false, "barrel"));
+        objects.add(new Object(7.5, 7.5, 0.4, 0, true, false, false, "barrel"));
+        objects.add(new Object(7.5, 11.5, 0.4, 0, true, false, false, "barrel"));
+        objects.add(new Object(8.5, 11.5, 0.4, 0, true, false, false, "barrel"));
+        
         try
         {
             wTex = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
@@ -108,41 +140,22 @@ public class World
         }
     }
 
-    private final List<Object> objects = new ArrayList<>()
-    {
-        {
-            new Object(7.5, 4.5, "Beholder");
-
-            new Object(1.5, 7.5, "Barrel");
-            new Object(6.5, 7.5, "Barrel");
-            new Object(7.5, 7.5, "Barrel");
-        }
-    };
+    private final List<Object> objects = new ArrayList<>();
 
     public List<Object> getObjects()
     {
         return objects;
     }
 
-    public void objectMove(int y0, int x0, int y1, int x1)
+
+    public void createObject(Object o)
     {
-        setTile(y1, x1, "c");
-        boolean canRemove = true;
-        for (Object object : objects)
-        {
-            if (object.isOnTile(x0, y0))
-            {
-                canRemove = false;
-                break;
-            }
-        }
-        if (canRemove) setTile(y0, x0, ".");
+        objects.add(o);
     }
 
-    public void objectDestroy(Object c)
+    public void destroyObject(Object o)
     {
-        setTile(c.getTilePos()[1], c.getTilePos()[0], ".");
-        objects.remove(c);
+        objects.remove(o);
     }
 
     public String[] getDynamicMap()

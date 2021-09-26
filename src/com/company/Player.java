@@ -1,5 +1,7 @@
 package com.company;
 
+import java.util.List;
+
 public class Player
 {
 
@@ -216,15 +218,31 @@ public class Player
 
     public void attack()
     {
-        for (Object c : World.getInstance().getObjects())
+        List<Object> objects = World.getInstance().getObjects();
+
+        for (int i = 1; i < objects.size(); i++)
         {
-            if (c.distToPlayer() <= 10 * 10)
+            for (int i1 = 0; i1 < i; i1++)
+            {
+                if (objects.get(i).distToPlayer() < objects.get(i1).distToPlayer())
+                {
+                    objects.add(i1, objects.get(i));
+                    objects.remove(i + 1);
+                }
+            }
+        }
+
+        for (Object o : objects)
+        {
+            if (!o.isDestroyable() || o.isDestroyed()) continue;
+
+            if (o.distToPlayer() <= 10 * 10)
             {
                 double radius = 0.05;
 
-                if (Math.abs(c.getXPos() - 0.5) < radius)
+                if (Math.abs(o.getXPos() - 0.5) < radius)
                 {
-                    c.getDamage(1);
+                    o.getDamage(1);
                     break;
                 }
             }

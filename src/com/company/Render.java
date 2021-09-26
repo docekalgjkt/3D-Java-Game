@@ -193,14 +193,15 @@ public class Render
         List<Object> objects = World.getInstance().getObjects();
         for (Object object : objects)
         {
-            object.setToRender(false);
+            object.setRenderd(false);
 
             double[] opos = object.getPos();
             opos[0] -= Player.getInstance().getX();
             opos[1] -= Player.getInstance().getY();
 
-            double atan = ((opos[0] == 0) ? ((opos[1] > 0) ? -90 : 90) : Math.atan(opos[1] / opos[0])) * 180 / Math.PI;
-            double angle = atan + ((opos[0] < 0) ? 180 : 0);
+            double angle = ((opos[0] == 0)
+                    ? ((opos[1] > 0) ? 90 : 270)
+                    : (Math.atan(opos[1] / opos[0])) * 180 / Math.PI) + ((opos[0] < 0) ? 180 : 0);
             double angleDif = Main.angleDist(angle, Player.getInstance().getAngle());
 
             if (Math.abs(angleDif) >= fov) continue;
@@ -208,7 +209,7 @@ public class Render
             double xPos = (Math.tan(angleDif / 180 * Math.PI) + screenHalf) / (screenHalf * 2);
 
             object.setXPos(xPos);
-            object.setToRender(true);
+            object.setRenderd(true);
         }
     }
 
