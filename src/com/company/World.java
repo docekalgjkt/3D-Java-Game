@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class World
 {
@@ -122,14 +121,14 @@ public class World
             map[i] = sb.toString();
         }*/
 
-        objects.add(new Object(7.5, 4.5, 0.5, 0, true, false, true, "wraith"));
+        entities.add(new Entity(7.5, 4.5, 0.5, 5, "wraith"));
 
-        objects.add(new Object(1.5, 7.5, 0.4, 0, true, false, false, "barrel"));
-        objects.add(new Object(6.5, 7.5, 0.4, 0, true, false, false, "barrel"));
-        objects.add(new Object(7.5, 7.5, 0.4, 0, true, false, false, "barrel"));
-        objects.add(new Object(7.5, 11.5, 0.4, 0, true, false, false, "barrel"));
-        objects.add(new Object(8.5, 11.5, 0.4, 0, true, false, false, "barrel"));
-        
+        staticObjects.add(new StaticObject(1.5, 7.5, 0.4, true, "barrel"));
+        staticObjects.add(new StaticObject(6.5, 7.5, 0.4, true, "barrel"));
+        staticObjects.add(new StaticObject(7.5, 7.5, 0.4, true, "barrel"));
+        staticObjects.add(new StaticObject(7.5, 11.5, 0.4, true, "barrel"));
+        staticObjects.add(new StaticObject(8.5, 11.5, 0.4, true, "barrel"));
+
         try
         {
             wTex = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
@@ -140,23 +139,68 @@ public class World
         }
     }
 
-    private final List<Object> objects = new ArrayList<>();
+    //region Entities
 
-    public List<Object> getObjects()
+    private final List<Entity> entities = new ArrayList<>();
+
+    public List<Entity> getEntities()
     {
-        return objects;
+        return entities;
     }
 
-
-    public void createObject(Object o)
+    public void createEntity(Entity o)
     {
-        objects.add(o);
+        entities.add(o);
     }
 
-    public void destroyObject(Object o)
+    public void destroyEntity(Entity o)
     {
-        objects.remove(o);
+        entities.remove(o);
     }
+
+    //endregion
+
+    //region Static Objects
+
+    private final List<StaticObject> staticObjects = new ArrayList<>();
+
+    public List<StaticObject> getStaticObjects()
+    {
+        return staticObjects;
+    }
+
+    public void createStaticObject(StaticObject p)
+    {
+        staticObjects.add(p);
+    }
+
+    public void destroyStaticObject(StaticObject p)
+    {
+        staticObjects.remove(p);
+    }
+
+    //endregion
+
+    //region Projectiles
+
+    private final List<Projectile> projectiles = new ArrayList<>();
+
+    public List<Projectile> getProjectiles()
+    {
+        return projectiles;
+    }
+
+    public void createProjectile(Projectile p)
+    {
+        projectiles.add(p);
+    }
+
+    public void destroyProjectile(Projectile p)
+    {
+        projectiles.remove(p);
+    }
+
+    //endregion
 
     public String[] getDynamicMap()
     {

@@ -24,6 +24,7 @@ public class Player
     private double x = 1.5;
     private double y = 1.5;
     private double angle = 0;
+    private double nearClip = 0.3;
 
     private double hitbox = 0.2;
 
@@ -56,6 +57,11 @@ public class Player
     public double getCamDistance()
     {
         return 10.0;
+    }
+
+    public double getNearClip()
+    {
+        return nearClip * nearClip;
     }
 
     public void move(int a)
@@ -218,23 +224,23 @@ public class Player
 
     public void attack()
     {
-        List<Object> objects = World.getInstance().getObjects();
+        List<Entity> entities = World.getInstance().getEntities();
 
-        for (int i = 1; i < objects.size(); i++)
+        for (int i = 1; i < entities.size(); i++)
         {
             for (int i1 = 0; i1 < i; i1++)
             {
-                if (objects.get(i).distToPlayer() < objects.get(i1).distToPlayer())
+                if (entities.get(i).distToPlayer() < entities.get(i1).distToPlayer())
                 {
-                    objects.add(i1, objects.get(i));
-                    objects.remove(i + 1);
+                    entities.add(i1, entities.get(i));
+                    entities.remove(i + 1);
                 }
             }
         }
 
-        for (Object o : objects)
+        for (Entity o : entities)
         {
-            if (!o.isDestroyable() || o.isDestroyed()) continue;
+            if (o.isDead()) continue;
 
             if (o.distToPlayer() <= 10 * 10)
             {

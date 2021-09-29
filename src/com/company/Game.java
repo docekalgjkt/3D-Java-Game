@@ -45,7 +45,6 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         width = getSize().width / scale;
 
         World.getInstance().setUp();
-        frame = 0;
         this.update();
 
         BufferedImage cImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -72,19 +71,21 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         // Screen Reset
         //g.clearRect(0, 0, getSize().width, getSize().height);
 
-        // Ceiling
+        //region Ceiling
         g.setColor(Color.getHSBColor(0, 0, 0.0f)); // 0, 0, 0.1f
         g.fillRect(0, 0, getSize().width, getSize().height / 2);
+        //endregion
 
-        // Floor
+        //region Floor
         for (int f = 0; f < 10; f++)
         {
             g.setColor(Color.getHSBColor(0.08333333f, 0.4f, 0.1f * (f / 9.0f)));
             int step = (getSize().height - edgeDown * scale) / 2 / 10;
             g.fillRect(0, (getSize().height - edgeDown * scale) / 2 + (step * f), getSize().width, step);
         }
+        //endregion
 
-        // Walls
+        //region Walls
         for (int i = 0; i < walls.length; i++)
         {
             if (walls[i] == 0) continue;
@@ -146,9 +147,14 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 g.fillRect(i * scale, y1 * scale, scale, ySize);
             }
         }
+        //endregion
 
-        // Objects
-        List<Object> objects = World.getInstance().getObjects();
+        //region Objects
+        List<Object> objects = new ArrayList<>();
+
+        objects.addAll(World.getInstance().getEntities());
+        objects.addAll(World.getInstance().getStaticObjects());
+        objects.addAll(World.getInstance().getProjectiles());
 
         // Sorting objects (by distance)
         for (int i = 1; i < objects.size(); i++)
@@ -166,7 +172,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         // Rendering objects
         for (Object object : objects)
         {
-            if (!object.isRenderd() || object.distToPlayer() <= 0.04) continue;
+            if (!object.isRendered() || object.distToPlayer() <= Player.getInstance().getNearClip()) continue;
 
             int size = (int) (height / object.distToPlayerTan());
 
@@ -236,6 +242,10 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
             }
         }
 
+        //endregion
+
+        //region UI
+
         // FPS
         g.setColor(Color.green);
         g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
@@ -261,6 +271,8 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         g.fillRect(getSize().width / 2, (getSize().height - (edgeDown * scale) - 1) / 2, 2, 4);
         g.fillRect(getSize().width / 2 - 1, (getSize().height - (edgeDown * scale)) / 2, 1, 2);
         g.fillRect(getSize().width / 2 + 2, (getSize().height - (edgeDown * scale)) / 2, 1, 2);
+
+        //endregion
     }
 
     long prevTime = 0;
@@ -315,10 +327,9 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
             if (!attacked)
             {
                 attacked = true;
-                Object object = new Object(Player.getInstance().getX(), Player.getInstance().getY(), 0.5, 50, false, false, false, "fireball");
-                object.setAngle(Player.getInstance().getAngle());
-                object.setLit(true);
-                World.getInstance().createObject(object);
+                Projectile fireball = new Projectile(Player.getInstance().getX(), Player.getInstance().getY(), 0.5, 50, Player.getInstance().getAngle(), "fireball", 0);
+                fireball.setLit(true);
+                World.getInstance().createProjectile(fireball);
             }
         }
     }
@@ -387,8 +398,6 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
     boolean isRotateL = false;
     boolean isRotateR = false;
 
-    private int frame;
-
     void update()
     {
         java.util.Timer timer = new Timer();
@@ -397,8 +406,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
             @Override
             public void run()
             {
-                frame++;
-                if (frame == 60) frame = 0;
+                //region Player Control
 
                 int dir = 0;
 
@@ -419,24 +427,32 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 )
                     Player.getInstance().move(dir);
 
-                List<Object> objects = World.getInstance().getObjects();
-                for (Object object : objects)
+                //endregion
+
+                //region Objects
+
+                List<Entity> entities = World.getInstance().getEntities();
+                for (int i = 0; i < entities.size(); i++)
                 {
-                    if (object.isAlive())
+                    if (entities.get(i).isDead()) continue;
+
+                    if (entities.get(i).distToPlayer() < 25 && entities.get(i).distToPlayer() > 0.6 && entities.get(i).getSpeed() != 0)
                     {
-                        if (object.distToPlayer() < 25 && object.getSpeed() != 0)
-                        {
-                            object.walk();
-                        }
+                        entities.get(i).move();
                     }
-                    else
+                    else if (entities.get(i).isMoving())
                     {
-                        if (object.getSpeed() != 0)
-                        {
-                            object.move();
-                        }
+                        entities.get(i).stopMove();
                     }
                 }
+
+                List<Projectile> projectiles = World.getInstance().getProjectiles();
+                for (int i = 0; i < projectiles.size(); i++)
+                {
+                    projectiles.get(i).move();
+                }
+
+                //endregion
 
                 repaint();
             }

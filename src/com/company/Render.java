@@ -1,5 +1,6 @@
 package com.company;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Render
@@ -189,15 +190,21 @@ public class Render
             }
         }
 
-        // Object rendering
-        List<Object> objects = World.getInstance().getObjects();
+        // Entity rendering
+        List<Object> objects = new ArrayList<>();
+
+        objects.addAll(World.getInstance().getEntities());
+        objects.addAll(World.getInstance().getStaticObjects());
+        objects.addAll(World.getInstance().getProjectiles());
+
+
         for (Object object : objects)
         {
             object.setRenderd(false);
 
-            double[] opos = object.getPos();
-            opos[0] -= Player.getInstance().getX();
-            opos[1] -= Player.getInstance().getY();
+            double[] opos = new double[2];
+            opos[0] = object.getX() - Player.getInstance().getX();
+            opos[1] = object.getY() - Player.getInstance().getY();
 
             double angle = ((opos[0] == 0)
                     ? ((opos[1] > 0) ? 90 : 270)
