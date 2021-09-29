@@ -420,20 +420,20 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                     Player.getInstance().move(dir);
 
                 List<Object> objects = World.getInstance().getObjects();
-                for (int o = 0; o < objects.size(); o++)
+                for (Object object : objects)
                 {
-                    if (objects.get(o).isAlive())
+                    if (object.isAlive())
                     {
-                        if (objects.get(o).distToPlayer() < 25 && objects.get(o).getSpeed() != 0)
+                        if (object.distToPlayer() < 25 && object.getSpeed() != 0)
                         {
-                            objects.get(o).walk();
+                            object.walk();
                         }
                     }
                     else
                     {
-                        if (objects.get(o).getSpeed() != 0)
+                        if (object.getSpeed() != 0)
                         {
-                            objects.get(o).move();
+                            object.move();
                         }
                     }
                 }
