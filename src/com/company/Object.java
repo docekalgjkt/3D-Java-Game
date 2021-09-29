@@ -239,6 +239,11 @@ public class Object
         }
     }
 
+    public void moveAnim()
+    {
+
+    }
+
     public double distToPlayer()
     {
         return (x - Player.getInstance().getX()) * (x - Player.getInstance().getX()) + (y - Player.getInstance().getY()) * (y - Player.getInstance().getY());
