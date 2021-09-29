@@ -322,6 +322,11 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         {
             Player.getInstance().sprint(true);
         }
+        // L Control
+        if (e.getKeyCode() == 17)
+        {
+            Player.getInstance().sneak(true);
+        }
         if (e.getKeyCode() == 32)
         {
             if (!attacked)
@@ -375,6 +380,11 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         if (e.getKeyCode() == 16)
         {
             Player.getInstance().sprint(false);
+        }
+        // L Control
+        if (e.getKeyCode() == 17)
+        {
+            Player.getInstance().sneak(false);
         }
         if (e.getKeyCode() == 77)
         {

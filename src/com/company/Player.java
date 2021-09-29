@@ -28,7 +28,8 @@ public class Player
 
     private double hitbox = 0.2;
 
-    private boolean sprinting = false;
+    private boolean sprinting;
+    private boolean sneaking;
 
     public double getX()
     {
@@ -44,7 +45,9 @@ public class Player
     {
         double res = 1;
 
-        res *= (sprinting) ? 1.75 : 1;
+        res *= (sprinting)
+                ? 1.75
+                : ((sneaking) ? 0.5 : 1);
 
         return res;
     }
@@ -213,6 +216,13 @@ public class Player
     public void sprint(boolean b)
     {
         sprinting = b;
+        sneaking = false;
+    }
+
+    public void sneak(boolean b)
+    {
+        sneaking = b;
+        sprinting = false;
     }
 
     public void rotate(double dir)
@@ -225,7 +235,6 @@ public class Player
     public void attack()
     {
         List<Entity> entities = World.getInstance().getEntities();
-
         for (int i = 1; i < entities.size(); i++)
         {
             for (int i1 = 0; i1 < i; i1++)
@@ -238,17 +247,18 @@ public class Player
             }
         }
 
-        for (Entity o : entities)
+        for (int i = 0; i < entities.size(); i++)
         {
-            if (o.isDead()) continue;
+            if (entities.get(i).isDead()) continue;
 
-            if (o.distToPlayer() <= 10 * 10)
+            if (entities.get(i).distToPlayer() <= 10 * 10)
             {
                 double radius = 0.05;
 
-                if (Math.abs(o.getXPos() - 0.5) < radius)
+                // TODO: Make radius to be same at all distances
+                if (Math.abs(entities.get(i).getXPos() - 0.5) < radius)
                 {
-                    o.getDamage(1);
+                    entities.get(i).getDamage(1);
                     break;
                 }
             }

@@ -15,7 +15,7 @@ public class Projectile extends Object
 
     public Projectile(double x, double y, double yPos, double speed, double angle, String img, int animCount)
     {
-        super(x, y, yPos, img);
+        super(x + (Math.cos(angle / 180 * Math.PI) * 0.2), y + (Math.sin(angle / 180 * Math.PI) * 0.2), yPos, img);
 
         this.speed = speed;
         this.angle = angle;
