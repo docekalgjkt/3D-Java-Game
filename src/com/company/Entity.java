@@ -14,10 +14,13 @@ public class Entity extends Object
     private BufferedImage imgDead;
     private BufferedImage[] imgMove;
 
-    private int health = 4;
+    private int health;
+    private int minDmg;
+    private int maxDmg;
     private final double speed; // 12
     private final double attackSpeed;
     private final double attackRange = 0.9;
+    private String[] drops;
 
     public double getSpeed()
     {
@@ -35,18 +38,22 @@ public class Entity extends Object
     }
     // -----
 
-    public Entity(double x, double y, double size, double yPos, double hitbox, double speed, double attackSpeed, String img)
+    public Entity(String img, double x, double y, double size, double yPos, double hitbox, int health, int minDmg, int maxDmg, double speed, double attackSpeed)
     {
-        super(x, y, size, yPos, hitbox, img);
+        super(img, x, y, size, yPos, hitbox * size);
 
+        this.health = health;
+        this.minDmg = minDmg;
+        this.maxDmg = maxDmg;
         this.speed = speed;
         this.attackSpeed = attackSpeed;
+        drops = new String[0];
 
         try
         {
             imgDefault = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + ".png")));
             imgHit = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + "_hit" + ".png")));
-            imgDead = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + "barrel_destroyed" + ".png")));
+            imgDead = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + "_dead" + ".png")));
             imgMove = new BufferedImage[2];
             for (int i = 0; i < imgMove.length; i++)
             {
@@ -56,6 +63,11 @@ public class Entity extends Object
         {
             e.printStackTrace();
         }
+    }
+
+    public void setDrops(String[] strings)
+    {
+        drops = strings;
     }
 
     //region Movement
@@ -132,12 +144,12 @@ public class Entity extends Object
 
     private void attack()
     {
-        /*double a = getX() - Player.getInstance().getX();
-        double b = getY() - Player.getInstance().getY();
-        double dist = a * a + b * b;*/
         if (distToPlayer() <= attackRange * attackRange)
         {
-            Player.getInstance().getDamage(new Random().nextInt(25) + 1);
+            int dmg;
+            if (minDmg == maxDmg) dmg = minDmg;
+            else dmg = new Random().nextInt(maxDmg - minDmg + 1) + minDmg;
+            Player.getInstance().getDamage(dmg);
         }
     }
 
@@ -169,12 +181,12 @@ public class Entity extends Object
         }
         else if (isAttacking)
         {
-            if (frame == (60 * attackSpeed) - 30)
+            if (frame == (60 * attackSpeed))
             {
                 setMyImage(imgHit);
                 attack();
             }
-            else if (frame == (60 * attackSpeed))
+            else if (frame == (60 * attackSpeed) + 25)
             {
                 stopAttack();
             }
@@ -222,6 +234,16 @@ public class Entity extends Object
     private void die()
     {
         health = 0;
+        setYPos(0);
         setMyImage(imgDead);
+        for (String string : drops)
+        {
+            switch (string)
+            {
+                case "healingPotion" -> World.getInstance().createPickable(new Pickable("healingPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+                case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MAGIC));
+            }
+        }
+        //World.getInstance().destroyEntity(this);
     }
 }

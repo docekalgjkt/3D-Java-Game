@@ -27,23 +27,18 @@ public class World
     // endregion
 
     private final String[] wallTexs = new String[]{
-            "wall"
-    };
+            "wall",
+            "door",
+            };
 
-    private final String[] doorTexs = new String[]{
-            "wall"
-    };
-
-    private BufferedImage wTex;
-
-    private final BufferedImage[] dTexs = new BufferedImage[1];
+    private BufferedImage[] wTexs = new BufferedImage[2];
 
     public BufferedImage getTex(String s)
     {
         return switch (s)
                 {
-                    case "#" -> wTex;
-                    case "+" -> dTexs[0];
+                    case "#" -> wTexs[0];
+                    case "-" -> wTexs[1];
                     default -> null;
                 };
 
@@ -54,32 +49,35 @@ public class World
     //     Y
     private String[] map = new String[]{
             //    5    10   15
-            "#########",        // 0
-            "#.......#",
-            "#.......#####",
+            "#############",    // 0
+            "#########...#",
             "#.......#...#",
-            "#...#.......#",
-            "#.......#...#",    // 5
-            "#.......###.#",
+            "#.......##-##",
+            "#.......#...#",
+            "#...#.......#",    // 5
+            "#.......#...#",
+            "#.......###-#",
             "#.......#.#.#",
-            "##.########.#",
-            "#....#......#",
-            "#....#...####",    // 10
-            "#....#......#",
+            "##-########.#",
+            "#....#......#",    // 10
+            "#....#...####",
+            "#....#...-..#",
             "#......####.#",
             "###########.#",
-            "#...#.#.....#",
-            "#...###.....#",    // 15
-            "#...........#",
-            "#.#####.....#",
+            "#...#.#.....#",    // 15
             "#...###.....#",
-            "#.....#######",
-            "#...#.#.....#",    // 20
-            "##.##.#.....#",
-            "#...#.......#",
+            "#....-......#",
+            "#.#####.....#",
             "#...#.#.....#",
-            "##.####.....#",
-            "#############",    // 25
+            "#.....#########",    // 20
+            "#...#.##.....##",
+            "##-##.#.......#",
+            "#...#.#.......#",
+            "#...#.-.......#",
+            "#...###.......#",    // 25
+            "##.#..#.......#",
+            "###...##.....##",
+            "###############",
             //    5    10   15
     };
 
@@ -145,24 +143,92 @@ public class World
             betterMap[i] = map[i].replaceAll("#", "*").replaceAll("\\.", " ");
         }
 
-        entities.add(new Entity(/*       */7.5, 4.5, 1, 0, 0.25, 7.5, 1.5, "wraith"));
-        entities.add(new Entity(/*       */9.5, 16.5, 1, 0, 0.25, 7.5, 1.5, "wraith"));
-        entities.add(new Entity(/*       */9.5, 18.5, 1, 0, 0.25, 7.5, 1.5, "wraith"));
+        entities.add(new Entity("wraith", 7.5, 5.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+        entities.add(new Entity("wraith", 2.5, 5.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+        entities.add(new Entity("wraith", 2.5, 8.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+        entities.add(new Entity("wraith", 3.5, 2.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
 
-        staticObjects.add(new StaticObject(1.5, 7.5, 1, 0, 0.35, true, "barrel"));
-        staticObjects.add(new StaticObject(6.5, 7.5, 1, 0, 0.35, true, "barrel"));
-        staticObjects.add(new StaticObject(7.5, 7.5, 1, 0, 0.35, true, "barrel"));
-        staticObjects.add(new StaticObject(7.5, 11.5, 1, 0, 0.35, true, "barrel"));
-        staticObjects.add(new StaticObject(8.5, 11.5, 1, 0, 0.35, true, "barrel"));
+        entities.add(new Entity("wraith", 8.5, 12.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
 
-        pickables.add(new Pickable(/*    */9.5, 3.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL, "healingPotion"));
-        pickables.add(new Pickable(/*    */10.5, 3.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL, "healingPotion"));
-        pickables.add(new Pickable(/*    */11.5, 3.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL, "healingPotion"));
+        entities.add(new Entity("wraith", 9.5, 17.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+        entities.add(new Entity("wraith", 9.5, 19.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+
+        entities.add(new Entity("wraith", 1.5, 16.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+
+        entities.add(new Entity("wraith", 3.5, 12.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+        entities.add(new Entity("wraith", 1.5, 13.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+
+        entities.add(new Entity("wraith", 4.5, 20.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+        entities.add(new Entity("wraith", 1.5, 21.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+
+        entities.add(new Entity("wraith", 2.5, 24.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
+
+        entities.add(new Entity("wraith", 13.5, 24.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
+        entities.add(new Entity("wraith", 10.5, 21.5, 1, 0.5, 0.25, 4, 3, 3, 25, 0.5));
+        entities.add(new Entity("wraith", 10.5, 27.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
+
+        for (int i = 0; i < entities.size(); i++)
+        {
+            entities.get(i).setDrops(new String[]{"magicPotion"});
+        }
+
+        // Boss
+        entities.add(new Entity("wraith", 10.5, 24.5, 2, 0, 0.25, 12, 10, 10, 15, 0.4));
+
+        staticObjects.add(new StaticObject("barrel", 1.5, 2.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 2.5, 2.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 1.5, 3.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 1.5, 8.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 6.5, 8.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 7.5, 8.5, 1, 0, 0.35, true));
+
+        staticObjects.add(new StaticObject("barrel", 5.5, 5.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 4.5, 4.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 4.5, 6.5, 1, 0, 0.35, true));
+
+        staticObjects.add(new StaticObject("barrel", 7.5, 12.5, 1, 0, 0.35, true));
+
+        staticObjects.add(new StaticObject("barrel", 7.5, 15.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 8.5, 15.5, 1, 0, 0.35, true));
+        
+        staticObjects.add(new StaticObject("barrel", 1.5, 15.5, 1, 0, 0.35, true));
+
+        staticObjects.add(new StaticObject("barrel", 10.5, 19.5, 1, 0, 0.35, true));
+        staticObjects.add(new StaticObject("barrel", 11.5, 19.5, 1, 0, 0.35, true));
+
+        staticObjects.add(new StaticObject("barrel", 3.5, 25.5, 1, 0, 0.35, true));
+
+        for (int i = 0; i < staticObjects.size(); i++)
+        {
+            staticObjects.get(i).setDrops(new String[]{(new Random().nextInt(2) == 0) ? "healingPotion" : "magicPotion"});
+        }
+
+        pickables.add(new Pickable("healingPotion", 4.5, 10.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+        pickables.add(new Pickable("healingPotion", 3.5, 5.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+        pickables.add(new Pickable("healingPotion", 6.5, 10.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+        pickables.add(new Pickable("healingPotion", 3.5, 15.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+        pickables.add(new Pickable("healingPotion", 5.5, 19.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+
+        interactBlocks.add(new InteractBlock(10, 3, InteractBlock.Effect.OPEN, new java.lang.Object[]{10, 3}));
+        interactBlocks.add(new InteractBlock(2, 9, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 9}));
+        interactBlocks.add(new InteractBlock(11, 7, InteractBlock.Effect.OPEN, new java.lang.Object[]{11, 7}));
+        interactBlocks.add(new InteractBlock(9, 12, InteractBlock.Effect.OPEN, new java.lang.Object[]{9, 12}));
+        interactBlocks.add(new InteractBlock(5, 17, InteractBlock.Effect.OPEN, new java.lang.Object[]{5, 17}));
+        interactBlocks.add(new InteractBlock(2, 22, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 22}));
+        interactBlocks.add(new InteractBlock(6, 24, InteractBlock.Effect.OPEN, new java.lang.Object[]{6, 24}));
+
+        // Secret
+        interactBlocks.add(new InteractBlock(2, 27, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 27}));
+
+        pickables.add(new Pickable("healingPotion", 4.5, 27.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+        pickables.add(new Pickable("healingPotion", 5.5, 27.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+        pickables.add(new Pickable("healingPotion", 4.5, 26.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+        pickables.add(new Pickable("healingPotion", 5.5, 26.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
 
         try
         {
-            wTex = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
-            dTexs[0] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + doorTexs[0] + ".png")));
+            wTexs[0] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
+            wTexs[1] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[1] + ".png")));
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -176,6 +242,16 @@ public class World
     public List<Entity> getEntities()
     {
         return entities;
+    }
+
+    public void createEntity(Entity e)
+    {
+        entities.add(e);
+    }
+
+    public void destroyEntity(Entity e)
+    {
+        entities.remove(e);
     }
 
     //endregion
@@ -229,6 +305,17 @@ public class World
     public void destroyPickable(Pickable p)
     {
         pickables.remove(p);
+    }
+
+    //endregion
+
+    //region InteractBlock
+
+    private final List<InteractBlock> interactBlocks = new ArrayList<>();
+
+    public List<InteractBlock> getDoors()
+    {
+        return interactBlocks;
     }
 
     //endregion

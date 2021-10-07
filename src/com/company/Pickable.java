@@ -4,14 +4,14 @@ public class Pickable extends Object
 {
     public enum Bonus
     {
-        HEAL
+        HEAL, MAGIC
     }
 
     private Bonus bonus;
 
-    public Pickable(double x, double y, double size, double yPos, double hitbox, Bonus bonus, String img)
+    public Pickable(String img, double x, double y, double size, double yPos, double hitbox, Bonus bonus)
     {
-        super(x, y, size, yPos, hitbox, img);
+        super(img, x, y, size, yPos, hitbox);
 
         this.bonus = bonus;
     }
@@ -21,7 +21,11 @@ public class Pickable extends Object
         switch (bonus)
         {
             case HEAL -> {
-                if (Player.getInstance().getHealthPercent() < 1) Player.getInstance().getHeal(10);
+                if (Player.getInstance().getHealthPercent() < 1) Player.getInstance().getHeal(2);
+                else return;
+            }
+            case MAGIC -> {
+                if (Player.getInstance().getMagicPercent() < 1) Player.getInstance().getMagic(10);
                 else return;
             }
         }

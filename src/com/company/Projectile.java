@@ -20,9 +20,9 @@ public class Projectile extends Object
         power = p;
     }
 
-    public Projectile(double x, double y, double size, double yPos, double hitbox, double speed, double angle, String img, int animCount)
+    public Projectile(String img, double x, double y, double size, double yPos, double hitbox, double speed, double angle, int animCount)
     {
-        super(x + (Math.cos(angle / 180 * Math.PI) * 0.2), y + (Math.sin(angle / 180 * Math.PI) * 0.2), size, yPos, hitbox, img);
+        super(img, x + (Math.cos(angle / 180 * Math.PI) * 0.2), y + (Math.sin(angle / 180 * Math.PI) * 0.2), size, yPos, hitbox);
 
         this.speed = speed;
         this.angle = angle;
@@ -68,7 +68,7 @@ public class Projectile extends Object
             double hitbox = Math.sqrt((getHitbox() + entity.getHitbox()) * (getHitbox() + entity.getHitbox()));
             if (dist <= hitbox)
             {
-                entity.getDamage(new Random().nextInt(power) + 1);
+                entity.getDamage(power);
                 World.getInstance().destroyProjectile(this);
                 return;
             }
@@ -83,7 +83,7 @@ public class Projectile extends Object
             double hitbox = Math.sqrt((getHitbox() + staticObject.getHitbox()) * (getHitbox() + staticObject.getHitbox()));
             if (dist <= hitbox)
             {
-                staticObject.getDamage(new Random().nextInt(power) + 1);
+                staticObject.getDamage(power);
                 World.getInstance().destroyProjectile(this);
                 return;
             }

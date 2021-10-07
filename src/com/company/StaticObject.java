@@ -9,7 +9,7 @@ public class StaticObject extends Object
 {
     private int health;
     private final boolean destroyable;
-
+    private String[] drops;
 
     public boolean isDestroyed()
     {
@@ -23,12 +23,13 @@ public class StaticObject extends Object
 
     private BufferedImage imgDestroyed;
 
-    public StaticObject(double x, double y, double size, double yPos, double hitbox, boolean destroyable, String img)
+    public StaticObject(String img, double x, double y, double size, double yPos, double hitbox, boolean destroyable)
     {
-        super(x, y, size, yPos, hitbox, img);
+        super(img, x, y, size, yPos, hitbox);
 
         health = 1;
         this.destroyable = destroyable;
+        drops = new String[0];
 
         try
         {
@@ -37,6 +38,11 @@ public class StaticObject extends Object
         {
             e.printStackTrace();
         }
+    }
+
+    public void setDrops(String[] strings)
+    {
+        drops = strings;
     }
 
     public void getDamage(int d)
@@ -53,5 +59,13 @@ public class StaticObject extends Object
     {
         health = 0;
         setMyImage(imgDestroyed);
+        for (String string : drops)
+        {
+            switch (string)
+            {
+                case "healingPotion" -> World.getInstance().createPickable(new Pickable("healingPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+                case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MAGIC));
+            }
+        }
     }
 }

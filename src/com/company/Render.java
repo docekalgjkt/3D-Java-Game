@@ -25,6 +25,7 @@ public class Render
     {
         walls = new double[screenWidth];
         texs = new double[screenWidth];
+        what = new String[screenWidth];
 
         double fov = 90;
 
@@ -69,6 +70,8 @@ public class Render
 
             boolean hit = false;
 
+            what[x] = "#";
+
             // Ray cycle
             while (!hit && (distX <= Player.getInstance().getCamDistance() || distY <= Player.getInstance().getCamDistance()))
             {
@@ -83,11 +86,13 @@ public class Render
                     if (curY < 0 || curX < 0 || curY >= World.getInstance().getMap().length || curX >= World.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
+                        what[x] = "#";
                     }
                     // Checks if the ray hit a wall
-                    else if (World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0)).equals("#"))
+                    else if (!World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0)).equals("."))
                     {
                         hit = true;
+                        what[x] = World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0));
                     }
                     // Ray didn't hit a wall, so we send him to next X pos :D
                     else
@@ -106,11 +111,13 @@ public class Render
                     if (curY < 0 || curX < 0 || curY >= World.getInstance().getMap().length || curX >= World.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
+                        what[x] = "#";
                     }
                     // Checks if the ray hit a wall
-                    else if (World.getInstance().getTile((int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curX)).equals("#"))
+                    else if (!World.getInstance().getTile((int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curX)).equals("."))
                     {
                         hit = true;
+                        what[x] = World.getInstance().getTile((int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curX));
                     }
                     // Ray didn't hit a wall, so we send him to next Y pos :D
                     else
@@ -129,14 +136,27 @@ public class Render
                     if (curY < 0 || curX < 0 || curY >= World.getInstance().getMap().length || curX >= World.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
+                        what[x] = "#";
                     }
-                    else if (World.getInstance().getTile((int) Math.floor(curY)/*  */, (int) Math.floor(curX)/**/).equals("#")
-                            || World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX)/**/).equals("#")
-                            || World.getInstance().getTile((int) Math.floor(curY)/**/, (int) Math.floor(curX) - 1).equals("#")
-                            || World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX) - 1).equals("#")
-                    )
+                    else if (!World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX)).equals("."))
                     {
                         hit = true;
+                        what[x] = World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX));
+                    }
+                    else if (!World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX)).equals("."))
+                    {
+                        hit = true;
+                        what[x] = World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX));
+                    }
+                    else if (!World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) - 1).equals("."))
+                    {
+                        hit = true;
+                        what[x] = World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) - 1);
+                    }
+                    else if (!World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX) - 1).equals("."))
+                    {
+                        hit = true;
+                        what[x] = World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX) - 1);
                     }
                     else
                     {
@@ -211,7 +231,8 @@ public class Render
                     : (Math.atan(opos[1] / opos[0])) * 180 / Math.PI) + ((opos[0] < 0) ? 180 : 0);
             double angleDif = Main.angleDist(angle, Player.getInstance().getAngle());
 
-            if (Math.abs(angleDif) >= fov) continue;
+            if (Math.abs(angleDif) >= fov || object.distToPlayer() > Player.getInstance().getCamDistance() * Player.getInstance().getCamDistance())
+                continue;
 
             double xPos = (Math.tan(angleDif / 180 * Math.PI) + screenHalf) / (screenHalf * 2);
 
@@ -222,6 +243,7 @@ public class Render
 
     private double[] walls;
     private double[] texs;
+    private String[] what;
 
     public double[] getWalls()
     {
@@ -231,5 +253,10 @@ public class Render
     public double[] getTexs()
     {
         return texs;
+    }
+
+    public String[] getWhat()
+    {
+        return what;
     }
 }

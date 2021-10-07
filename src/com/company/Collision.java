@@ -38,19 +38,19 @@ public class Collision
         {
             boolean onlyCorner = true;
 
-            if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x) + 1).equals("#"))
+            if (!World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x) + 1).equals("."))
             {
                 nextX -= hitbox - xr;
                 onlyCorner = false;
                 result = true;
             }
-            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
+            if (yr < hitbox && !World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("."))
             {
                 nextY -= hitbox - yr;
                 onlyCorner = false;
                 result = true;
             }
-            else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
+            else if (yl < hitbox && !World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("."))
             {
                 nextY += hitbox - yl;
                 onlyCorner = false;
@@ -59,7 +59,7 @@ public class Collision
 
             if (onlyCorner)
             {
-                if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x) + 1).equals("#"))
+                if (yr < hitbox && !World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x) + 1).equals("."))
                 {
                     if (xr > yr)
                     {
@@ -76,7 +76,7 @@ public class Collision
                     }
                     result = true;
                 }
-                else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x) + 1).equals("#"))
+                else if (yl < hitbox && !World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x) + 1).equals("."))
                 {
                     if (xr > yl)
                     {
@@ -99,19 +99,19 @@ public class Collision
         {
             boolean onlyCorner = true;
 
-            if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x) - 1).equals("#"))
+            if (!World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x) - 1).equals("."))
             {
                 nextX += hitbox - xl;
                 onlyCorner = false;
                 result = true;
             }
-            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
+            if (yr < hitbox && !World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("."))
             {
                 nextY -= hitbox - yr;
                 onlyCorner = false;
                 result = true;
             }
-            else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
+            else if (yl < hitbox && !World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("."))
             {
                 nextY += hitbox - yl;
                 onlyCorner = false;
@@ -120,7 +120,7 @@ public class Collision
 
             if (onlyCorner)
             {
-                if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x) - 1).equals("#"))
+                if (yr < hitbox && !World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x) - 1).equals("."))
                 {
                     if (xl > yr)
                     {
@@ -137,7 +137,7 @@ public class Collision
                     }
                     result = true;
                 }
-                else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x) - 1).equals("#"))
+                else if (yl < hitbox && !World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x) - 1).equals("."))
                 {
                     if (xl > yl)
                     {
@@ -158,12 +158,12 @@ public class Collision
         }
         else
         {
-            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
+            if (yr < hitbox && !World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("."))
             {
                 nextY -= hitbox - yr;
                 result = true;
             }
-            if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
+            if (yl < hitbox && !World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("."))
             {
                 nextY += hitbox - yl;
                 result = true;

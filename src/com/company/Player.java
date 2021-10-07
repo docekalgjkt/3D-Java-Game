@@ -1,6 +1,7 @@
 package com.company;
 
 import java.util.List;
+import java.util.Random;
 
 public class Player
 {
@@ -20,17 +21,26 @@ public class Player
 
     // endregion
 
-    private int health = 100;
-    private int healthMax = 100;
-    private int magic = 100;
-    private int magicMax = 100;
-    private double x = 1.5;
+    private int health = 15;
+    private int healthMax = 15;
+    private int magic = 50;
+    private int magicMax = 50;
+    private int healthRegen = 0;
+    private int healthRegenFrame;
+    private int healthRegenTick = 90;
+    private int magicRegen = 1;
+    private int magicRegenFrame;
+    private int magicRegenTick = 6;
+    private int magicCost = 20;
+    private double speed = 30.0;
+    private double x = 10.5;
     private double y = 1.5;
     private double angle = 0;
     private double nearClip = 0.3;
     private double hitbox = 0.2;
     private boolean sprinting;
     private boolean sneaking;
+
 
     public double getHealthPercent()
     {
@@ -81,9 +91,8 @@ public class Player
 
     public void move(int a)
     {
-        double speed = 30.0;
-        double nextX = x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / (600));
-        double nextY = y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / (600));
+        double nextX = x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed/* * modSpeed()*/ / (600));
+        double nextY = y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed/* * modSpeed()*/ / (600));
 
         x = nextX;
         y = nextY;
@@ -130,29 +139,31 @@ public class Player
         else if (angle < 0) angle += 360;
     }
 
-    int healthRegenFrame;
+    public void place(double x, double y)
+    {
+        this.x = x;
+        this.y = y;
+    }
 
     public void healthRegen()
     {
         if (health == healthMax) return;
         healthRegenFrame++;
-        if (healthRegenFrame == 90)
+        if (healthRegenFrame == healthRegenTick)
         {
             healthRegenFrame = 0;
-            health++;
+            getHeal(healthRegen);
         }
     }
-
-    int magicRegenFrame;
 
     public void magicRegen()
     {
         if (magic == magicMax) return;
         magicRegenFrame++;
-        if (magicRegenFrame == 5)
+        if (magicRegenFrame == magicRegenTick)
         {
             magicRegenFrame = 0;
-            magic++;
+            getMagic(magicRegen);
         }
     }
 
@@ -189,16 +200,31 @@ public class Player
         }
     }
 
-    int magicCost = 30;
-
     public void castFireball()
     {
         if (magic < magicCost) return;
-        Projectile fireball = new Projectile(Player.getInstance().getX(), Player.getInstance().getY(), 1, 1.0 / 16, 0.05, 50, Player.getInstance().getAngle(), "fireball", 0);
+        Projectile fireball = new Projectile("fireball", Player.getInstance().getX(), Player.getInstance().getY(), 1, 1.0 / 16, 0.05, 50, Player.getInstance().getAngle(), 0);
         fireball.setLit(true);
         fireball.setPower(2);
         World.getInstance().createProjectile(fireball);
         magic -= magicCost;
+    }
+
+    public void interact()
+    {
+        // Interact Blocks
+        int nextX = (int) (x + (Math.cos(angle * Math.PI / 180) * 0.7));
+        int nextY = (int) (y + (Math.sin(angle * Math.PI / 180) * 0.7));
+        List<InteractBlock> interactBlocks = World.getInstance().getDoors();
+        for (int i = 0; i < interactBlocks.size(); i++)
+        {
+            if (interactBlocks.get(i).getX() == nextX && interactBlocks.get(i).getY() == nextY)
+            {
+                interactBlocks.get(i).interact();
+                System.out.println("INTERACT");
+                break;
+            }
+        }
     }
 
     public void getHeal(int h)
@@ -206,6 +232,15 @@ public class Player
         health += h;
         if (health > healthMax)
             health = healthMax;
+    }
+
+    public void getMagic(int m)
+    {
+        magic += m;
+        if (magic > magicMax)
+        {
+            magic = magicMax;
+        }
     }
 
     public void getDamage(int dmg)

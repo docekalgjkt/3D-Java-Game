@@ -41,6 +41,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         //setSize(1500, 500);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
+        //setExtendedState(MAXIMIZED_BOTH);
 
         view = new RenderPanel();
         view.setPreferredSize(new Dimension(getSize().width, getSize().height));
@@ -77,6 +78,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
 
             double[] walls = Render.getInstance().getWalls();
             double[] texs = Render.getInstance().getTexs();
+            String[] what = Render.getInstance().getWhat();
 
             g.setColor(new Color(40, 40, 40));
             g.fillRect(0, 0, width * scale, height * scale);
@@ -109,9 +111,9 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 shade = (shade < 0) ? 0 : shade;
 
                 int y0 = (height / 2) - (lineHeight / 2);
-                int x0 = (int) Math.floor((double) World.getInstance().getTex("#").getWidth() * texs[i]);
+                int x0 = (int) Math.floor((double) World.getInstance().getTex(what[i]).getWidth() * texs[i]);
 
-                int p = World.getInstance().getTex("#").getHeight();
+                int p = World.getInstance().getTex(what[i]).getHeight();
                 double h = (double) lineHeight / p;
 
                 double ratio = (p > lineHeight) ? (double) p / lineHeight : 1;
@@ -152,7 +154,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                         ySize = ((height - edgeDown) * scale) - (y1 * scale) - 1;
                     }
 
-                    int pixel = World.getInstance().getTex("#").getRGB(x0, (int) Math.floor(w * ratio));
+                    int pixel = World.getInstance().getTex(what[i]).getRGB(x0, (int) Math.floor(w * ratio));
                     Color color = new Color(pixel, false);
                     Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
@@ -422,11 +424,15 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         }
         if (e.getKeyCode() == 27)
         {
-            //dispose();
+            dispose();
         }
         if (e.getKeyCode() == 32)
         {
             attacked = false;
+        }
+        if (e.getKeyCode() == 69)
+        {
+            Player.getInstance().interact();
         }
     }
 
@@ -446,6 +452,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
             @Override
             public void run()
             {
+
                 Player.getInstance().healthRegen();
                 Player.getInstance().magicRegen();
 
@@ -453,8 +460,8 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
 
                 int dir = 0;
 
-                if (isRotateL) Player.getInstance().rotate(-1);
-                if (isRotateR) Player.getInstance().rotate(1);
+                if (isRotateL) Player.getInstance().rotate(-0.9);
+                if (isRotateR) Player.getInstance().rotate(0.9);
 
                 if (isMoveB) dir = 180;
                 if (isMoveL) dir = 270;
@@ -479,7 +486,10 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 {
                     if (entities.get(i).isDead()) continue;
 
-                    if (entities.get(i).distToPlayer() < 25 && entities.get(i).distToPlayer() > 0.75 * 0.75 && entities.get(i).getSpeed() != 0)
+                    if (entities.get(i).distToPlayer() < 6 * 6
+                            && entities.get(i).distToPlayer() > 0.75 * 0.75
+                            && entities.get(i).getSpeed() != 0
+                            && entities.get(i).isRendered())
                     {
                         entities.get(i).move();
                     }

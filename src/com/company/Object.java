@@ -89,6 +89,11 @@ public class Object
         this.xPos = xPos;
     }
 
+    public void setYPos(double yPos)
+    {
+        this.yPos = yPos;
+    }
+
     public void setLit(boolean lit)
     {
         this.lit = lit;
@@ -100,7 +105,7 @@ public class Object
     }
 
 
-    public Object(double x, double y, double size, double yPos, double hitbox, String img)
+    public Object(String img, double x, double y, double size, double yPos, double hitbox)
     {
         this.x = x;
         this.y = y;
