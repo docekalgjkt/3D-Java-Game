@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class World
 {
@@ -64,9 +65,21 @@ public class World
             "##.########.#",
             "#....#......#",
             "#....#...####",    // 10
-            "#....#...#",
-            "#......###",
-            "########",
+            "#....#......#",
+            "#......####.#",
+            "###########.#",
+            "#...#.#.....#",
+            "#...###.....#",    // 15
+            "#...........#",
+            "#.#####.....#",
+            "#...###.....#",
+            "#.....#######",
+            "#...#.#.....#",    // 20
+            "##.##.#.....#",
+            "#...#.......#",
+            "#...#.#.....#",
+            "##.####.....#",
+            "#############",    // 25
             //    5    10   15
     };
 
@@ -74,6 +87,8 @@ public class World
     {
         return map;
     }
+
+    private String[] betterMap;
 
     public String getTile(int y, int x)
     {
@@ -89,7 +104,8 @@ public class World
 
     void setUp()
     {
-        /*map = new String[150];
+        /*
+        map = new String[150];
 
         for (int i = 0; i < map.length; i++)
         {
@@ -119,15 +135,29 @@ public class World
             sb.append("#");
 
             map[i] = sb.toString();
-        }*/
+        }
 
-        entities.add(new Entity(7.5, 4.5, 0.5, 5, "wraith"));
+        */
 
-        staticObjects.add(new StaticObject(1.5, 7.5, 0.4, true, "barrel"));
-        staticObjects.add(new StaticObject(6.5, 7.5, 0.4, true, "barrel"));
-        staticObjects.add(new StaticObject(7.5, 7.5, 0.4, true, "barrel"));
-        staticObjects.add(new StaticObject(7.5, 11.5, 0.4, true, "barrel"));
-        staticObjects.add(new StaticObject(8.5, 11.5, 0.4, true, "barrel"));
+        betterMap = new String[map.length];
+        for (int i = 0; i < map.length; i++)
+        {
+            betterMap[i] = map[i].replaceAll("#", "*").replaceAll("\\.", " ");
+        }
+
+        entities.add(new Entity(/*       */7.5, 4.5, 1, 0, 0.25, 7.5, 1.5, "wraith"));
+        entities.add(new Entity(/*       */9.5, 16.5, 1, 0, 0.25, 7.5, 1.5, "wraith"));
+        entities.add(new Entity(/*       */9.5, 18.5, 1, 0, 0.25, 7.5, 1.5, "wraith"));
+
+        staticObjects.add(new StaticObject(1.5, 7.5, 1, 0, 0.35, true, "barrel"));
+        staticObjects.add(new StaticObject(6.5, 7.5, 1, 0, 0.35, true, "barrel"));
+        staticObjects.add(new StaticObject(7.5, 7.5, 1, 0, 0.35, true, "barrel"));
+        staticObjects.add(new StaticObject(7.5, 11.5, 1, 0, 0.35, true, "barrel"));
+        staticObjects.add(new StaticObject(8.5, 11.5, 1, 0, 0.35, true, "barrel"));
+
+        pickables.add(new Pickable(/*    */9.5, 3.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL, "healingPotion"));
+        pickables.add(new Pickable(/*    */10.5, 3.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL, "healingPotion"));
+        pickables.add(new Pickable(/*    */11.5, 3.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL, "healingPotion"));
 
         try
         {
@@ -148,16 +178,6 @@ public class World
         return entities;
     }
 
-    public void createEntity(Entity o)
-    {
-        entities.add(o);
-    }
-
-    public void destroyEntity(Entity o)
-    {
-        entities.remove(o);
-    }
-
     //endregion
 
     //region Static Objects
@@ -167,16 +187,6 @@ public class World
     public List<StaticObject> getStaticObjects()
     {
         return staticObjects;
-    }
-
-    public void createStaticObject(StaticObject p)
-    {
-        staticObjects.add(p);
-    }
-
-    public void destroyStaticObject(StaticObject p)
-    {
-        staticObjects.remove(p);
     }
 
     //endregion
@@ -202,14 +212,35 @@ public class World
 
     //endregion
 
+    //region Pickables
+
+    private final List<Pickable> pickables = new ArrayList<>();
+
+    public List<Pickable> getPickables()
+    {
+        return pickables;
+    }
+
+    public void createPickable(Pickable p)
+    {
+        pickables.add(p);
+    }
+
+    public void destroyPickable(Pickable p)
+    {
+        pickables.remove(p);
+    }
+
+    //endregion
+
     public String[] getDynamicMap()
     {
-        String[] res = new String[map.length];
+        String[] res = new String[betterMap.length];
 
         int y = (int) Math.floor(Player.getInstance().getY());
         int x = (int) Math.floor(Player.getInstance().getX());
 
-        StringBuilder sb = new StringBuilder(map[y]);
+        StringBuilder sb = new StringBuilder(betterMap[y]);
         String p;
         double a = Player.getInstance().getAngle();
 
@@ -232,11 +263,11 @@ public class World
 
         sb.replace(x, x + 1, p);
 
-        for (int i = 0; i < map.length; i++)
+        for (int i = 0; i < betterMap.length; i++)
         {
-            res[i] = (i == y) ? sb.toString() : map[i];
-            String s = res[i].replaceAll("\\.", " ").replaceAll("\\+", "-").replaceAll("#", "*");
-            res[i] = s;
+            res[i] = (i == y) ? sb.toString() : betterMap[i];
+            //String s = res[i].replaceAll("\\.", " ").replaceAll("\\+", "-").replaceAll("#", "*");
+            //res[i] = s;
         }
 
         return res;

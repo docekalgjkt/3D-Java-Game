@@ -8,11 +8,10 @@ import java.util.Objects;
 public class Object
 {
     private double x, y;
-
-    private int mapX, mapY;
-
     private double xPos, yPos;
-
+    private double hitbox;
+    private double size;
+    private int mapX, mapY;
     private boolean rendered;
     private boolean lit;
 
@@ -40,14 +39,19 @@ public class Object
         return y;
     }
 
-    public void setX(double x)
+    public double getSize()
     {
-        this.x = x;
+        return size;
     }
 
-    public void setY(double y)
+    public boolean isLit()
     {
-        this.y = y;
+        return lit;
+    }
+
+    public boolean isRendered()
+    {
+        return rendered;
     }
 
     public int[] getTilePos()
@@ -65,6 +69,21 @@ public class Object
         return yPos;
     }
 
+    public double getHitbox()
+    {
+        return hitbox;
+    }
+
+    public void setX(double x)
+    {
+        this.x = x;
+    }
+
+    public void setY(double y)
+    {
+        this.y = y;
+    }
+
     public void setXPos(double xPos)
     {
         this.xPos = xPos;
@@ -75,25 +94,20 @@ public class Object
         this.lit = lit;
     }
 
-    public boolean isLit()
-    {
-        return lit;
-    }
-
     public void setRenderd(boolean b)
     {
         rendered = b;
     }
 
-    public boolean isRendered()
-    {
-        return rendered;
-    }
 
-    public Object(double x, double y, double yPos, String img)
+    public Object(double x, double y, double size, double yPos, double hitbox, String img)
     {
         this.x = x;
         this.y = y;
+
+        this.size = size;
+
+        this.hitbox = hitbox;
 
         mapX = (int) Math.floor(x);
         mapY = (int) Math.floor(y);

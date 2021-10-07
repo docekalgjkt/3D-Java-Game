@@ -4,20 +4,29 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Random;
 
 public class Entity extends Object
 {
-    private int health = 1;
-
-    private final double speed; // 12
-
     private BufferedImage imgDefault;
+    private BufferedImage imgAttack;
+    private BufferedImage imgHit;
     private BufferedImage imgDead;
     private BufferedImage[] imgMove;
+
+    private int health = 4;
+    private final double speed; // 12
+    private final double attackSpeed;
+    private final double attackRange = 0.9;
 
     public double getSpeed()
     {
         return speed;
+    }
+
+    public double getAttackRange()
+    {
+        return attackRange;
     }
 
     public boolean isDead()
@@ -26,15 +35,17 @@ public class Entity extends Object
     }
     // -----
 
-    public Entity(double x, double y, double yPos, double speed, String img)
+    public Entity(double x, double y, double size, double yPos, double hitbox, double speed, double attackSpeed, String img)
     {
-        super(x, y, yPos, img);
+        super(x, y, size, yPos, hitbox, img);
 
         this.speed = speed;
+        this.attackSpeed = attackSpeed;
 
         try
         {
             imgDefault = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + ".png")));
+            imgHit = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + "_hit" + ".png")));
             imgDead = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + "barrel_destroyed" + ".png")));
             imgMove = new BufferedImage[2];
             for (int i = 0; i < imgMove.length; i++)
@@ -47,9 +58,18 @@ public class Entity extends Object
         }
     }
 
+    //region Movement
+
+    private int moveImg;
+
     public void move()
     {
-        if (!isMoving) isMoving = true;
+        if (isBeingHit || isAttacking) return;
+        if (!isMoving)
+        {
+            animsOff();
+            isMoving = true;
+        }
 
         double x = getX();
         double y = getY();
@@ -65,75 +85,132 @@ public class Entity extends Object
         double nextX = x + Math.cos(angle / 180.0 * Math.PI) * (speed / (600));
         double nextY = y + Math.sin(angle / 180.0 * Math.PI) * (speed / (600));
 
-        boolean hitWallX = false;
-        boolean hitWallY = false;
+        setX(nextX);
+        setY(nextY);
 
-        double hitBoxRange = 0.5;
-        for (int xx = 0; xx < 2; xx++)
+        if (Collision.hitWall(getX(), getY(), getHitbox()))
         {
-            if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x + Math.cos((180.0 * xx) / 180.0 * Math.PI) * hitBoxRange)).equals("#"))
-            {
-                if (Math.abs(Main.angleDist(angle, (180.0 * xx))) < 90) hitWallX = true;
-            }
+            if (getX() != Collision.getNextX()) setX(Collision.getNextX());
+            if (getY() != Collision.getNextY()) setY(Collision.getNextY());
         }
-        for (int yy = 0; yy < 2; yy++)
+        if (Collision.hitObject(getX(), getY(), getHitbox()))
         {
-            if (World.getInstance().getTile((int) Math.floor(y + Math.sin((90 + (180.0 * yy)) / 180.0 * Math.PI) * hitBoxRange), (int) Math.floor(x)).equals("#"))
-            {
-                if (Math.abs(Main.angleDist(angle, (90 + (180.0 * yy)))) < 90) hitWallY = true;
-            }
+            if (getX() != Collision.getNextX()) setX(Collision.getNextX());
+            if (getY() != Collision.getNextY()) setY(Collision.getNextY());
         }
-
-        for (int i = 0; i < 4; i++)
-        {
-            if (World.getInstance().getTile((int) Math.floor(y + Math.sin((double) (45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange), (int) Math.floor(x + Math.cos((double) (45 + (i * 90)) / 180.0 * Math.PI) * hitBoxRange)).equals("#"))
-            {
-                if (Math.abs(Main.angleDist(angle, 45 + (i * 90))) < 45)
-                {
-                    hitWallX = true;
-                    hitWallY = true;
-                }
-            }
-        }
-
-        if (!hitWallX) x = nextX;
-        if (!hitWallY) y = nextY;
-
-        setX(x);
-        setY(y);
-
-        moveAnim();
     }
-
-    private boolean isMoving;
-    private int moveFrame;
-    private int moveImg;
 
     public boolean isMoving()
     {
         return isMoving;
     }
 
-    private void moveAnim()
-    {
-        moveFrame++;
-        if (moveFrame % 30 == 0)
-        {
-            moveFrame = 0;
-            moveImg = (moveImg == 0) ? 1 : 0;
-            setMyImage(imgMove[moveImg]);
-        }
-    }
-
     public void stopMove()
     {
-        moveFrame = 0;
+        frame = 0;
         isMoving = false;
         setMyImage(imgDefault);
     }
 
+    //endregion
+
+    //region Attacking
+
+    public boolean isAttacking()
+    {
+        return isAttacking;
+    }
+
+    public void startAttack()
+    {
+        if (!isAttacking && !isBeingHit)
+        {
+            animsOff();
+            isAttacking = true;
+        }
+    }
+
+    private void attack()
+    {
+        /*double a = getX() - Player.getInstance().getX();
+        double b = getY() - Player.getInstance().getY();
+        double dist = a * a + b * b;*/
+        if (distToPlayer() <= attackRange * attackRange)
+        {
+            Player.getInstance().getDamage(new Random().nextInt(25) + 1);
+        }
+    }
+
+    public void stopAttack()
+    {
+        frame = 0;
+        isAttacking = false;
+        setMyImage(imgDefault);
+    }
+
+    //endregion
+
+    private boolean isMoving;
+    private boolean isAttacking;
+    private boolean isBeingHit;
+
+    private int frame;
+
+    public void anim()
+    {
+        if (isMoving)
+        {
+            if (frame == 30)
+            {
+                frame = 0;
+                moveImg = (moveImg == 0) ? 1 : 0;
+                setMyImage(imgMove[moveImg]);
+            }
+        }
+        else if (isAttacking)
+        {
+            if (frame == (60 * attackSpeed) - 30)
+            {
+                setMyImage(imgHit);
+                attack();
+            }
+            else if (frame == (60 * attackSpeed))
+            {
+                stopAttack();
+            }
+        }
+        else if (isBeingHit)
+        {
+            if (frame == 12)
+            {
+                frame = 0;
+                isBeingHit = false;
+                setMyImage(imgDefault);
+            }
+        }
+        else
+        {
+            frame = 0;
+            return;
+        }
+
+        frame++;
+    }
+
+    private void animsOff()
+    {
+        isMoving = false;
+        isAttacking = false;
+        isBeingHit = false;
+    }
+
     public void getDamage(int dmg)
     {
+        setMyImage(imgHit);
+        animsOff();
+        frame = 0;
+        isBeingHit = true;
+
         health -= dmg;
 
         if (health <= 0)

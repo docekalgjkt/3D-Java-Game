@@ -20,16 +20,27 @@ public class Player
 
     // endregion
 
-
+    private int health = 100;
+    private int healthMax = 100;
+    private int magic = 100;
+    private int magicMax = 100;
     private double x = 1.5;
     private double y = 1.5;
     private double angle = 0;
     private double nearClip = 0.3;
-
     private double hitbox = 0.2;
-
     private boolean sprinting;
     private boolean sneaking;
+
+    public double getHealthPercent()
+    {
+        return (double) health / healthMax;
+    }
+
+    public double getMagicPercent()
+    {
+        return (double) magic / magicMax;
+    }
 
     public double getX()
     {
@@ -67,148 +78,35 @@ public class Player
         return nearClip * nearClip;
     }
 
+
     public void move(int a)
     {
         double speed = 30.0;
-
         double nextX = x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / (600));
-        //double nextX = Math.round((x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
-        //double nextY = Math.round((y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / 1000.0)) * 1000) / 1000.0;
         double nextY = y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed * modSpeed() / (600));
-
 
         x = nextX;
         y = nextY;
 
-        // Box Hitbox Calculation
-
-        double xr = Math.floor(x + 1) - x;
-        double xl = x - Math.floor(x);
-
-        double yr = Math.floor(y + 1) - y;
-        double yl = y - Math.floor(y);
-
-        if (xr < hitbox)
+        if (Collision.hitWall(x, y, hitbox))
         {
-            boolean onlyCorner = true;
-
-            if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x) + 1).equals("#"))
-            {
-                x -= hitbox - xr;
-                onlyCorner = false;
-            }
-            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
-            {
-                y -= hitbox - yr;
-                onlyCorner = false;
-            }
-            else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
-            {
-                y += hitbox - yl;
-                onlyCorner = false;
-            }
-
-            if (onlyCorner)
-            {
-                if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x) + 1).equals("#"))
-                {
-                    if (xr > yr)
-                    {
-                        x -= hitbox - xr;
-                    }
-                    else if (xr < yr)
-                    {
-                        y -= hitbox - yr;
-                    }
-                    else
-                    {
-                        x -= hitbox - xr;
-                        y -= hitbox - yr;
-                    }
-                }
-                else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x) + 1).equals("#"))
-                {
-                    if (xr > yl)
-                    {
-                        x -= hitbox - xr;
-                    }
-                    else if (xr < yl)
-                    {
-                        y += hitbox - yl;
-                    }
-                    else
-                    {
-                        x -= hitbox - xr;
-                        y += hitbox - yl;
-                    }
-                }
-            }
+            if (x != Collision.getNextX()) x = Collision.getNextX();
+            if (y != Collision.getNextY()) y = Collision.getNextY();
         }
-        else if (xl < hitbox)
+        if (Collision.hitObject(x, y, hitbox))
         {
-            boolean onlyCorner = true;
-
-            if (World.getInstance().getTile((int) Math.floor(y), (int) Math.floor(x) - 1).equals("#"))
-            {
-                x += hitbox - xl;
-                onlyCorner = false;
-            }
-            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
-            {
-                y -= hitbox - yr;
-                onlyCorner = false;
-            }
-            else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
-            {
-                y += hitbox - yl;
-                onlyCorner = false;
-            }
-
-            if (onlyCorner)
-            {
-                if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x) - 1).equals("#"))
-                {
-                    if (xl > yr)
-                    {
-                        x += hitbox - xl;
-                    }
-                    else if (xl < yr)
-                    {
-                        y -= hitbox - yr;
-                    }
-                    else
-                    {
-                        x += hitbox - xl;
-                        y -= hitbox - yr;
-                    }
-                }
-                else if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x) - 1).equals("#"))
-                {
-                    if (xl > yl)
-                    {
-                        x += hitbox - xl;
-                    }
-                    else if (xl < yl)
-                    {
-                        y += hitbox - yl;
-                    }
-                    else
-                    {
-                        x += hitbox - xl;
-                        y += hitbox - yl;
-                    }
-                }
-            }
+            if (x != Collision.getNextX()) x = Collision.getNextX();
+            if (y != Collision.getNextY()) y = Collision.getNextY();
         }
-        else
+
+        if (Collision.hitPickable(x, y, hitbox))
         {
-            if (yr < hitbox && World.getInstance().getTile((int) Math.floor(y) + 1, (int) Math.floor(x)).equals("#"))
+            if (Collision.hitPickables.size() > 0)
             {
-                y -= hitbox - yr;
-            }
-            if (yl < hitbox && World.getInstance().getTile((int) Math.floor(y) - 1, (int) Math.floor(x)).equals("#"))
-            {
-                y += hitbox - yl;
+                for (int i = Collision.hitPickables.size() - 1; i >= 0; i--)
+                {
+                    Collision.hitPickables.get(i).pick();
+                }
             }
         }
     }
@@ -230,6 +128,32 @@ public class Player
         angle += 2.5 * dir;
         if (angle >= 360) angle -= 360;
         else if (angle < 0) angle += 360;
+    }
+
+    int healthRegenFrame;
+
+    public void healthRegen()
+    {
+        if (health == healthMax) return;
+        healthRegenFrame++;
+        if (healthRegenFrame == 90)
+        {
+            healthRegenFrame = 0;
+            health++;
+        }
+    }
+
+    int magicRegenFrame;
+
+    public void magicRegen()
+    {
+        if (magic == magicMax) return;
+        magicRegenFrame++;
+        if (magicRegenFrame == 5)
+        {
+            magicRegenFrame = 0;
+            magic++;
+        }
     }
 
     public void attack()
@@ -263,5 +187,41 @@ public class Player
                 }
             }
         }
+    }
+
+    int magicCost = 30;
+
+    public void castFireball()
+    {
+        if (magic < magicCost) return;
+        Projectile fireball = new Projectile(Player.getInstance().getX(), Player.getInstance().getY(), 1, 1.0 / 16, 0.05, 50, Player.getInstance().getAngle(), "fireball", 0);
+        fireball.setLit(true);
+        fireball.setPower(2);
+        World.getInstance().createProjectile(fireball);
+        magic -= magicCost;
+    }
+
+    public void getHeal(int h)
+    {
+        health += h;
+        if (health > healthMax)
+            health = healthMax;
+    }
+
+    public void getDamage(int dmg)
+    {
+        health -= dmg;
+        System.out.println("Ouch, -" + dmg + " health");
+
+        if (health <= 0)
+        {
+            die();
+        }
+    }
+
+    private void die()
+    {
+        health = 0;
+        System.out.println("You died!");
     }
 }

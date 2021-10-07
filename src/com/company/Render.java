@@ -190,13 +190,13 @@ public class Render
             }
         }
 
-        // Entity rendering
+        // Object rendering
         List<Object> objects = new ArrayList<>();
 
         objects.addAll(World.getInstance().getEntities());
         objects.addAll(World.getInstance().getStaticObjects());
         objects.addAll(World.getInstance().getProjectiles());
-
+        objects.addAll(World.getInstance().getPickables());
 
         for (Object object : objects)
         {

@@ -5,17 +5,24 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class Projectile extends Object
 {
+    private BufferedImage[] imgAnim;
+
+    private int power;
     private double speed;
     private double angle;
 
-    private BufferedImage[] imgAnim;
-
-    public Projectile(double x, double y, double yPos, double speed, double angle, String img, int animCount)
+    public void setPower(int p)
     {
-        super(x + (Math.cos(angle / 180 * Math.PI) * 0.2), y + (Math.sin(angle / 180 * Math.PI) * 0.2), yPos, img);
+        power = p;
+    }
+
+    public Projectile(double x, double y, double size, double yPos, double hitbox, double speed, double angle, String img, int animCount)
+    {
+        super(x + (Math.cos(angle / 180 * Math.PI) * 0.2), y + (Math.sin(angle / 180 * Math.PI) * 0.2), size, yPos, hitbox, img);
 
         this.speed = speed;
         this.angle = angle;
@@ -57,10 +64,11 @@ public class Projectile extends Object
         {
             if (entity.isDead()) continue;
 
-            double dist = (x - entity.getX()) * (x - entity.getX()) + (y - entity.getY()) * (y - entity.getY());
-            if (dist <= 0.4 * 0.4)
+            double dist = Math.sqrt((x - entity.getX()) * (x - entity.getX()) + (y - entity.getY()) * (y - entity.getY()));
+            double hitbox = Math.sqrt((getHitbox() + entity.getHitbox()) * (getHitbox() + entity.getHitbox()));
+            if (dist <= hitbox)
             {
-                entity.getDamage(1);
+                entity.getDamage(new Random().nextInt(power) + 1);
                 World.getInstance().destroyProjectile(this);
                 return;
             }
@@ -71,13 +79,19 @@ public class Projectile extends Object
         {
             if (!staticObject.isDestroyable() || staticObject.isDestroyed()) continue;
 
-            double dist = (x - staticObject.getX()) * (x - staticObject.getX()) + (y - staticObject.getY()) * (y - staticObject.getY());
-            if (dist <= 0.4 * 0.4)
+            double dist = Math.sqrt((x - staticObject.getX()) * (x - staticObject.getX()) + (y - staticObject.getY()) * (y - staticObject.getY()));
+            double hitbox = Math.sqrt((getHitbox() + staticObject.getHitbox()) * (getHitbox() + staticObject.getHitbox()));
+            if (dist <= hitbox)
             {
-                staticObject.getDamage(1);
+                staticObject.getDamage(new Random().nextInt(power) + 1);
                 World.getInstance().destroyProjectile(this);
                 return;
             }
+        }
+
+        if (Collision.hitWall(x, y, getHitbox()))
+        {
+            World.getInstance().destroyProjectile(this);
         }
     }
 }

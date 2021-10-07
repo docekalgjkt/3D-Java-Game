@@ -8,7 +8,6 @@ import java.util.Objects;
 public class StaticObject extends Object
 {
     private int health;
-
     private final boolean destroyable;
 
 
@@ -24,9 +23,9 @@ public class StaticObject extends Object
 
     private BufferedImage imgDestroyed;
 
-    public StaticObject(double x, double y, double yPos, boolean destroyable, String img)
+    public StaticObject(double x, double y, double size, double yPos, double hitbox, boolean destroyable, String img)
     {
-        super(x, y, yPos, img);
+        super(x, y, size, yPos, hitbox, img);
 
         health = 1;
         this.destroyable = destroyable;
