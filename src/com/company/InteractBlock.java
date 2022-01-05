@@ -4,7 +4,7 @@ public class InteractBlock
 {
     public enum Effect
     {
-        MOVE, OPEN
+        MOVE, OPEN, WALL
     }
 
     private Effect effect;
@@ -38,6 +38,7 @@ public class InteractBlock
         {
             case MOVE -> Player.getInstance().place((double) params[0], (double) params[1]);
             case OPEN -> World.getInstance().setTile((int) params[1], (int) params[0], ".");
+            case WALL -> World.getInstance().setTile((int) params[1], (int) params[0], "#");
         }
     }
 }

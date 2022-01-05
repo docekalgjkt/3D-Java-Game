@@ -87,6 +87,7 @@ public class Render
                     {
                         hit = true;
                         what[x] = "#";
+                        break;
                     }
                     // Checks if the ray hit a wall
                     else if (!World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0)).equals("."))
@@ -95,7 +96,6 @@ public class Render
                         what[x] = World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0));
                     }
                     // Ray didn't hit a wall, so we send him to next X pos :D
-                    else
                     {
                         X += stepX;
 
@@ -205,7 +205,8 @@ public class Render
             }
             else
             {
-                walls[x] = 0.0;
+                walls[x] = Player.getInstance().getCamDistance();
+                what[x] = "#";
                 texs[x] = 0.0;
             }
         }

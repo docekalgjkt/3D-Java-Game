@@ -31,20 +31,33 @@ public class Player
     private int magicRegen = 1;
     private int magicRegenFrame;
     private int magicRegenTick = 6;
-    private int magicCost = 20;
+    private int magicCost = 15;
     private double speed = 30.0;
-    private double x = 10.5;
-    private double y = 1.5;
+    private double x;
+    private double y;
     private double angle = 0;
+    private int angleY = 0;
+    private int yRotLimit = Game.getInstance().getScreenHeight() / 2;
     private double nearClip = 0.3;
     private double hitbox = 0.2;
     private boolean sprinting;
     private boolean sneaking;
 
+    // -----
 
     public double getHealthPercent()
     {
         return (double) health / healthMax;
+    }
+
+    public int getHealth()
+    {
+        return health;
+    }
+
+    public int getHealthMax()
+    {
+        return healthMax;
     }
 
     public double getMagicPercent()
@@ -78,6 +91,11 @@ public class Player
         return angle;
     }
 
+    public int getAngleY()
+    {
+        return angleY;
+    }
+
     public double getCamDistance()
     {
         return 10.0;
@@ -88,6 +106,14 @@ public class Player
         return nearClip * nearClip;
     }
 
+    // -----
+
+    public void setHealth(int h)
+    {
+        health = h;
+    }
+
+    // -----
 
     public void move(int a)
     {
@@ -137,6 +163,13 @@ public class Player
         angle += 2.5 * dir;
         if (angle >= 360) angle -= 360;
         else if (angle < 0) angle += 360;
+    }
+
+    public void rotateY(double dir)
+    {
+        angleY -= dir;
+        if (angleY > yRotLimit) angleY = yRotLimit;
+        else if (angleY < -yRotLimit) angleY = -yRotLimit;
     }
 
     public void place(double x, double y)
@@ -203,7 +236,7 @@ public class Player
     public void castFireball()
     {
         if (magic < magicCost) return;
-        Projectile fireball = new Projectile("fireball", Player.getInstance().getX(), Player.getInstance().getY(), 1, 1.0 / 16, 0.05, 50, Player.getInstance().getAngle(), 0);
+        Projectile fireball = new Projectile("fireball", Player.getInstance().getX(), Player.getInstance().getY(), 1, 1.0 / 16, 0.05, 50, angle, 0);
         fireball.setLit(true);
         fireball.setPower(2);
         World.getInstance().createProjectile(fireball);
@@ -221,8 +254,6 @@ public class Player
             if (interactBlocks.get(i).getX() == nextX && interactBlocks.get(i).getY() == nextY)
             {
                 interactBlocks.get(i).interact();
-                System.out.println("INTERACT");
-                break;
             }
         }
     }
@@ -257,6 +288,7 @@ public class Player
     private void die()
     {
         health = 0;
+        World.getInstance().reset();
         System.out.println("You died!");
     }
 }

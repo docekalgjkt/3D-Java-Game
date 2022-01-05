@@ -47,39 +47,40 @@ public class World
     //    -Y
     // -X [ ] X
     //     Y
-    private String[] map = new String[]{
-            //    5    10   15
-            "#############",    // 0
-            "#########...#",
-            "#.......#...#",
-            "#.......##-##",
-            "#.......#...#",
-            "#...#.......#",    // 5
-            "#.......#...#",
-            "#.......###-#",
-            "#.......#.#.#",
-            "##-########.#",
-            "#....#......#",    // 10
-            "#....#...####",
-            "#....#...-..#",
-            "#......####.#",
-            "###########.#",
-            "#...#.#.....#",    // 15
-            "#...###.....#",
-            "#....-......#",
-            "#.#####.....#",
-            "#...#.#.....#",
-            "#.....#########",    // 20
-            "#...#.##.....##",
-            "##-##.#.......#",
-            "#...#.#.......#",
-            "#...#.-.......#",
-            "#...###.......#",    // 25
-            "##.#..#.......#",
-            "###...##.....##",
-            "###############",
-            //    5    10   15
-    };
+
+    private String[] map = new String[]
+            {//    5    10   15
+             "#############.......",    // 0
+             "#########...#",
+             "#.......#...#",
+             "#.......##-##",
+             "#.......#...#",
+             "#...#.......#",    // 5
+             "#.......#...#",
+             "#.......###-#",
+             "#.......#.#.#",
+             "##-########.#",
+             "#....#......#",    // 10
+             "#....#...####",
+             "#....#...-..#",
+             "#......####.#",
+             "###########.#",
+             "#...#.#.....#",    // 15
+             "#...###.....#",
+             "#....-......#",
+             "#.#####.....#",
+             "#...#.#.....#",
+             "#.....##############",    // 20
+             "#...#.#######.....##",
+             "##-##.######.......#",
+             "#...#.######.......#",
+             "#...#.-............#",
+             "#...########.......#",    // 25
+             "##.#..######.......#",
+             "###...#######.....##",
+             "####################",
+             //    5    10   15
+            };
 
     public String[] getMap()
     {
@@ -102,7 +103,7 @@ public class World
 
     void setUp()
     {
-        /*
+/*
         map = new String[150];
 
         for (int i = 0; i < map.length; i++)
@@ -163,9 +164,9 @@ public class World
 
         entities.add(new Entity("wraith", 2.5, 24.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
 
-        entities.add(new Entity("wraith", 13.5, 24.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
-        entities.add(new Entity("wraith", 10.5, 21.5, 1, 0.5, 0.25, 4, 3, 3, 25, 0.5));
-        entities.add(new Entity("wraith", 10.5, 27.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
+        entities.add(new Entity("wraith", 18.5, 24.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
+        entities.add(new Entity("wraith", 15.5, 21.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
+        entities.add(new Entity("wraith", 15.5, 27.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
 
         for (int i = 0; i < entities.size(); i++)
         {
@@ -173,7 +174,7 @@ public class World
         }
 
         // Boss
-        entities.add(new Entity("wraith", 10.5, 24.5, 2, 0, 0.25, 12, 10, 10, 15, 0.4));
+        entities.add(new Entity("wraith", 15.5, 24.5, 1.5, 0, 0.25, 12, 10, 10, 15, 0.4));
 
         staticObjects.add(new StaticObject("barrel", 1.5, 2.5, 1, 0, 0.35, true));
         staticObjects.add(new StaticObject("barrel", 2.5, 2.5, 1, 0, 0.35, true));
@@ -190,7 +191,7 @@ public class World
 
         staticObjects.add(new StaticObject("barrel", 7.5, 15.5, 1, 0, 0.35, true));
         staticObjects.add(new StaticObject("barrel", 8.5, 15.5, 1, 0, 0.35, true));
-        
+
         staticObjects.add(new StaticObject("barrel", 1.5, 15.5, 1, 0, 0.35, true));
 
         staticObjects.add(new StaticObject("barrel", 10.5, 19.5, 1, 0, 0.35, true));
@@ -200,7 +201,16 @@ public class World
 
         for (int i = 0; i < staticObjects.size(); i++)
         {
-            staticObjects.get(i).setDrops(new String[]{(new Random().nextInt(2) == 0) ? "healingPotion" : "magicPotion"});
+            int r = new Random().nextInt(4);
+
+            if (r == 0)
+            {
+                staticObjects.get(i).setDrops(new String[]{"healingPotion"});
+            }
+            else if (r == 1)
+            {
+                staticObjects.get(i).setDrops(new String[]{"magicPotion"});
+            }
         }
 
         pickables.add(new Pickable("healingPotion", 4.5, 10.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
@@ -216,6 +226,7 @@ public class World
         interactBlocks.add(new InteractBlock(5, 17, InteractBlock.Effect.OPEN, new java.lang.Object[]{5, 17}));
         interactBlocks.add(new InteractBlock(2, 22, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 22}));
         interactBlocks.add(new InteractBlock(6, 24, InteractBlock.Effect.OPEN, new java.lang.Object[]{6, 24}));
+        interactBlocks.add(new InteractBlock(6, 24, InteractBlock.Effect.WALL, new java.lang.Object[]{5, 22}));
 
         // Secret
         interactBlocks.add(new InteractBlock(2, 27, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 27}));
@@ -233,11 +244,26 @@ public class World
         {
             e.printStackTrace();
         }
+
+        Player.getInstance().place(10.5, 2);
+    }
+
+    public void reset()
+    {
+        entities = new ArrayList<>();
+        staticObjects = new ArrayList<>();
+        projectiles = new ArrayList<>();
+        pickables = new ArrayList<>();
+        interactBlocks = new ArrayList<>();
+
+        Player.getInstance().setHealth(Player.getInstance().getHealthMax());
+
+        setUp();
     }
 
     //region Entities
 
-    private final List<Entity> entities = new ArrayList<>();
+    private List<Entity> entities = new ArrayList<>();
 
     public List<Entity> getEntities()
     {
@@ -258,7 +284,7 @@ public class World
 
     //region Static Objects
 
-    private final List<StaticObject> staticObjects = new ArrayList<>();
+    private List<StaticObject> staticObjects = new ArrayList<>();
 
     public List<StaticObject> getStaticObjects()
     {
@@ -269,7 +295,7 @@ public class World
 
     //region Projectiles
 
-    private final List<Projectile> projectiles = new ArrayList<>();
+    private List<Projectile> projectiles = new ArrayList<>();
 
     public List<Projectile> getProjectiles()
     {
@@ -290,7 +316,7 @@ public class World
 
     //region Pickables
 
-    private final List<Pickable> pickables = new ArrayList<>();
+    private List<Pickable> pickables = new ArrayList<>();
 
     public List<Pickable> getPickables()
     {
@@ -311,7 +337,7 @@ public class World
 
     //region InteractBlock
 
-    private final List<InteractBlock> interactBlocks = new ArrayList<>();
+    private List<InteractBlock> interactBlocks = new ArrayList<>();
 
     public List<InteractBlock> getDoors()
     {
