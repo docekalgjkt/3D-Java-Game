@@ -1,4 +1,4 @@
-package com.company;
+package com.cesak;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -6,8 +6,13 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * Třída definující jednotlivá živá (pohybující se) stvoření
+ */
 public class Entity extends Object
 {
+
+    // Obrázky k jednotlivým stavům
     private BufferedImage imgDefault;
     private BufferedImage imgAttack;
     private BufferedImage imgHit;

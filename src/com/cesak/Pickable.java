@@ -1,4 +1,4 @@
-package com.company;
+package com.cesak;
 
 public class Pickable extends Object
 {
@@ -25,7 +25,7 @@ public class Pickable extends Object
                 else return;
             }
             case MAGIC -> {
-                if (Player.getInstance().getMagicPercent() < 1) Player.getInstance().getMagic(10);
+                if (Player.getInstance().getMagicPercent() < 1) Player.getInstance().getMana(10);
                 else return;
             }
         }

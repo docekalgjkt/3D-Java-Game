@@ -1,4 +1,4 @@
-package com.company;
+package com.cesak;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.List;
 import java.util.Timer;
 
-public class Game extends JFrame implements KeyListener, MouseMotionListener
+public class Game extends JFrame implements KeyListener
 {
     // region Singleton
 
@@ -25,7 +25,8 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
 
     // endregion
 
-    private final int scale = 1; // 5
+    // hodnota, která mění rozlišení vykresleného obrázku podle vzorce: Resolution / scale
+    private final int scale = 2; // 5
 
     private int height;
     private int width;
@@ -42,8 +43,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         if (game == null) game = this;
 
         setTitle("Program");
-        //setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
-        setSize(800, 800);
+        setSize(1250, 800);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         //setUndecorated(true);
         //setExtendedState(MAXIMIZED_BOTH);
@@ -52,7 +52,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         view.setPreferredSize(new Dimension(getSize().width, getSize().height));
         add(view);
 
-        height = view.getPreferredSize().height / scale;
+        height = view.getPreferredSize().height / scale - ((isUndecorated()) ? 0 : 18);
         width = view.getPreferredSize().width / scale;
 
         World.getInstance().setUp();
@@ -63,11 +63,13 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
         getContentPane().setCursor(cursor);
 
         addKeyListener(this);
-        addMouseMotionListener(this);
 
         setVisible(true);
     }
 
+    /**
+     * Panel, na který je vykreslován pohled do scény
+     */
     private class RenderPanel extends JPanel
     {
         public void paintComponent(Graphics g)
@@ -91,7 +93,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
             //region Ceiling
             g.setColor(new Color(5, 5, 5)); // 0, 0, 0.1f
             //g.setColor(Color.getHSBColor(0.52f, 0.9f, 1f)); // 0, 0, 0.1f
-            g.fillRect(edgeLeft * scale, edgeUp * scale, (width - (edgeLeft + edgeRight)) * scale, (height * scale / 2) + Player.getInstance().getAngleY() * scale);
+            g.fillRect(edgeLeft * scale, edgeUp * scale, (width - (edgeLeft + edgeRight)) * scale, (height * scale / 2));
             //endregion
 
             //region Floors
@@ -104,7 +106,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 g.fillRect(edgeLeft * scale, ((height - edgeDown) * scale) / 2 + (step * f), (width - (edgeLeft + edgeRight)) * scale, step);
             }*/
             g.setColor(new Color(30, 30, 30));
-            g.fillRect(edgeLeft * scale, (((height - edgeDown) * scale) / 2) + Player.getInstance().getAngleY() * scale, (width - (edgeLeft + edgeRight)) * scale, ((height - edgeDown) * scale) - Player.getInstance().getAngleY() * scale);
+            g.fillRect(edgeLeft * scale, (((height - edgeDown) * scale) / 2), (width - (edgeLeft + edgeRight)) * scale, ((height - edgeDown) * scale));
             //endregion
 
             //region Walls
@@ -117,7 +119,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 float shade = 1 - (Math.round(walls[i]) / /*10.0f*/ (float) Player.getInstance().getCamDistance());
                 shade = (shade < 0) ? 0 : shade;
 
-                int y0 = (height / 2) - (lineHeight / 2) + Player.getInstance().getAngleY();
+                int y0 = (height / 2) - (lineHeight / 2);
                 int x0 = (int) Math.floor((double) World.getInstance().getTex(what[i]).getWidth() * texs[i]);
 
                 int p = World.getInstance().getTex(what[i]).getHeight();
@@ -204,7 +206,7 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 {
                     int posX = -(sizeX / 2) + x + (int) (object.getXPos() * (width - (edgeLeft + edgeRight))) + edgeLeft;
                     double yPos = (1.0 + object.getYPos()) - ((1.0 / object.getSize()) * 0.5);
-                    int y0 = (height / 2) - (int) (size * (yPos)) + Player.getInstance().getAngleY();
+                    int y0 = (height / 2) - (int) (size * (yPos));
 
                     if (posX < edgeLeft || posX >= walls.length + edgeRight || (walls[posX - edgeLeft] < object.distToPlayerTan() && walls[posX - edgeLeft] != 0))
                         continue;
@@ -332,42 +334,39 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
     @Override
     public void keyPressed(KeyEvent e)
     {
+        // W
         if (e.getKeyCode() == 87)
         {
             isMoveF = true;
         }
+        // S
         if (e.getKeyCode() == 83)
         {
             isMoveB = true;
         }
+        // A
         if (e.getKeyCode() == 65)
         {
             isMoveL = true;
         }
+        // D
         if (e.getKeyCode() == 68)
         {
             isMoveR = true;
         }
 
+        // Left Arrow
         if (e.getKeyCode() == 37)
         {
             isRotateL = true;
         }
+        // Right Arrow
         if (e.getKeyCode() == 39)
         {
             isRotateR = true;
         }
 
-        // L Shift
-        if (e.getKeyCode() == 16)
-        {
-            Player.getInstance().sprint(true);
-        }
-        // L Control
-        if (e.getKeyCode() == 17)
-        {
-            Player.getInstance().sneak(true);
-        }
+        // Space
         if (e.getKeyCode() == 32)
         {
             if (!attacked)
@@ -389,54 +388,54 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
     @Override
     public void keyReleased(KeyEvent e)
     {
+        // W
         if (e.getKeyCode() == 87)
         {
             isMoveF = false;
         }
+        // S
         if (e.getKeyCode() == 83)
         {
             isMoveB = false;
         }
+        // A
         if (e.getKeyCode() == 65)
         {
             isMoveL = false;
         }
+        // D
         if (e.getKeyCode() == 68)
         {
             isMoveR = false;
         }
 
+        // Left Arrow
         if (e.getKeyCode() == 37)
         {
             isRotateL = false;
         }
+        // Right Arrow
         if (e.getKeyCode() == 39)
         {
             isRotateR = false;
         }
 
-        // L Shift
-        if (e.getKeyCode() == 16)
-        {
-            Player.getInstance().sprint(false);
-        }
-        // L Control
-        if (e.getKeyCode() == 17)
-        {
-            Player.getInstance().sneak(false);
-        }
+        // M
         if (e.getKeyCode() == 77)
         {
             minimap = !minimap;
         }
+        // Escape
         if (e.getKeyCode() == 27)
         {
-            dispose();
+            System.exit(0);
         }
+        // Space
         if (e.getKeyCode() == 32)
         {
             attacked = false;
         }
+        // E
         if (e.getKeyCode() == 69)
         {
             Player.getInstance().interact();
@@ -451,19 +450,11 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
     boolean isRotateL = false;
     boolean isRotateR = false;
 
+    /**
+     * Method which updates the game each frame (default FPS is 60)
+     */
     void update()
     {
-        java.util.Timer timerStart = new Timer();
-        timerStart.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                rotX = true;
-                rotY = false;
-            }
-        }, 500);
-
         java.util.Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask()
         {
@@ -534,74 +525,5 @@ public class Game extends JFrame implements KeyListener, MouseMotionListener
                 view.repaint();
             }
         }, 0, 1000 / 60);
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e)
-    {
-
-    }
-
-    private int mouseX;
-    private int mouseY;
-
-    private boolean rotX = false;
-    private boolean rotY = false;
-
-    @Override
-    public void mouseMoved(MouseEvent e)
-    {
-        if ((rotX && (e.getX() == 0 || e.getX() == Toolkit.getDefaultToolkit().getScreenSize().width - 1))
-                || (rotY && (e.getY() == 0 || e.getY() == Toolkit.getDefaultToolkit().getScreenSize().height - 1)))
-        {
-            try
-            {
-                Robot robot = new Robot();
-                if (rotX)
-                {
-                    if (e.getX() == 0)
-                    {
-                        robot.mouseMove(Toolkit.getDefaultToolkit().getScreenSize().width - 2, e.getY());
-                        mouseX = Toolkit.getDefaultToolkit().getScreenSize().width - 2;
-                    }
-                    else if (e.getX() == Toolkit.getDefaultToolkit().getScreenSize().width - 1)
-                    {
-                        robot.mouseMove(1, e.getY());
-                        mouseX = 1;
-                    }
-                }
-
-                if (rotY)
-                {
-                    if (e.getY() == 0)
-                    {
-                        robot.mouseMove(e.getX(), Toolkit.getDefaultToolkit().getScreenSize().height - 2);
-                        mouseY = Toolkit.getDefaultToolkit().getScreenSize().height - 2;
-                    }
-                    else if (e.getY() == Toolkit.getDefaultToolkit().getScreenSize().height - 1)
-                    {
-                        robot.mouseMove(e.getX(), 1);
-                        mouseY = 1;
-                    }
-                }
-
-            } catch (AWTException awtException)
-            {
-                awtException.printStackTrace();
-            }
-
-            return;
-        }
-
-        if (e.getX() > 0 && e.getX() < Toolkit.getDefaultToolkit().getScreenSize().width - 1 && rotX)
-        {
-            if (e.getX() != mouseX) Player.getInstance().rotate((double) (e.getX() - mouseX) / 12.0);
-            mouseX = e.getX();
-        }
-        if (e.getY() > 0 && e.getY() < Toolkit.getDefaultToolkit().getScreenSize().height - 1 && rotY)
-        {
-            if (e.getY() != mouseY) Player.getInstance().rotateY((double) (e.getY() - mouseY) / scale * 4);
-            mouseY = e.getY();
-        }
     }
 }

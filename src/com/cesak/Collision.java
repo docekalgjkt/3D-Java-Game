@@ -1,4 +1,4 @@
-package com.company;
+package com.cesak;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,16 @@ public class Collision
     public static List<Pickable> hitPickables;
 
 
+    /**
+     * Checks whether or not the player hit a wall.
+     * <br></>
+     * Player's hitbox is considered to be box-shaped.
+     *
+     * @param x      Player's X position
+     * @param y      Player's Y position
+     * @param hitbox Half-length of the hitbox's side
+     * @return True if the player collided with a wall
+     */
     public static boolean hitWall(double x, double y, double hitbox)
     {
         boolean result = false;
@@ -173,6 +183,16 @@ public class Collision
         return result;
     }
 
+    /**
+     * Checks whether or not the player walked into a Static Object and if he/she did he/she is pushed away from the Object.
+     * <br><br/>
+     * Both hitboxes are considered to be cylinder-shaped.
+     *
+     * @param x      Player's X position
+     * @param y      Player's Y position
+     * @param hitbox Player's hitbox radius
+     * @return True if the player collided with a Static Object
+     */
     public static boolean hitObject(double x, double y, double hitbox)
     {
         List<StaticObject> objects = World.getInstance().getStaticObjects();
@@ -204,6 +224,16 @@ public class Collision
         return false;
     }
 
+    /**
+     * Checks whether or not the player stepped on a Pickable Object and if he/she did they are saved in a list for their effect to be applied.
+     * <br><br/>
+     * Both hitboxes are considered to be cylinder-shaped.
+     *
+     * @param x      Player's X position
+     * @param y      Player's Y position
+     * @param hitbox Player's hitbox radius
+     * @return True when the player stepped on a Pickable Object
+     */
     public static boolean hitPickable(double x, double y, double hitbox)
     {
         boolean result = false;

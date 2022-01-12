@@ -1,4 +1,4 @@
-package com.company;
+package com.cesak;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

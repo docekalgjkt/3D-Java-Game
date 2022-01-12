@@ -1,8 +1,10 @@
-package com.company;
+package com.cesak;
 
 import java.util.List;
-import java.util.Random;
 
+/**
+ * Třída popisující objekt hráče
+ */
 public class Player
 {
 
@@ -23,25 +25,21 @@ public class Player
 
     private int health = 15;
     private int healthMax = 15;
-    private int magic = 50;
-    private int magicMax = 50;
+    private int mana = 50;
+    private int manaMax = 50;
     private int healthRegen = 0;
     private int healthRegenFrame;
     private int healthRegenTick = 90;
-    private int magicRegen = 1;
-    private int magicRegenFrame;
+    private int manaRegen = 1;
+    private int manaRegenFrame;
     private int magicRegenTick = 6;
     private int magicCost = 15;
     private double speed = 30.0;
     private double x;
     private double y;
     private double angle = 0;
-    private int angleY = 0;
-    private int yRotLimit = Game.getInstance().getScreenHeight() / 2;
     private double nearClip = 0.3;
     private double hitbox = 0.2;
-    private boolean sprinting;
-    private boolean sneaking;
 
     // -----
 
@@ -62,7 +60,7 @@ public class Player
 
     public double getMagicPercent()
     {
-        return (double) magic / magicMax;
+        return (double) mana / manaMax;
     }
 
     public double getX()
@@ -75,25 +73,9 @@ public class Player
         return y;
     }
 
-    private double modSpeed()
-    {
-        double res = 1;
-
-        res *= (sprinting)
-                ? 1.75
-                : ((sneaking) ? 0.5 : 1);
-
-        return res;
-    }
-
     public double getAngle()
     {
         return angle;
-    }
-
-    public int getAngleY()
-    {
-        return angleY;
     }
 
     public double getCamDistance()
@@ -115,6 +97,11 @@ public class Player
 
     // -----
 
+    /**
+     * Moves the player in X and Z axis
+     *
+     * @param a Angle which represents the direction in which the player will move
+     */
     public void move(int a)
     {
         double nextX = x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed/* * modSpeed()*/ / (600));
@@ -146,18 +133,11 @@ public class Player
         }
     }
 
-    public void sprint(boolean b)
-    {
-        sprinting = b;
-        sneaking = false;
-    }
-
-    public void sneak(boolean b)
-    {
-        sneaking = b;
-        sprinting = false;
-    }
-
+    /**
+     * Rotates the player around Y axis (left and right)
+     *
+     * @param dir Direction and also speed which the player will rotate with
+     */
     public void rotate(double dir)
     {
         angle += 2.5 * dir;
@@ -165,19 +145,18 @@ public class Player
         else if (angle < 0) angle += 360;
     }
 
-    public void rotateY(double dir)
-    {
-        angleY -= dir;
-        if (angleY > yRotLimit) angleY = yRotLimit;
-        else if (angleY < -yRotLimit) angleY = -yRotLimit;
-    }
-
+    /**
+     * Sets player position
+     */
     public void place(double x, double y)
     {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Method called each frame, regenerating some health points to player every X-th frame
+     */
     public void healthRegen()
     {
         if (health == healthMax) return;
@@ -189,65 +168,40 @@ public class Player
         }
     }
 
+    /**
+     * Method called each frame, regenerating some mana points to player every X-th frame
+     */
     public void magicRegen()
     {
-        if (magic == magicMax) return;
-        magicRegenFrame++;
-        if (magicRegenFrame == magicRegenTick)
+        if (mana == manaMax) return;
+        manaRegenFrame++;
+        if (manaRegenFrame == magicRegenTick)
         {
-            magicRegenFrame = 0;
-            getMagic(magicRegen);
+            manaRegenFrame = 0;
+            getMana(manaRegen);
         }
     }
 
-    public void attack()
-    {
-        List<Entity> entities = World.getInstance().getEntities();
-        for (int i = 1; i < entities.size(); i++)
-        {
-            for (int i1 = 0; i1 < i; i1++)
-            {
-                if (entities.get(i).distToPlayer() < entities.get(i1).distToPlayer())
-                {
-                    entities.add(i1, entities.get(i));
-                    entities.remove(i + 1);
-                }
-            }
-        }
-
-        for (int i = 0; i < entities.size(); i++)
-        {
-            if (entities.get(i).isDead()) continue;
-
-            if (entities.get(i).distToPlayer() <= 10 * 10)
-            {
-                double radius = 0.05;
-
-                // TODO: Make radius to be same at all distances
-                if (Math.abs(entities.get(i).getXPos() - 0.5) < radius)
-                {
-                    entities.get(i).getDamage(1);
-                    break;
-                }
-            }
-        }
-    }
-
+    /**
+     * Spawns a fireball that flies in the player's look direction damaging enemies on hit
+     */
     public void castFireball()
     {
-        if (magic < magicCost) return;
+        if (mana < magicCost) return;
+
         Projectile fireball = new Projectile("fireball", Player.getInstance().getX(), Player.getInstance().getY(), 1, 1.0 / 16, 0.05, 50, angle, 0);
         fireball.setLit(true);
         fireball.setPower(2);
         World.getInstance().createProjectile(fireball);
-        magic -= magicCost;
+        mana -= magicCost;
     }
 
     public void interact()
     {
-        // Interact Blocks
+        // Interacting with a Wall-like Object
         int nextX = (int) (x + (Math.cos(angle * Math.PI / 180) * 0.7));
         int nextY = (int) (y + (Math.sin(angle * Math.PI / 180) * 0.7));
+
         List<InteractBlock> interactBlocks = World.getInstance().getDoors();
         for (int i = 0; i < interactBlocks.size(); i++)
         {
@@ -258,6 +212,11 @@ public class Player
         }
     }
 
+    /**
+     * Instant health gain for the player
+     *
+     * @param h Amount of health the player will get
+     */
     public void getHeal(int h)
     {
         health += h;
@@ -265,15 +224,25 @@ public class Player
             health = healthMax;
     }
 
-    public void getMagic(int m)
+    /**
+     * Instant mana gain for the player
+     *
+     * @param m Amount of mana the player will get
+     */
+    public void getMana(int m)
     {
-        magic += m;
-        if (magic > magicMax)
+        mana += m;
+        if (mana > manaMax)
         {
-            magic = magicMax;
+            mana = manaMax;
         }
     }
 
+    /**
+     * Damages the player
+     *
+     * @param dmg Amount of health the player will loose
+     */
     public void getDamage(int dmg)
     {
         health -= dmg;
@@ -285,6 +254,9 @@ public class Player
         }
     }
 
+    /**
+     * Method called when the player dies
+     */
     private void die()
     {
         health = 0;
