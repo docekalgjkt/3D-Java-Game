@@ -3,7 +3,7 @@ package com.cesak;
 import java.util.List;
 
 /**
- * Třída popisující objekt hráče
+ * Class which defines the Player Object
  */
 public class Player
 {

@@ -230,7 +230,7 @@ public class Render
             double angle = ((opos[0] == 0)
                     ? ((opos[1] > 0) ? 90 : 270)
                     : (Math.atan(opos[1] / opos[0])) * 180 / Math.PI) + ((opos[0] < 0) ? 180 : 0);
-            double angleDif = Main.angleDist(angle, Player.getInstance().getAngle());
+            double angleDif = MyMath.angleDist(angle, Player.getInstance().getAngle());
 
             if (Math.abs(angleDif) >= fov || object.distToPlayer() > Player.getInstance().getCamDistance() * Player.getInstance().getCamDistance())
                 continue;

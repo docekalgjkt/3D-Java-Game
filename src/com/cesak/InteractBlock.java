@@ -1,5 +1,8 @@
 package com.cesak;
 
+/**
+ * An Object the player is able to interact with.
+ */
 public class InteractBlock
 {
     public enum Effect

@@ -5,6 +5,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Class which defines every type of object the player can see
+ * <br></>
+ * It is used as a Superclass for classes defining specific types of objects (Static, Projectile, Entity, Pickable).
+ */
 public class Object
 {
     private double x, y;

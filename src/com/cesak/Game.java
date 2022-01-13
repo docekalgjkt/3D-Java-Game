@@ -45,6 +45,10 @@ public class Game extends JFrame implements KeyListener
         setTitle("Program");
         setSize(1250, 800);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setLocation(
+                Toolkit.getDefaultToolkit().getScreenSize().width / 2 - getWidth() / 2,
+                Toolkit.getDefaultToolkit().getScreenSize().height / 2 - getHeight() / 2
+        );
         //setUndecorated(true);
         //setExtendedState(MAXIMIZED_BOTH);
 
