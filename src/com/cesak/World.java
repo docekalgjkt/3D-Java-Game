@@ -8,8 +8,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * Class where is described the world as a map with walls and objects.
+ */
 public class World
 {
+    // TODO: Udelat World Class non-Singleton + prevest na cteni z textoveho souboru
 
     // region Singleton
 
@@ -103,41 +107,6 @@ public class World
 
     void setUp()
     {
-/*
-        map = new String[150];
-
-        for (int i = 0; i < map.length; i++)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("#");
-
-            for (int i1 = 1; i1 < map.length; i1++)
-            {
-                if (i == 0 || i == map.length - 1)
-                {
-                    sb.append("#");
-                }
-                else
-                {
-                    if (new Random().nextDouble() < 0.1)
-                    {
-                        sb.append("#");
-                    }
-                    else
-                    {
-                        sb.append(".");
-                    }
-                }
-            }
-
-            sb.append("#");
-
-            map[i] = sb.toString();
-        }
-
-        */
-
         betterMap = new String[map.length];
         for (int i = 0; i < map.length; i++)
         {

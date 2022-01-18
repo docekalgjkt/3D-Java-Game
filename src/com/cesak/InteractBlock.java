@@ -1,7 +1,9 @@
 package com.cesak;
 
 /**
- * An Object the player is able to interact with.
+ * An Object the player is able to interact with
+ * <br></br>
+ * After interaction, it will do something
  */
 public class InteractBlock
 {

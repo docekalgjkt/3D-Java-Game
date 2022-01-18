@@ -7,17 +7,17 @@ import java.util.List;
  */
 public class Player
 {
-
     // region Singleton
 
-    private static Player player = null;
+    private static final Player player = new Player();
+
+    private Player()
+    {
+
+    }
 
     public static Player getInstance()
     {
-        if (player == null)
-        {
-            player = new Player();
-        }
         return player;
     }
 

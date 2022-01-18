@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Random;
 
 /**
- * Třída definující jednotlivá živá (pohybující se) stvoření
+ * Class defining individual living beings (for now hostile)
  */
 public class Entity extends Object
 {

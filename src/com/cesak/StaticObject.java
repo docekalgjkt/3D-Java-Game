@@ -5,6 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Type of Object which does not move or do anything. It stays in one position and can be destroyable.
+ */
 public class StaticObject extends Object
 {
     private int health;
@@ -55,6 +58,9 @@ public class StaticObject extends Object
         }
     }
 
+    /**
+     * Method called after this object is destroyed
+     */
     private void getDestroyed()
     {
         health = 0;

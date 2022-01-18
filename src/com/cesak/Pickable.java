@@ -1,5 +1,8 @@
 package com.cesak;
 
+/**
+ * Type of Object triggering an effect when the player collides with it
+ */
 public class Pickable extends Object
 {
     public enum Bonus

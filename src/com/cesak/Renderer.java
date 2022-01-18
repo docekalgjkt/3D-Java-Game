@@ -3,20 +3,23 @@ package com.cesak;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Render
+/**
+ * Class used to get values which is then a picture rendered from
+ */
+public class Renderer
 {
 
     // region Singleton
 
-    private static Render render = null;
+    private static Renderer renderer = null;
 
-    public static Render getInstance()
+    public static Renderer getInstance()
     {
-        if (render == null)
+        if (renderer == null)
         {
-            render = new Render();
+            renderer = new Renderer();
         }
-        return render;
+        return renderer;
     }
 
     // endregion

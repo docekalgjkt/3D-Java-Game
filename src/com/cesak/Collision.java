@@ -3,6 +3,9 @@ package com.cesak;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class containing methods used to find out whether the player collided with something
+ */
 public class Collision
 {
     private static double nextX, nextY;
@@ -21,7 +24,7 @@ public class Collision
 
 
     /**
-     * Checks whether or not the player hit a wall.
+     * Checks whether the player hit a wall.
      * <br></>
      * Player's hitbox is considered to be box-shaped.
      *
@@ -184,7 +187,7 @@ public class Collision
     }
 
     /**
-     * Checks whether or not the player walked into a Static Object and if he/she did he/she is pushed away from the Object.
+     * Checks whether the player walked into a Static Object and if he/she did he/she is pushed away from the Object.
      * <br><br/>
      * Both hitboxes are considered to be cylinder-shaped.
      *
@@ -225,7 +228,7 @@ public class Collision
     }
 
     /**
-     * Checks whether or not the player stepped on a Pickable Object and if he/she did they are saved in a list for their effect to be applied.
+     * Checks whether the player stepped on a Pickable Object and if he/she did they are saved in a list for their effect to be applied.
      * <br><br/>
      * Both hitboxes are considered to be cylinder-shaped.
      *

@@ -1,5 +1,8 @@
 package com.cesak;
 
+/**
+ * Class containing helpful custom math methods
+ */
 public class MyMath
 {
     public static double angleDist(double angle0, double angle1)

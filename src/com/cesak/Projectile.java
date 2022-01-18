@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Type of Object which moves in given direction with given velocity and on hit damaging target
+ */
 public class Projectile extends Object
 {
     private BufferedImage[] imgAnim;
@@ -44,20 +47,24 @@ public class Projectile extends Object
         double x = getX();
         double y = getY();
 
+        // Calculating the position where this object is supposed to move
         double nextX = x + Math.cos(angle / 180.0 * Math.PI) * (speed / (600));
         double nextY = y + Math.sin(angle / 180.0 * Math.PI) * (speed / (600));
 
         x = nextX;
         y = nextY;
 
+/*
         if (World.getInstance().getTile((int) y, (int) x).equals("#"))
         {
             World.getInstance().destroyProjectile(this);
         }
+*/
 
         setX(x);
         setY(y);
 
+        // Checking for Entities (Enemy Objects) to see if this projectile hit them
         List<Entity> entities = World.getInstance().getEntities();
         for (Entity entity : entities)
         {
@@ -73,6 +80,7 @@ public class Projectile extends Object
             }
         }
 
+        // Checking for Static Objects to see if this projectile hit them
         List<StaticObject> staticObjects = World.getInstance().getStaticObjects();
         for (StaticObject staticObject : staticObjects)
         {
@@ -88,6 +96,7 @@ public class Projectile extends Object
             }
         }
 
+        // Projectile gets destroyed when it hits a wall
         if (Collision.hitWall(x, y, getHitbox()))
         {
             World.getInstance().destroyProjectile(this);

@@ -3,11 +3,14 @@ package com.cesak;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Class where is GUI built
+ */
 public class Window extends JFrame
 {
     //region Singleton
 
-    private static Window window = new Window();
+    private static final Window window = new Window();
 
     private Window()
     {
@@ -20,6 +23,7 @@ public class Window extends JFrame
 
     //endregion
 
+    private Container pane;
 
     public void start()
     {
@@ -36,28 +40,41 @@ public class Window extends JFrame
                 Toolkit.getDefaultToolkit().getScreenSize().height / 2 - getHeight() / 2
         );
 
-        CardLayout layout = new CardLayout();
+        pane = getContentPane();
 
-        setLayout(layout);
+        CardLayout cd = new CardLayout();
+        pane.setLayout(cd);
 
-        layout.addLayoutComponent(view, "View");
+        pane.add(menu);
+        pane.add(game);
+
+        cd.addLayoutComponent(menu, "Menu");
+        cd.addLayoutComponent(game, "Game");
 
         setVisible(true);
     }
 
-    private final JPanel menu = new JPanel()
+    /**
+     * Panel which represents Main Menu Scene
+     */
+    private JPanel menu = new JPanel()
     {
         public void paintComponent(Graphics g)
         {
-
+            g.setColor(Color.red);
+            g.fillRect(0, 0, getWidth(), getHeight());
         }
     };
 
-    private final JPanel view = new JPanel()
+    /**
+     * Panel which represents In-Game Scene
+     */
+    private JPanel game = new JPanel()
     {
         public void paintComponent(Graphics g)
         {
-
+            g.setColor(Color.green);
+            g.fillRect(0, 0, getWidth(), getHeight());
         }
     };
 }

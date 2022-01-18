@@ -8,6 +8,9 @@ import java.util.*;
 import java.util.List;
 import java.util.Timer;
 
+/**
+ * Class which controls GUI and also User's Input
+ */
 public class Game extends JFrame implements KeyListener
 {
     // region Singleton
@@ -85,11 +88,11 @@ public class Game extends JFrame implements KeyListener
 
             int offset = edgeDown / 2;
 
-            Render.getInstance().render(width - (edgeLeft + edgeRight));
+            Renderer.getInstance().render(width - (edgeLeft + edgeRight));
 
-            double[] walls = Render.getInstance().getWalls();
-            double[] texs = Render.getInstance().getTexs();
-            String[] what = Render.getInstance().getWhat();
+            double[] walls = Renderer.getInstance().getWalls();
+            double[] texs = Renderer.getInstance().getTexs();
+            String[] what = Renderer.getInstance().getWhat();
 
             g.setColor(new Color(40, 40, 40));
             g.fillRect(0, 0, width * scale, height * scale);
@@ -101,14 +104,6 @@ public class Game extends JFrame implements KeyListener
             //endregion
 
             //region Floors
-            /*int stepCount = 10;
-            for (int f = 0; f < stepCount; f++)
-            {
-                g.setColor(Color.getHSBColor(0.08333333f, 0.4f, 0.1f * (f / 9.0f)));
-                //g.setColor(Color.getHSBColor(0.33333333f, 1f, 0.1f + 0.65f * ((float) f / stepCount)));
-                int step = ((height - edgeDown) * scale) / 2 / stepCount;
-                g.fillRect(edgeLeft * scale, ((height - edgeDown) * scale) / 2 + (step * f), (width - (edgeLeft + edgeRight)) * scale, step);
-            }*/
             g.setColor(new Color(30, 30, 30));
             g.fillRect(edgeLeft * scale, (((height - edgeDown) * scale) / 2), (width - (edgeLeft + edgeRight)) * scale, ((height - edgeDown) * scale));
             //endregion
