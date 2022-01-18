@@ -19,6 +19,9 @@ public class Pickable extends Object
         this.bonus = bonus;
     }
 
+    /**
+     * Method called when this Object is "Picked Up"
+     */
     public void pick()
     {
         switch (bonus)

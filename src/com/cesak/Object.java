@@ -139,11 +139,13 @@ public class Object
         return (int) Math.floor(this.x) == x && (int) Math.floor(this.y) == y;
     }
 
+    // Returns distance of this Object from the Player
     public double distToPlayer()
     {
         return (getX() - Player.getInstance().getX()) * (getX() - Player.getInstance().getX()) + (getY() - Player.getInstance().getY()) * (getY() - Player.getInstance().getY());
     }
 
+    // Returns distance to the Player in camera view
     public double distToPlayerTan()
     {
         double angle = (getXPos() * 90) - 45;
