@@ -110,6 +110,8 @@ public class Player
         x = nextX;
         y = nextY;
 
+        if (1 < 2) return;
+
         if (Collision.hitWall(x, y, hitbox))
         {
             if (x != Collision.getNextX()) x = Collision.getNextX();
