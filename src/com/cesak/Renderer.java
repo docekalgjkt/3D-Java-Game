@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class used to get values which is then a picture rendered from
+ * Class which calculates where and what kind of tiles/blocks/walls the player sees
  */
 public class Renderer
 {
@@ -24,8 +24,30 @@ public class Renderer
 
     // endregion
 
+    /**
+     * Array containing wall distances from the player for each ray cast.
+     * <br></br>
+     * Length of the array is based on number of rays cast.
+     */
     private double[] walls;
+    /**
+     * When a wall is hit by a ray,
+     * it is calculated in which spot the ray has hit the wall.
+     * <br></br>
+     * This Array contains a value from 0.0 to 1.0,
+     * which corresponds to a spot's x-coordinate.
+     * <br></br>
+     * This value is then used to get a certain column of the texture,
+     * that will be drawn on the wall.
+     * <br></br>
+     * Length of the array is based on number of rays cast.
+     */
     private double[] texs;
+    /**
+     * Array containing the symbol of the tile/block, that has been hit.
+     * <br></br>
+     * Length of the array is based on number of rays cast.
+     */
     private String[] what;
 
     public double[] getWalls()
@@ -263,6 +285,8 @@ public class Renderer
             object.setRenderd(true);
         }
     }
+
+    // --- Rendering Extended to 3rd Dimension ---
 
     private String[][] textureHit;
     private double[][][] hitPoint;
