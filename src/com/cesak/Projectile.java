@@ -84,7 +84,7 @@ public class Projectile extends Object
         List<StaticObject> staticObjects = World.getInstance().getStaticObjects();
         for (StaticObject staticObject : staticObjects)
         {
-            if (!staticObject.isDestroyable() || staticObject.isDestroyed()) continue;
+            if (!staticObject.isDestructible() || staticObject.isDestroyed()) continue;
 
             double dist = Math.sqrt((x - staticObject.getX()) * (x - staticObject.getX()) + (y - staticObject.getY()) * (y - staticObject.getY()));
             double hitbox = Math.sqrt((getHitbox() + staticObject.getHitbox()) * (getHitbox() + staticObject.getHitbox()));

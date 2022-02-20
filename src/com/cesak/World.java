@@ -277,16 +277,6 @@ public class World
         return entities;
     }
 
-    public void createEntity(Entity e)
-    {
-        entities.add(e);
-    }
-
-    public void destroyEntity(Entity e)
-    {
-        entities.remove(e);
-    }
-
     //endregion
 
     //region Static Objects

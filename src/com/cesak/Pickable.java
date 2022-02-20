@@ -7,7 +7,7 @@ public class Pickable extends Object
 {
     public enum Bonus
     {
-        HEAL, MAGIC
+        HEAL, MANA
     }
 
     private Bonus bonus;
@@ -30,8 +30,8 @@ public class Pickable extends Object
                 if (Player.getInstance().getHealthPercent() < 1) Player.getInstance().getHeal(2);
                 else return;
             }
-            case MAGIC -> {
-                if (Player.getInstance().getMagicPercent() < 1) Player.getInstance().getMana(10);
+            case MANA -> {
+                if (Player.getInstance().getManaPercent() < 1) Player.getInstance().getMana(10);
                 else return;
             }
         }

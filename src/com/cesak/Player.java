@@ -32,8 +32,8 @@ public class Player
     private int healthRegenTick = 90;
     private int manaRegen = 1;
     private int manaRegenFrame;
-    private int magicRegenTick = 6;
-    private int magicCost = 15;
+    private int manaRegenTick = 6;
+    private int manaCost = 15;
     private double speed = 30.0;
     private double x;
     private double y;
@@ -58,7 +58,7 @@ public class Player
         return healthMax;
     }
 
-    public double getMagicPercent()
+    public double getManaPercent()
     {
         return (double) mana / manaMax;
     }
@@ -173,11 +173,11 @@ public class Player
     /**
      * Method called each frame, regenerating some mana points to player every X-th frame
      */
-    public void magicRegen()
+    public void manaRegen()
     {
         if (mana == manaMax) return;
         manaRegenFrame++;
-        if (manaRegenFrame == magicRegenTick)
+        if (manaRegenFrame == manaRegenTick)
         {
             manaRegenFrame = 0;
             getMana(manaRegen);
@@ -189,13 +189,13 @@ public class Player
      */
     public void castFireball()
     {
-        if (mana < magicCost) return;
+        if (mana < manaCost) return;
 
         Projectile fireball = new Projectile("fireball", Player.getInstance().getX(), Player.getInstance().getY(), 1, 1.0 / 16, 0.05, 50, angle, 0);
         fireball.setLit(true);
         fireball.setPower(2);
         World.getInstance().createProjectile(fireball);
-        mana -= magicCost;
+        mana -= manaCost;
     }
 
     public void interact()

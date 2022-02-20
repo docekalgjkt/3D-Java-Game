@@ -83,8 +83,6 @@ public class Game extends JFrame implements KeyListener
             new Color(175, 0, 255)
     };
 
-    private double rotY;
-
     /**
      * Panel, na který je vykreslován pohled do scény
      */
@@ -322,14 +320,14 @@ public class Game extends JFrame implements KeyListener
             g.setColor(new Color(10, 10, 10));
             g.fillRect(20, (height - 80 / scale) * scale + 45, 300, 15);
             g.setColor(new Color(0, 40, 255));
-            g.fillRect(20, (height - 80 / scale) * scale + 45, (int) (300 * Player.getInstance().getMagicPercent()), 15);
+            g.fillRect(20, (height - 80 / scale) * scale + 45, (int) (300 * Player.getInstance().getManaPercent()), 15);
 
             //endregion
         }
 
         public void paintComponent(Graphics g)
         {
-            Renderer.getInstance().render3D(Player.getInstance().getX(), Player.getInstance().getY(), 1.5, Player.getInstance().getAngle(), rotY, Player.getInstance().getCamDistance(), width, height);
+            Renderer.getInstance().render3D(Player.getInstance().getX(), Player.getInstance().getY(), 1.5, Player.getInstance().getAngle(), 0, Player.getInstance().getCamDistance(), width, height);
 
             String[][] textureHit = Renderer.getInstance().getTextureHit();
             //double[][][] hitPoint = Renderer.getInstance().getHitPoint();
@@ -393,15 +391,6 @@ public class Game extends JFrame implements KeyListener
             isRotateR = true;
         }
 
-        if (e.getKeyCode() == 38)
-        {
-            isRotateU = true;
-        }
-        if (e.getKeyCode() == 40)
-        {
-            isRotateD = true;
-        }
-
         // Space
         if (e.getKeyCode() == 32)
         {
@@ -456,15 +445,6 @@ public class Game extends JFrame implements KeyListener
             isRotateR = false;
         }
 
-        if (e.getKeyCode() == 38)
-        {
-            isRotateU = false;
-        }
-        if (e.getKeyCode() == 40)
-        {
-            isRotateD = false;
-        }
-
         // M
         if (e.getKeyCode() == 77)
         {
@@ -495,9 +475,6 @@ public class Game extends JFrame implements KeyListener
     boolean isRotateL = false;
     boolean isRotateR = false;
 
-    boolean isRotateU = false;
-    boolean isRotateD = false;
-
     /**
      * Method which updates the game each frame (default FPS is 60)
      */
@@ -510,7 +487,7 @@ public class Game extends JFrame implements KeyListener
             public void run()
             {
                 Player.getInstance().healthRegen();
-                Player.getInstance().magicRegen();
+                Player.getInstance().manaRegen();
 
                 //region Player Control
 

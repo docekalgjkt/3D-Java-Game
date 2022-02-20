@@ -11,7 +11,7 @@ import java.util.Objects;
 public class StaticObject extends Object
 {
     private int health;
-    private final boolean destroyable;
+    private final boolean destructible;
     private String[] drops;
 
     public boolean isDestroyed()
@@ -19,9 +19,9 @@ public class StaticObject extends Object
         return health == 0;
     }
 
-    public boolean isDestroyable()
+    public boolean isDestructible()
     {
-        return destroyable;
+        return destructible;
     }
 
     private BufferedImage imgDestroyed;
@@ -31,7 +31,7 @@ public class StaticObject extends Object
         super(img, x, y, size, yPos, hitbox);
 
         health = 1;
-        this.destroyable = destroyable;
+        this.destructible = destroyable;
         drops = new String[0];
 
         try
@@ -70,7 +70,7 @@ public class StaticObject extends Object
             switch (string)
             {
                 case "healingPotion" -> World.getInstance().createPickable(new Pickable("healingPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-                case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MAGIC));
+                case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MANA));
             }
         }
     }
