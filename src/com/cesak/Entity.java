@@ -27,11 +27,6 @@ public class Entity extends Object
     private final double attackRange = 0.9;
     private String[] drops;
 
-    public double getSpeed()
-    {
-        return speed;
-    }
-
     public double getAttackRange()
     {
         return attackRange;
@@ -246,7 +241,7 @@ public class Entity extends Object
             switch (string)
             {
                 case "healingPotion" -> World.getInstance().createPickable(new Pickable("healingPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-                case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MAGIC));
+                case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MANA));
             }
         }
         //World.getInstance().destroyEntity(this);

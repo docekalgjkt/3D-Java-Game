@@ -29,7 +29,7 @@ public class Game extends JFrame implements KeyListener
     // endregion
 
     // hodnota, která mění rozlišení vykresleného obrázku podle vzorce: Resolution / scale
-    private final int scale = 2; // 5
+    private final int scale = 5; // 5
 
     private int height;
     private int width;
@@ -47,11 +47,12 @@ public class Game extends JFrame implements KeyListener
 
         setTitle("Program");
         setSize(1250, 800);
+        //setSize(800, 800);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocation(
                 Toolkit.getDefaultToolkit().getScreenSize().width / 2 - getWidth() / 2,
                 Toolkit.getDefaultToolkit().getScreenSize().height / 2 - getHeight() / 2
-        );
+                   );
         //setUndecorated(true);
         //setExtendedState(MAXIMIZED_BOTH);
 
@@ -74,12 +75,20 @@ public class Game extends JFrame implements KeyListener
         setVisible(true);
     }
 
+    Color[] colors = new Color[]{
+            new Color(255, 0, 0),
+            new Color(0, 255, 0),
+            new Color(0, 0, 255),
+            new Color(200, 200, 0),
+            new Color(175, 0, 255)
+    };
+
     /**
      * Panel, na který je vykreslován pohled do scény
      */
     private class RenderPanel extends JPanel
     {
-        public void paintComponent(Graphics g)
+        public void paintComponent1(Graphics g)
         {
             int edgeUp = 0 / scale;
             int edgeDown = 0 / scale;
@@ -311,9 +320,26 @@ public class Game extends JFrame implements KeyListener
             g.setColor(new Color(10, 10, 10));
             g.fillRect(20, (height - 80 / scale) * scale + 45, 300, 15);
             g.setColor(new Color(0, 40, 255));
-            g.fillRect(20, (height - 80 / scale) * scale + 45, (int) (300 * Player.getInstance().getMagicPercent()), 15);
+            g.fillRect(20, (height - 80 / scale) * scale + 45, (int) (300 * Player.getInstance().getManaPercent()), 15);
 
             //endregion
+        }
+
+        public void paintComponent(Graphics g)
+        {
+            Renderer.getInstance().render3D(Player.getInstance().getX(), Player.getInstance().getY(), 1.5, Player.getInstance().getAngle(), 0, Player.getInstance().getCamDistance(), width, height);
+
+            String[][] textureHit = Renderer.getInstance().getTextureHit();
+            //double[][][] hitPoint = Renderer.getInstance().getHitPoint();
+
+            for (int y = 0; y < textureHit.length; y++)
+            {
+                for (int x = 0; x < textureHit[y].length; x++)
+                {
+                    g.setColor(colors[Integer.parseInt(textureHit[y][x])]);
+                    g.fillRect(x * scale, y * scale, scale, scale);
+                }
+            }
         }
     }
 
@@ -461,7 +487,7 @@ public class Game extends JFrame implements KeyListener
             public void run()
             {
                 Player.getInstance().healthRegen();
-                Player.getInstance().magicRegen();
+                Player.getInstance().manaRegen();
 
                 //region Player Control
 
@@ -485,7 +511,7 @@ public class Game extends JFrame implements KeyListener
                     Player.getInstance().move(dir);
 
                 //endregion
-
+/*
                 //region Objects
 
                 List<Entity> entities = World.getInstance().getEntities();
@@ -520,7 +546,7 @@ public class Game extends JFrame implements KeyListener
                 }
 
                 //endregion
-
+*/
                 view.repaint();
             }
         }, 0, 1000 / 60);

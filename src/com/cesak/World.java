@@ -48,6 +48,44 @@ public class World
 
     }
 
+    private String[][] map3D = new String[][]
+            {
+                    {
+                            "00000",
+                            "00000",
+                            "00000",
+                            "00040",
+                            "00000"
+                    },
+                    {
+                            "11111",
+                            "1...1",
+                            "1.3.1",
+                            "1...1",
+                            "11111"
+                    },
+                    {
+                            "22222",
+                            "22222",
+                            "22322",
+                            "22222",
+                            "22222"
+                    }
+            };
+
+    public String[][] getMap3D()
+    {
+        return map3D;
+    }
+
+    public String getTile3D(int y, int x, int z)
+    {
+        return (x < 0 || y < 0 || z < 0 || x >= map3D[z][y].length() || y >= map3D[z].length || z >= map3D.length)
+                ? "1"
+                : String.valueOf(map3D[z][y].toCharArray()[x]);
+    }
+
+
     //    -Y
     // -X [ ] X
     //     Y
@@ -214,7 +252,7 @@ public class World
             e.printStackTrace();
         }
 
-        Player.getInstance().place(10.5, 2);
+        Player.getInstance().place(1.5, 1.5);
     }
 
     public void reset()
@@ -237,16 +275,6 @@ public class World
     public List<Entity> getEntities()
     {
         return entities;
-    }
-
-    public void createEntity(Entity e)
-    {
-        entities.add(e);
-    }
-
-    public void destroyEntity(Entity e)
-    {
-        entities.remove(e);
     }
 
     //endregion
