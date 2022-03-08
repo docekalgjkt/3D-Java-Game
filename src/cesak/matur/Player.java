@@ -1,9 +1,14 @@
-package com.cesak;
+package cesak.matur;
+
+import com.cesak.Collision;
+import com.cesak.InteractBlock;
+import com.cesak.Projectile;
+import com.cesak.World;
 
 import java.util.List;
 
 /**
- * Class which defines the Player Object
+ * Class which defines the Player
  */
 public class Player
 {
@@ -34,7 +39,7 @@ public class Player
     private int manaRegenFrame;
     private int manaRegenTick = 6;
     private int manaCost = 15;
-    private double speed = 30.0;
+    private double speed = 20.0;
     private double x;
     private double y;
     private double angle = 0;
@@ -98,11 +103,46 @@ public class Player
     // -----
 
     /**
+     * Tells the player to perform a move
+     */
+    public void move()
+    {
+        int dir = 0;
+
+        if (Controller.getInstance().isMoveB()) dir = 180;
+        if (Controller.getInstance().isMoveL()) dir = 270;
+        if (Controller.getInstance().isMoveR()) dir = 90;
+        if (Controller.getInstance().isMoveF() && Controller.getInstance().isMoveL()) dir = 315;
+        if (Controller.getInstance().isMoveF() && Controller.getInstance().isMoveR()) dir = 45;
+        if (Controller.getInstance().isMoveB() && Controller.getInstance().isMoveL()) dir = 225;
+        if (Controller.getInstance().isMoveB() && Controller.getInstance().isMoveR()) dir = 135;
+
+        if ((Controller.getInstance().isMoveF() || Controller.getInstance().isMoveB() || Controller.getInstance().isMoveL() || Controller.getInstance().isMoveR()) &&
+                !(Controller.getInstance().isMoveF() && Controller.getInstance().isMoveB()) &&
+                !(Controller.getInstance().isMoveL() && Controller.getInstance().isMoveR())
+        )
+            performMovement(dir);
+    }
+
+    /**
+     * Tells the player to perform a rotation
+     */
+    public void rotate()
+    {
+        double dir = 0;
+
+        if (Controller.getInstance().isRotateR()) dir = 0.9;
+        if (Controller.getInstance().isRotateL()) dir = -0.9;
+
+        if (dir != 0) performRotation(dir);
+    }
+
+    /**
      * Moves the player in X and Z axis
      *
      * @param a Angle which represents the direction in which the player will move
      */
-    public void move(int a)
+    public void performMovement(int a)
     {
         double nextX = x + Math.cos((angle + a) / 180.0 * Math.PI) * (speed/* * modSpeed()*/ / (600));
         double nextY = y + Math.sin((angle + a) / 180.0 * Math.PI) * (speed/* * modSpeed()*/ / (600));
@@ -110,7 +150,7 @@ public class Player
         x = nextX;
         y = nextY;
 
-        if (1 < 2) return;
+        //if (1 < 2) return;
 
         if (Collision.hitWall(x, y, hitbox))
         {
@@ -140,7 +180,7 @@ public class Player
      *
      * @param dir Direction and also speed which the player will rotate with
      */
-    public void rotate(double dir)
+    public void performRotation(double dir)
     {
         angle += 2.5 * dir;
         if (angle >= 360) angle -= 360;
@@ -148,16 +188,18 @@ public class Player
     }
 
     /**
-     * Sets player position
+     * Sets the player position
      */
-    public void place(double x, double y)
+    public void setPosition(double x, double y)
     {
         this.x = x;
         this.y = y;
     }
 
+    // TODO: Add reset() after death
+
     /**
-     * Method called each frame, regenerating some health points to player every X-th frame
+     * Regenerates the player X health points
      */
     public void healthRegen()
     {
@@ -171,7 +213,7 @@ public class Player
     }
 
     /**
-     * Method called each frame, regenerating some mana points to player every X-th frame
+     * Regenerates the player X mana points
      */
     public void manaRegen()
     {
@@ -245,10 +287,9 @@ public class Player
      *
      * @param dmg Amount of health the player will loose
      */
-    public void getDamage(int dmg)
+    public void takeDamage(int dmg)
     {
         health -= dmg;
-        System.out.println("Ouch, -" + dmg + " health");
 
         if (health <= 0)
         {
@@ -263,6 +304,5 @@ public class Player
     {
         health = 0;
         World.getInstance().reset();
-        System.out.println("You died!");
     }
 }

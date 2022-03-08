@@ -1,5 +1,7 @@
 package com.cesak;
 
+import cesak.matur.Player;
+
 /**
  * Type of Object triggering an effect when the player collides with it
  */

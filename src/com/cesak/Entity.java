@@ -1,5 +1,7 @@
 package com.cesak;
 
+import cesak.matur.Player;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -149,7 +151,7 @@ public class Entity extends Object
             int dmg;
             if (minDmg == maxDmg) dmg = minDmg;
             else dmg = new Random().nextInt(maxDmg - minDmg + 1) + minDmg;
-            Player.getInstance().getDamage(dmg);
+            Player.getInstance().takeDamage(dmg);
         }
     }
 

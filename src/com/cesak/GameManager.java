@@ -1,5 +1,7 @@
 package com.cesak;
 
+import cesak.matur.Player;
+
 /**
  * Class, which WILL control the game.
  */

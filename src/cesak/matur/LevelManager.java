@@ -1,33 +1,29 @@
-package com.cesak;
+package cesak.matur;
 
-import cesak.matur.Player;
+import com.cesak.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.lang.Object;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-/**
- * Class where is described the world as a map with walls and objects.
- */
-public class World
+public class LevelManager
 {
-    // TODO: Udelat World Class non-Singleton + prevest na cteni z textoveho souboru
-
     // region Singleton
 
-    private static World world = null;
+    private static LevelManager levelManager = null;
 
-    public static World getInstance()
+    public static LevelManager getInstance()
     {
-        if (world == null)
+        if (levelManager == null)
         {
-            world = new World();
+            levelManager = new LevelManager();
         }
-        return world;
+        return levelManager;
     }
 
     // endregion
@@ -97,7 +93,7 @@ public class World
              "#############.......",    // 0
              "#########...#",
              "#.......#...#",
-             "#.......##-##",
+             "#.......##.##",
              "#.......#...#",
              "#...#.......#",    // 5
              "#.......#...#",
@@ -145,45 +141,18 @@ public class World
         map[y] = sb.toString();
     }
 
-    void setUp()
+    public void setUp()
     {
-        betterMap = new String[map.length];
-        for (int i = 0; i < map.length; i++)
+        try
         {
-            betterMap[i] = map[i].replaceAll("#", "*").replaceAll("\\.", " ");
+            wTexs[0] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
+            wTexs[1] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[1] + ".png")));
+        } catch (IOException e)
+        {
+            e.printStackTrace();
         }
 
-        entities.add(new Entity("wraith", 7.5, 5.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-        entities.add(new Entity("wraith", 2.5, 5.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-        entities.add(new Entity("wraith", 2.5, 8.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-        entities.add(new Entity("wraith", 3.5, 2.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-
-        entities.add(new Entity("wraith", 8.5, 12.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-
-        entities.add(new Entity("wraith", 9.5, 17.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-        entities.add(new Entity("wraith", 9.5, 19.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-
-        entities.add(new Entity("wraith", 1.5, 16.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-
-        entities.add(new Entity("wraith", 3.5, 12.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-        entities.add(new Entity("wraith", 1.5, 13.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-
-        entities.add(new Entity("wraith", 4.5, 20.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-        entities.add(new Entity("wraith", 1.5, 21.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-
-        entities.add(new Entity("wraith", 2.5, 24.5, 1, 0, 0.25, 5, 4, 4, 20, 0.5));
-
-        entities.add(new Entity("wraith", 18.5, 24.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
-        entities.add(new Entity("wraith", 15.5, 21.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
-        entities.add(new Entity("wraith", 15.5, 27.5, 0.5, 0.5, 0.25, 4, 3, 3, 25, 0.5));
-
-        for (int i = 0; i < entities.size(); i++)
-        {
-            entities.get(i).setDrops(new String[]{"magicPotion"});
-        }
-
-        // Boss
-        entities.add(new Entity("wraith", 15.5, 24.5, 1.5, 0, 0.25, 12, 10, 10, 15, 0.4));
+        Player.getInstance().setPosition(10.5, 1.5);
 
         staticObjects.add(new StaticObject("barrel", 1.5, 2.5, 1, 0, 0.35, true));
         staticObjects.add(new StaticObject("barrel", 2.5, 2.5, 1, 0, 0.35, true));
@@ -244,30 +213,6 @@ public class World
         pickables.add(new Pickable("healingPotion", 5.5, 27.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
         pickables.add(new Pickable("healingPotion", 4.5, 26.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
         pickables.add(new Pickable("healingPotion", 5.5, 26.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-
-        try
-        {
-            wTexs[0] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
-            wTexs[1] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[1] + ".png")));
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        Player.getInstance().setPosition(1.5, 1.5);
-    }
-
-    public void reset()
-    {
-        entities = new ArrayList<>();
-        staticObjects = new ArrayList<>();
-        projectiles = new ArrayList<>();
-        pickables = new ArrayList<>();
-        interactBlocks = new ArrayList<>();
-
-        Player.getInstance().setHealth(Player.getInstance().getHealthMax());
-
-        setUp();
     }
 
     //region Entities
@@ -344,44 +289,4 @@ public class World
     }
 
     //endregion
-
-    public String[] getDynamicMap()
-    {
-        String[] res = new String[betterMap.length];
-
-        int y = (int) Math.floor(Player.getInstance().getY());
-        int x = (int) Math.floor(Player.getInstance().getX());
-
-        StringBuilder sb = new StringBuilder(betterMap[y]);
-        String p;
-        double a = Player.getInstance().getAngle();
-
-        if (a > 315 || a <= 45)
-        {
-            p = ">";
-        }
-        else if (a > 45 && a <= 135)
-        {
-            p = "V";
-        }
-        else if (a > 135 && a <= 225)
-        {
-            p = "<";
-        }
-        else
-        {
-            p = "A";
-        }
-
-        sb.replace(x, x + 1, p);
-
-        for (int i = 0; i < betterMap.length; i++)
-        {
-            res[i] = (i == y) ? sb.toString() : betterMap[i];
-            //String s = res[i].replaceAll("\\.", " ").replaceAll("\\+", "-").replaceAll("#", "*");
-            //res[i] = s;
-        }
-
-        return res;
-    }
 }

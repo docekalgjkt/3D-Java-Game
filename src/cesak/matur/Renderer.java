@@ -1,4 +1,8 @@
-package com.cesak;
+package cesak.matur;
+
+import com.cesak.MyMath;
+import com.cesak.Object;
+import cesak.matur.LevelManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,17 +131,17 @@ public class Renderer
                     curY = posY + (Math.abs(dist * Math.sin(rayAngle)) * stepY);
 
                     // Ray hits edge of the map
-                    if (curY < 0 || curX < 0 || curY >= World.getInstance().getMap().length || curX >= World.getInstance().getMap()[(int) Math.floor(curY)].length())
+                    if (curY < 0 || curX < 0 || curY >= LevelManager.getInstance().getMap().length || curX >= LevelManager.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
                         what[x] = "#";
                         break;
                     }
                     // Checks if the ray hit a wall
-                    else if (!World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0)).equals("."))
+                    else if (!LevelManager.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0)).equals("."))
                     {
                         hit = true;
-                        what[x] = World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0));
+                        what[x] = LevelManager.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) + ((stepX < 0) ? stepX : 0));
                     }
                     // Ray didn't hit a wall, so we send him to next X pos :D
                     {
@@ -152,16 +156,16 @@ public class Renderer
                     curX = posX + (Math.abs(dist * Math.cos(rayAngle)) * stepX);
 
                     // Ray hits edge of the map
-                    if (curY < 0 || curX < 0 || curY >= World.getInstance().getMap().length || curX >= World.getInstance().getMap()[(int) Math.floor(curY)].length())
+                    if (curY < 0 || curX < 0 || curY >= LevelManager.getInstance().getMap().length || curX >= LevelManager.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
                         what[x] = "#";
                     }
                     // Checks if the ray hit a wall
-                    else if (!World.getInstance().getTile((int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curX)).equals("."))
+                    else if (!LevelManager.getInstance().getTile((int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curX)).equals("."))
                     {
                         hit = true;
-                        what[x] = World.getInstance().getTile((int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curX));
+                        what[x] = LevelManager.getInstance().getTile((int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curX));
                     }
                     // Ray didn't hit a wall, so we send him to next Y pos :D
                     else
@@ -177,30 +181,30 @@ public class Renderer
                     curY = posY + Y;
 
                     // Ray hits edge of the map
-                    if (curY < 0 || curX < 0 || curY >= World.getInstance().getMap().length || curX >= World.getInstance().getMap()[(int) Math.floor(curY)].length())
+                    if (curY < 0 || curX < 0 || curY >= LevelManager.getInstance().getMap().length || curX >= LevelManager.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
                         what[x] = "#";
                     }
-                    else if (!World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX)).equals("."))
+                    else if (!LevelManager.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX)).equals("."))
                     {
                         hit = true;
-                        what[x] = World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX));
+                        what[x] = LevelManager.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX));
                     }
-                    else if (!World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX)).equals("."))
+                    else if (!LevelManager.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX)).equals("."))
                     {
                         hit = true;
-                        what[x] = World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX));
+                        what[x] = LevelManager.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX));
                     }
-                    else if (!World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) - 1).equals("."))
+                    else if (!LevelManager.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) - 1).equals("."))
                     {
                         hit = true;
-                        what[x] = World.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) - 1);
+                        what[x] = LevelManager.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX) - 1);
                     }
-                    else if (!World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX) - 1).equals("."))
+                    else if (!LevelManager.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX) - 1).equals("."))
                     {
                         hit = true;
-                        what[x] = World.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX) - 1);
+                        what[x] = LevelManager.getInstance().getTile((int) Math.floor(curY) - 1, (int) Math.floor(curX) - 1);
                     }
                     else
                     {
@@ -258,10 +262,10 @@ public class Renderer
         // Object rendering
         List<Object> objects = new ArrayList<>();
 
-        objects.addAll(World.getInstance().getEntities());
-        objects.addAll(World.getInstance().getStaticObjects());
-        objects.addAll(World.getInstance().getProjectiles());
-        objects.addAll(World.getInstance().getPickables());
+        objects.addAll(LevelManager.getInstance().getEntities());
+        objects.addAll(LevelManager.getInstance().getStaticObjects());
+        objects.addAll(LevelManager.getInstance().getProjectiles());
+        objects.addAll(LevelManager.getInstance().getPickables());
 
         for (Object object : objects)
         {
@@ -370,17 +374,17 @@ public class Renderer
                         curZ = posZ + (Math.abs(distance * Math.sin(yRayAngle)) * stepZ);
 
                         // Ray hits the edge of the map
-                        if (curX < 0 || curY < 0 || curZ < 0 || curX >= World.getInstance().getMap3D()[(int) Math.floor(curZ)][(int) Math.floor(curY)].length() || curY >= World.getInstance().getMap3D()[(int) Math.floor(curZ)].length || curZ >= World.getInstance().getMap3D().length)
+                        if (curX < 0 || curY < 0 || curZ < 0 || curX >= LevelManager.getInstance().getMap3D()[(int) Math.floor(curZ)][(int) Math.floor(curY)].length() || curY >= LevelManager.getInstance().getMap3D()[(int) Math.floor(curZ)].length || curZ >= LevelManager.getInstance().getMap3D().length)
                         {
                             hit = true;
                             textureHit[y][x] = "1";
                             break;
                         }
                         // Checks if the ray hit a wall
-                        else if (!World.getInstance().getTile3D((int) Math.floor(curX) + ((stepX < 0) ? stepX : 0), (int) Math.floor(curY), (int) Math.floor(curZ)).equals("."))
+                        else if (!LevelManager.getInstance().getTile3D((int) Math.floor(curX) + ((stepX < 0) ? stepX : 0), (int) Math.floor(curY), (int) Math.floor(curZ)).equals("."))
                         {
                             hit = true;
-                            textureHit[y][x] = World.getInstance().getTile3D((int) Math.floor(curX) + ((stepX < 0) ? stepX : 0), (int) Math.floor(curY), (int) Math.floor(curZ));
+                            textureHit[y][x] = LevelManager.getInstance().getTile3D((int) Math.floor(curX) + ((stepX < 0) ? stepX : 0), (int) Math.floor(curY), (int) Math.floor(curZ));
                         }
                         // Ray did not hit a wall, so we send him to next X pos
                         else
@@ -396,17 +400,17 @@ public class Renderer
                         curZ = posZ + (Math.abs(distance * Math.sin(yRayAngle)) * stepZ);
 
                         // Ray hits the edge of the map
-                        if (curX < 0 || curY < 0 || curZ < 0 || curX >= World.getInstance().getMap3D()[(int) Math.floor(curZ)][(int) Math.floor(curY)].length() || curY >= World.getInstance().getMap3D()[(int) Math.floor(curZ)].length || curZ >= World.getInstance().getMap3D().length)
+                        if (curX < 0 || curY < 0 || curZ < 0 || curX >= LevelManager.getInstance().getMap3D()[(int) Math.floor(curZ)][(int) Math.floor(curY)].length() || curY >= LevelManager.getInstance().getMap3D()[(int) Math.floor(curZ)].length || curZ >= LevelManager.getInstance().getMap3D().length)
                         {
                             hit = true;
                             textureHit[y][x] = "1";
                             break;
                         }
                         // Checks if the ray hit a wall
-                        else if (!World.getInstance().getTile3D((int) Math.floor(curX), (int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curZ)).equals("."))
+                        else if (!LevelManager.getInstance().getTile3D((int) Math.floor(curX), (int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curZ)).equals("."))
                         {
                             hit = true;
-                            textureHit[y][x] = World.getInstance().getTile3D((int) Math.floor(curX), (int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curZ));
+                            textureHit[y][x] = LevelManager.getInstance().getTile3D((int) Math.floor(curX), (int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curZ));
                         }
                         // Ray did not hit a wall, so we send him to next X pos
                         else
@@ -422,17 +426,17 @@ public class Renderer
                         curZ = posZ + Z;
 
                         // Ray hits the edge of the map
-                        if (curX < 0 || curY < 0 || curZ < 0 || curX >= World.getInstance().getMap3D()[(int) Math.floor(curZ)][(int) Math.floor(curY)].length() || curY >= World.getInstance().getMap3D()[(int) Math.floor(curZ)].length || curZ >= World.getInstance().getMap3D().length)
+                        if (curX < 0 || curY < 0 || curZ < 0 || curX >= LevelManager.getInstance().getMap3D()[(int) Math.floor(curZ)][(int) Math.floor(curY)].length() || curY >= LevelManager.getInstance().getMap3D()[(int) Math.floor(curZ)].length || curZ >= LevelManager.getInstance().getMap3D().length)
                         {
                             hit = true;
                             textureHit[y][x] = "1";
                             break;
                         }
                         // Checks if the ray hit a wall
-                        else if (!World.getInstance().getTile3D((int) Math.floor(curX), (int) Math.floor(curY), (int) Math.floor(curZ) + ((stepZ < 0) ? stepZ : 0)).equals("."))
+                        else if (!LevelManager.getInstance().getTile3D((int) Math.floor(curX), (int) Math.floor(curY), (int) Math.floor(curZ) + ((stepZ < 0) ? stepZ : 0)).equals("."))
                         {
                             hit = true;
-                            textureHit[y][x] = World.getInstance().getTile3D((int) Math.floor(curX), (int) Math.floor(curY), (int) Math.floor(curZ) + ((stepZ < 0) ? stepZ : 0));
+                            textureHit[y][x] = LevelManager.getInstance().getTile3D((int) Math.floor(curX), (int) Math.floor(curY), (int) Math.floor(curZ) + ((stepZ < 0) ? stepZ : 0));
                         }
                         // Ray did not hit a wall, so we send him to next X pos
                         else

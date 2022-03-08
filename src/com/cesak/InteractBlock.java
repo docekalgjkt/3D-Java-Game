@@ -1,5 +1,7 @@
 package com.cesak;
 
+import cesak.matur.Player;
+
 /**
  * An Object the player is able to interact with
  * <br></br>
@@ -41,7 +43,7 @@ public class InteractBlock
     {
         switch (effect)
         {
-            case MOVE -> Player.getInstance().place((double) params[0], (double) params[1]);
+            case MOVE -> Player.getInstance().setPosition((double) params[0], (double) params[1]);
             case OPEN -> World.getInstance().setTile((int) params[1], (int) params[0], ".");
             case WALL -> World.getInstance().setTile((int) params[1], (int) params[0], "#");
         }

@@ -1,5 +1,8 @@
 package com.cesak;
 
+import cesak.matur.Player;
+import cesak.matur.Renderer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -97,11 +100,11 @@ public class Game extends JFrame implements KeyListener
 
             int offset = edgeDown / 2;
 
-            Renderer.getInstance().render(width - (edgeLeft + edgeRight));
+            cesak.matur.Renderer.getInstance().render(width - (edgeLeft + edgeRight));
 
-            double[] walls = Renderer.getInstance().getWalls();
-            double[] texs = Renderer.getInstance().getTexs();
-            String[] what = Renderer.getInstance().getWhat();
+            double[] walls = cesak.matur.Renderer.getInstance().getWalls();
+            double[] texs = cesak.matur.Renderer.getInstance().getTexs();
+            String[] what = cesak.matur.Renderer.getInstance().getWhat();
 
             g.setColor(new Color(40, 40, 40));
             g.fillRect(0, 0, width * scale, height * scale);
@@ -327,7 +330,7 @@ public class Game extends JFrame implements KeyListener
 
         public void paintComponent(Graphics g)
         {
-            Renderer.getInstance().render3D(Player.getInstance().getX(), Player.getInstance().getY(), 1.5, Player.getInstance().getAngle(), 0, Player.getInstance().getCamDistance(), width, height);
+            cesak.matur.Renderer.getInstance().render3D(Player.getInstance().getX(), Player.getInstance().getY(), 1.5, Player.getInstance().getAngle(), 0, Player.getInstance().getCamDistance(), width, height);
 
             String[][] textureHit = Renderer.getInstance().getTextureHit();
             //double[][][] hitPoint = Renderer.getInstance().getHitPoint();
@@ -493,8 +496,8 @@ public class Game extends JFrame implements KeyListener
 
                 int dir = 0;
 
-                if (isRotateL) Player.getInstance().rotate(-0.9);
-                if (isRotateR) Player.getInstance().rotate(0.9);
+                if (isRotateL) Player.getInstance().performRotation(-0.9);
+                if (isRotateR) Player.getInstance().performRotation(0.9);
 
                 if (isMoveB) dir = 180;
                 if (isMoveL) dir = 270;
@@ -508,7 +511,7 @@ public class Game extends JFrame implements KeyListener
                         !(isMoveF && isMoveB) &&
                         !(isMoveL && isMoveR)
                 )
-                    Player.getInstance().move(dir);
+                    Player.getInstance().performMovement(dir);
 
                 //endregion
 /*
