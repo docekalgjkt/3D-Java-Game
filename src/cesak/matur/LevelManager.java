@@ -5,11 +5,9 @@ import com.cesak.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.Object;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class LevelManager
 {
@@ -46,88 +44,12 @@ public class LevelManager
 
     }
 
-    private String[][] map3D = new String[][]
-            {
-                    {
-                            "00000",
-                            "00000",
-                            "00000",
-                            "00040",
-                            "00000"
-                    },
-                    {
-                            "11111",
-                            "1...1",
-                            "1.3.1",
-                            "1...1",
-                            "11111"
-                    },
-                    {
-                            "22222",
-                            "22222",
-                            "22322",
-                            "22222",
-                            "22222"
-                    }
-            };
-
-    public String[][] getMap3D()
-    {
-        return map3D;
-    }
-
-    public String getTile3D(int y, int x, int z)
-    {
-        return (x < 0 || y < 0 || z < 0 || x >= map3D[z][y].length() || y >= map3D[z].length || z >= map3D.length)
-                ? "1"
-                : String.valueOf(map3D[z][y].toCharArray()[x]);
-    }
-
-
-    //    -Y
-    // -X [ ] X
-    //     Y
-
-    private String[] map = new String[]
-            {//    5    10   15
-             "#############.......",    // 0
-             "#########...#",
-             "#.......#...#",
-             "#.......##.##",
-             "#.......#...#",
-             "#...#.......#",    // 5
-             "#.......#...#",
-             "#.......###-#",
-             "#.......#.#.#",
-             "##-########.#",
-             "#....#......#",    // 10
-             "#....#...####",
-             "#....#...-..#",
-             "#......####.#",
-             "###########.#",
-             "#...#.#.....#",    // 15
-             "#...###.....#",
-             "#....-......#",
-             "#.#####.....#",
-             "#...#.#.....#",
-             "#.....##############",    // 20
-             "#...#.#######.....##",
-             "##-##.######.......#",
-             "#...#.######.......#",
-             "#...#.-............#",
-             "#...########.......#",    // 25
-             "##.#..######.......#",
-             "###...#######.....##",
-             "####################",
-             //    5    10   15
-            };
+    private String[] map;
 
     public String[] getMap()
     {
         return map;
     }
-
-    private String[] betterMap;
 
     public String getTile(int y, int x)
     {
@@ -143,6 +65,8 @@ public class LevelManager
 
     public void setUp()
     {
+        getLevelMap();
+
         try
         {
             wTexs[0] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
@@ -152,74 +76,94 @@ public class LevelManager
             e.printStackTrace();
         }
 
-        Player.getInstance().setPosition(10.5, 1.5);
-
-        staticObjects.add(new StaticObject("barrel", 1.5, 2.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 2.5, 2.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 1.5, 3.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 1.5, 8.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 6.5, 8.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 7.5, 8.5, 1, 0, 0.35, true));
-
-        staticObjects.add(new StaticObject("barrel", 5.5, 5.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 4.5, 4.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 4.5, 6.5, 1, 0, 0.35, true));
-
-        staticObjects.add(new StaticObject("barrel", 7.5, 12.5, 1, 0, 0.35, true));
-
-        staticObjects.add(new StaticObject("barrel", 7.5, 15.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 8.5, 15.5, 1, 0, 0.35, true));
-
-        staticObjects.add(new StaticObject("barrel", 1.5, 15.5, 1, 0, 0.35, true));
-
-        staticObjects.add(new StaticObject("barrel", 10.5, 19.5, 1, 0, 0.35, true));
-        staticObjects.add(new StaticObject("barrel", 11.5, 19.5, 1, 0, 0.35, true));
-
-        staticObjects.add(new StaticObject("barrel", 3.5, 25.5, 1, 0, 0.35, true));
-
-        for (int i = 0; i < staticObjects.size(); i++)
-        {
-            int r = new Random().nextInt(4);
-
-            if (r == 0)
-            {
-                staticObjects.get(i).setDrops(new String[]{"healingPotion"});
-            }
-            else if (r == 1)
-            {
-                staticObjects.get(i).setDrops(new String[]{"magicPotion"});
-            }
-        }
-
-        pickables.add(new Pickable("healingPotion", 4.5, 10.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-        pickables.add(new Pickable("healingPotion", 3.5, 5.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-        pickables.add(new Pickable("healingPotion", 6.5, 10.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-        pickables.add(new Pickable("healingPotion", 3.5, 15.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-        pickables.add(new Pickable("healingPotion", 5.5, 19.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-
-        interactBlocks.add(new InteractBlock(10, 3, InteractBlock.Effect.OPEN, new java.lang.Object[]{10, 3}));
-        interactBlocks.add(new InteractBlock(2, 9, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 9}));
-        interactBlocks.add(new InteractBlock(11, 7, InteractBlock.Effect.OPEN, new java.lang.Object[]{11, 7}));
-        interactBlocks.add(new InteractBlock(9, 12, InteractBlock.Effect.OPEN, new java.lang.Object[]{9, 12}));
-        interactBlocks.add(new InteractBlock(5, 17, InteractBlock.Effect.OPEN, new java.lang.Object[]{5, 17}));
-        interactBlocks.add(new InteractBlock(2, 22, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 22}));
-        interactBlocks.add(new InteractBlock(6, 24, InteractBlock.Effect.OPEN, new java.lang.Object[]{6, 24}));
-        interactBlocks.add(new InteractBlock(6, 24, InteractBlock.Effect.WALL, new java.lang.Object[]{5, 22}));
-
-        // Secret
-        interactBlocks.add(new InteractBlock(2, 27, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 27}));
-
-        pickables.add(new Pickable("healingPotion", 4.5, 27.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-        pickables.add(new Pickable("healingPotion", 5.5, 27.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-        pickables.add(new Pickable("healingPotion", 4.5, 26.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-        pickables.add(new Pickable("healingPotion", 5.5, 26.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+        setPlayerStartPos();
+        placeStatics();
+        placePickables();
+        placeEnemies();
     }
+
+    private void getLevelMap()
+    {
+        ResFileReader rfr = new ResFileReader();
+
+        List<String> list = rfr.getFile("levels/level0/map.txt");
+        map = list.toArray(new String[0]);
+    }
+
+    private void setPlayerStartPos()
+    {
+        ResFileReader rfr = new ResFileReader();
+        List<String> list = rfr.getFile("levels/level0/playerStart.txt");
+
+        String[] playerStartPos = list.get(0).split(",");
+
+        double playerStartX = Integer.parseInt(playerStartPos[0]) + 0.5;
+        double playerStartY = Integer.parseInt(playerStartPos[1]) + 0.5;
+
+        Player.getInstance().setPosition(playerStartX, playerStartY);
+    }
+
+    private void placeStatics()
+    {
+        ResFileReader rfr = new ResFileReader();
+        List<String> list = rfr.getFile("levels/level0/staticObjects.txt");
+
+        for (int i = 0; i < list.size(); i++)
+        {
+            String[] objectProps = list.get(i).split("-");
+            String[] objectPos = objectProps[1].split(",");
+
+            int id = Integer.parseInt(objectProps[0]);
+            int x = Integer.parseInt(objectPos[0]);
+            int y = Integer.parseInt(objectPos[1]);
+
+            staticObjects.add(new StaticObject(id, x, y));
+        }
+    }
+
+    private void placePickables()
+    {
+        ResFileReader rfr = new ResFileReader();
+        List<String> list = rfr.getFile("levels/level0/pickables.txt");
+
+        for (int i = 0; i < list.size(); i++)
+        {
+            String[] objectProps = list.get(i).split("-");
+            String[] objectPos = objectProps[1].split(",");
+
+            int id = Integer.parseInt(objectProps[0]);
+            int x = Integer.parseInt(objectPos[0]);
+            int y = Integer.parseInt(objectPos[1]);
+
+            pickables.add(new Pickable(id, x, y));
+        }
+    }
+
+    private void placeEnemies()
+    {
+        ResFileReader rfr = new ResFileReader();
+        List<String> list = rfr.getFile("levels/level0/enemies.txt");
+
+        for (int i = 0; i < list.size(); i++)
+        {
+            String[] objectProps = list.get(i).split("-");
+            String[] objectPos = objectProps[1].split(",");
+
+            int id = Integer.parseInt(objectProps[0]);
+            int x = Integer.parseInt(objectPos[0]);
+            int y = Integer.parseInt(objectPos[1]);
+
+            entities.add(new Enemy(id, x, y));
+        }
+    }
+
+    // ---
 
     //region Entities
 
-    private List<Entity> entities = new ArrayList<>();
+    private List<Enemy> entities = new ArrayList<>();
 
-    public List<Entity> getEntities()
+    public List<Enemy> getEntities()
     {
         return entities;
     }
@@ -233,27 +177,6 @@ public class LevelManager
     public List<StaticObject> getStaticObjects()
     {
         return staticObjects;
-    }
-
-    //endregion
-
-    //region Projectiles
-
-    private List<Projectile> projectiles = new ArrayList<>();
-
-    public List<Projectile> getProjectiles()
-    {
-        return projectiles;
-    }
-
-    public void createProjectile(Projectile p)
-    {
-        projectiles.add(p);
-    }
-
-    public void destroyProjectile(Projectile p)
-    {
-        projectiles.remove(p);
     }
 
     //endregion

@@ -1,7 +1,5 @@
 package cesak.matur;
 
-import cesak.matur.GameManager;
-
 public class Main
 {
 
@@ -12,5 +10,8 @@ public class Main
 
         LevelManager.getInstance().setUp();
         GameManager.getInstance().start();
+
+        //PlayerWeapon pw = new PlayerWeapon();
+        //pw.setUp();
     }
 }

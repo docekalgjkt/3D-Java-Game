@@ -1,9 +1,5 @@
 package cesak.matur;
 
-import com.cesak.Object;
-import cesak.matur.LevelManager;
-import cesak.matur.LevelManager;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -82,7 +78,7 @@ public class Window extends JFrame
     /**
      * Panel which represents Main Menu Scene
      */
-    private JPanel menu = new JPanel()
+    private final JPanel menu = new JPanel()
     {
         public void paintComponent(Graphics g)
         {
@@ -94,10 +90,17 @@ public class Window extends JFrame
     /**
      * Panel which represents In-Game Scene
      */
-    private JPanel game = new JPanel()
+    private final JPanel game = new JPanel()
     {
         public void paintComponent(Graphics g)
         {
+
+            if (walls == null)
+            {
+                redraw(1);
+                return;
+            }
+
             // Ceiling
             g.setColor(new Color(5, 5, 5)); // 0, 0, 0.1f
             g.fillRect(0, 0, screenWidth, screenHeight / 2);
@@ -119,7 +122,7 @@ public class Window extends JFrame
                 shade = (shade < 0) ? 0 : shade;
 
                 // y-position of the top-first pixel of the currently rendered column
-                int wallTopYPos = (scaledHeight / 2) - (lineHeight / 2);
+                int colTopPixelY = (scaledHeight / 2) - (lineHeight / 2);
 
                 // Index of the column in the texture of the wall which was hit
                 int textureColumnIndex = (int) Math.floor((double) LevelManager.getInstance().getTex(what[i]).getWidth() * texs[i]);
@@ -138,92 +141,104 @@ public class Window extends JFrame
                 // This value is here to prevent overdrawing pixels that already has a color
                 int prevY = -1;
 
+                // Cycling through a texture column to draw particular color into selected pixel
                 for (int currentTextureRow = 0; currentTextureRow < textureHeight / ratio1; currentTextureRow++)
                 {
-                    // Y-position on the pixel we are about to assign a color to
-                    int posY = (int) (wallTopYPos + (ratio0 * (int) (currentTextureRow * ratio1 + 2/* <-- HERE IS THE PLAYER EYES POSITION ON Y-AXIS */)));
+                    // Offset of the player view point to make it look like the player character actually has a height
+                    int playerEyes = 2;
+
+                    // Y-position of the pixel we are about to assign a color to
+                    int pixelY = (int) (colTopPixelY + (ratio0 * (int) (currentTextureRow * ratio1 + playerEyes)));
 
                     // Moves to the next pixel, because this we know this one has already been colored (thanks to the prevY)
-                    if (currentTextureRow != 0 && posY == prevY)
+                    if (currentTextureRow != 0 && pixelY == prevY)
                     {
-                        posY++;
+                        pixelY++;
                     }
 
-                    prevY = posY;
+                    // Assigning prevY value
+                    prevY = pixelY;
 
-                    
+                    // Getting the number of pixels that are going to be colored with particular color
+                    // Used if rendered column has more pixels than the texture's rows
+                    // Just to speed up the process, otherwise there could be more pixels gaining color from the same texture pixel
                     int ySize = (int) Math.floor(ratio0 + 1) * scale;
 
-                    if (posY < 0)
+
+                    if (pixelY < 0)
                     {
-                        if (-posY >= (int) Math.floor(ratio0 + 1))
+                        if (-pixelY >= (int) Math.floor(ratio0 + 1))
                         {
                             continue;
                         }
-                        else if (-posY < (int) Math.floor(ratio0 + 1))
+                        else if (-pixelY < (int) Math.floor(ratio0 + 1))
                         {
-                            ySize += posY;
-                            posY = 0;
+                            ySize += pixelY;
+                            pixelY = 0;
                         }
                     }
-                    else if ((posY * scale) >= scaledHeight * scale)
+                    else if ((pixelY * scale) >= scaledHeight * scale)
                     {
                         break;
                     }
-                    else if ((posY * scale) + ySize >= scaledHeight * scale)
+                    else if ((pixelY * scale) + ySize >= scaledHeight * scale)
                     {
-                        ySize = (scaledHeight * scale) - (posY * scale) - 1;
+                        ySize = (scaledHeight * scale) - (pixelY * scale) - 1;
                     }
 
+                    // Getting the color of particular texture pixel
                     int pixel = LevelManager.getInstance().getTex(what[i]).getRGB(textureColumnIndex, (int) Math.floor(currentTextureRow * ratio1));
                     Color color = new Color(pixel, false);
+
+                    // Getting darker shades of the color
                     Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
+                    // Filling selected pixels with the gotten color
                     g.setColor(shadedColor);
-                    g.fillRect(i * scale, posY * scale, scale, ySize);
+                    g.fillRect(i * scale, pixelY * scale, scale, ySize);
                 }
             }
             //endregion
 
             //region Objects
-            List<Object> objects = new ArrayList<>();
+            List<SceneObject> sceneObjects = new ArrayList<>();
 
-            objects.addAll(LevelManager.getInstance().getEntities());
-            objects.addAll(LevelManager.getInstance().getStaticObjects());
-            objects.addAll(LevelManager.getInstance().getProjectiles());
-            objects.addAll(LevelManager.getInstance().getPickables());
+            sceneObjects.addAll(LevelManager.getInstance().getEntities());
+            sceneObjects.addAll(LevelManager.getInstance().getStaticObjects());
+            sceneObjects.addAll(LevelManager.getInstance().getPickables());
 
-            // Sorting objects (by distance)
-            for (int i = 1; i < objects.size(); i++)
+            // Sorting sceneObjects (by distance)
+            for (int i = 1; i < sceneObjects.size(); i++)
             {
                 for (int i1 = 0; i1 < i; i1++)
                 {
-                    if (objects.get(i).distToPlayer() > objects.get(i1).distToPlayer())
+                    if (sceneObjects.get(i).distToPlayer() > sceneObjects.get(i1).distToPlayer())
                     {
-                        objects.add(i1, objects.get(i));
-                        objects.remove(i + 1);
+                        sceneObjects.add(i1, sceneObjects.get(i));
+                        sceneObjects.remove(i + 1);
                     }
                 }
             }
 
-            // Rendering objects
-            for (Object object : objects)
+            // Rendering sceneObjects
+            for (SceneObject sceneObject : sceneObjects)
             {
-                if (!object.isRendered() || object.distToPlayer() <= Player.getInstance().getNearClip()) continue;
+                if (sceneObject.distToPlayer() <= Player.getInstance().getNearClip())
+                    continue;
 
-                int size = (int) ((scaledHeight / (object.distToPlayerTan() / 1.1)) * object.getSize() / 2);
-                int sizeX = (int) (((scaledWidth / (object.distToPlayerTan() / 1.1)) / (16.0 / 9)) * object.getSize());
+                int size = (int) ((scaledHeight / (sceneObject.distToPlayerTan() / 1.1)) * sceneObject.getSize() / 2);
+                int sizeX = (int) (((scaledWidth / (sceneObject.distToPlayerTan() / 1.1)) / (16.0 / 9)) * sceneObject.getSize());
 
                 for (int x = 0; x < sizeX; x++)
                 {
-                    int posX = -(sizeX / 2) + x + (int) (object.getXPos() * (scaledWidth));
-                    double yPos = (1.0 + object.getYPos()) - ((1.0 / object.getSize()) * 0.5);
+                    int posX = -(sizeX / 2) + x + (int) (sceneObject.getScreenX() * (scaledWidth));
+                    double yPos = (1.0 + sceneObject.getScreenY()) - ((1.0 / sceneObject.getSize()) * 0.5);
                     int y0 = (scaledHeight / 2) - (int) (size * (yPos));
 
-                    if (posX < 0 || posX >= walls.length || (walls[posX] < object.distToPlayerTan() && walls[posX] != 0))
+                    if (posX < 0 || posX >= walls.length || (walls[posX] < sceneObject.distToPlayerTan() && walls[posX] != 0))
                         continue;
 
-                    int p = object.getMyImage().getHeight();
+                    int p = sceneObject.getMyImage().getHeight();
                     double h = (double) size / p;
 
                     double ratio = (p > size) ? (double) p / size : 1;
@@ -264,18 +279,18 @@ public class Window extends JFrame
                             ySize = (scaledHeight * scale) - (y1 * scale) - 1;
                         }
 
-                        double imgW = object.getMyImage().getWidth() * ((double) x / sizeX);
+                        double imgW = sceneObject.getMyImage().getWidth() * ((double) x / sizeX);
 
-                        int pixel = object.getMyImage().getRGB((int) imgW, (int) Math.floor(y * ratio));
+                        int pixel = sceneObject.getMyImage().getRGB((int) imgW, (int) Math.floor(y * ratio));
                         if (pixel == 0) continue;
 
-                        float shade = 1 - (Math.round(object.distToPlayerTan()) / (float) Player.getInstance().getCamDistance());
+                        float shade = 1 - (Math.round(sceneObject.distToPlayerTan()) / (float) Player.getInstance().getCamDistance());
                         shade = (shade < 0) ? 0 : shade;
 
                         Color color = new Color(pixel, false);
                         Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
-                        g.setColor((object.isLit()) ? color : shadedColor);
+                        g.setColor(shadedColor);
                         g.fillRect(posX * scale, y1 * scale, scale, ySize);
                     }
                 }
@@ -298,13 +313,6 @@ public class Window extends JFrame
             g.fillRect(20, (scaledHeight - 80 / scale) * scale + 20, 300, 25);
             g.setColor(Color.red);
             g.fillRect(20, (scaledHeight - 80 / scale) * scale + 20, (int) (300 * Player.getInstance().getHealthPercent()), 25);
-
-            // Magic bar
-
-            g.setColor(new Color(10, 10, 10));
-            g.fillRect(20, (scaledHeight - 80 / scale) * scale + 45, 300, 15);
-            g.setColor(new Color(0, 40, 255));
-            g.fillRect(20, (scaledHeight - 80 / scale) * scale + 45, (int) (300 * Player.getInstance().getManaPercent()), 15);
 
             //endregion
         }

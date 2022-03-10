@@ -1,17 +1,15 @@
-package com.cesak;
+package cesak.matur;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Objects;
+import java.util.List;
 
 /**
- * Type of Object which does not move or do anything. It stays in one position and can be destroyable.
+ * Type of SceneObject which does not move or do anything. It stays in one position and can be destroyable.
  */
-public class StaticObject extends Object
+public class StaticObject extends SceneObject
 {
     private int health;
-    private final boolean destructible;
+    private boolean destructible;
     private String[] drops;
 
     public boolean isDestroyed()
@@ -26,22 +24,19 @@ public class StaticObject extends Object
 
     private BufferedImage imgDestroyed;
 
-    public StaticObject(String img, double x, double y, double size, double yPos, double hitbox, boolean destroyable)
+    // ---
+
+    public StaticObject(int id, int x, int y)
     {
-        super(img, x, y, size, yPos, hitbox);
+        super(id, x, y, "sceneObjects/object");
 
-        health = 1;
-        this.destructible = destroyable;
-        drops = new String[0];
+        ResFileReader rfr = new ResFileReader();
+        List<String> list = rfr.getFile("sceneObjects/object" + id + "/static.txt");
 
-        try
-        {
-            imgDestroyed = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + "barrel_destroyed" + ".png")));
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        health = Integer.parseInt(list.get(0));
     }
+
+    // ---
 
     public void setDrops(String[] strings)
     {
@@ -63,7 +58,7 @@ public class StaticObject extends Object
      */
     private void getDestroyed()
     {
-        health = 0;
+        /*health = 0;
         setMyImage(imgDestroyed);
         for (String string : drops)
         {
@@ -72,6 +67,6 @@ public class StaticObject extends Object
                 case "healingPotion" -> World.getInstance().createPickable(new Pickable("healingPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.HEAL));
                 case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MANA));
             }
-        }
+        }*/
     }
 }

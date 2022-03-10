@@ -1,6 +1,8 @@
 package com.cesak;
 
 import cesak.matur.LevelManager;
+import cesak.matur.Pickable;
+import cesak.matur.StaticObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -189,14 +191,14 @@ public class Collision
     }
 
     /**
-     * Checks whether the player walked into a Static Object and if he/she did he/she is pushed away from the Object.
+     * Checks whether the player walked into a Static SceneObject and if he/she did he/she is pushed away from the SceneObject.
      * <br><br/>
      * Both hitboxes are considered to be cylinder-shaped.
      *
      * @param x      Player's X position
      * @param y      Player's Y position
      * @param hitbox Player's hitbox radius
-     * @return True if the player collided with a Static Object
+     * @return True if the player collided with a Static SceneObject
      */
     public static boolean hitObject(double x, double y, double hitbox)
     {
@@ -230,14 +232,14 @@ public class Collision
     }
 
     /**
-     * Checks whether the player stepped on a Pickable Object and if he/she did they are saved in a list for their effect to be applied.
+     * Checks whether the player stepped on a Pickable SceneObject and if he/she did they are saved in a list for their effect to be applied.
      * <br><br/>
      * Both hitboxes are considered to be cylinder-shaped.
      *
      * @param x      Player's X position
      * @param y      Player's Y position
      * @param hitbox Player's hitbox radius
-     * @return True when the player stepped on a Pickable Object
+     * @return True when the player stepped on a Pickable SceneObject
      */
     public static boolean hitPickable(double x, double y, double hitbox)
     {

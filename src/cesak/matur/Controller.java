@@ -77,7 +77,7 @@ public class Controller implements KeyListener
     public void keyPressed(KeyEvent e)
     {
         // Prevents controlling the player character while in Menu
-        if (!GameManager.getInstance().inGame())
+        if (GameManager.getInstance().notInGame())
             return;
 
         // W
@@ -118,7 +118,6 @@ public class Controller implements KeyListener
             if (!attacked)
             {
                 attacked = true;
-                Player.getInstance().castFireball();
             }
         }
     }
@@ -140,7 +139,7 @@ public class Controller implements KeyListener
         }
 
         // Prevents controlling the player character while in Menu
-        if (!GameManager.getInstance().inGame())
+        if (GameManager.getInstance().notInGame())
             return;
 
         // W

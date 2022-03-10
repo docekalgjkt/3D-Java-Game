@@ -1,20 +1,20 @@
-package com.cesak;
+package cesak.matur;
 
-import cesak.matur.Player;
+import com.cesak.Collision;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
 /**
  * Class defining individual living beings (for now hostile)
  */
-public class Entity extends Object
+public class Enemy extends SceneObject
 {
-
-    // Obrázky k jednotlivým stavům
+    // Images for each enemy state
     private BufferedImage imgDefault;
     private BufferedImage imgAttack;
     private BufferedImage imgHit;
@@ -24,10 +24,14 @@ public class Entity extends Object
     private int health;
     private int minDmg;
     private int maxDmg;
-    private final double speed; // 12
-    private final double attackSpeed;
-    private final double attackRange = 0.9;
-    private String[] drops;
+    // Movement speed
+    private double speed; // 12
+    // How fast this enemy attacks
+    private double attackSpeed;
+    // At what distance will this enemy start attacking
+    private double attackRange = 0.9;
+    // What will drop from this enemy when killed
+    private String loot;
 
     public double getAttackRange()
     {
@@ -38,28 +42,32 @@ public class Entity extends Object
     {
         return health == 0;
     }
+
     // -----
 
-    public Entity(String img, double x, double y, double size, double yPos, double hitbox, int health, int minDmg, int maxDmg, double speed, double attackSpeed)
+    public Enemy(int id, int x, int y)
     {
-        super(img, x, y, size, yPos, hitbox * size);
+        super(id, x, y, "enemies/enemy");
 
-        this.health = health;
-        this.minDmg = minDmg;
-        this.maxDmg = maxDmg;
-        this.speed = speed;
-        this.attackSpeed = attackSpeed;
-        drops = new String[0];
+        ResFileReader rfr = new ResFileReader();
+        List<String> list = rfr.getFile("enemies/enemy" + id + "/enemy.txt");
+
+        health = Integer.parseInt(list.get(1));
+        minDmg = maxDmg = Integer.parseInt(list.get(2));
+        speed = Integer.parseInt(list.get(3));
+        attackSpeed = Integer.parseInt(list.get(4));
+        attackRange = Double.parseDouble(list.get(5));
+        loot = list.get(6);
 
         try
         {
-            imgDefault = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + ".png")));
-            imgHit = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + "_hit" + ".png")));
-            imgDead = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + "_dead" + ".png")));
+            imgDefault = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/def.png")));
+            imgHit = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/hit.png")));
+            imgDead = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/dead.png")));
             imgMove = new BufferedImage[2];
             for (int i = 0; i < imgMove.length; i++)
             {
-                imgMove[i] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + "_move" + i + ".png")));
+                imgMove[i] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/move" + i + ".png")));
             }
         } catch (IOException e)
         {
@@ -67,9 +75,9 @@ public class Entity extends Object
         }
     }
 
-    public void setDrops(String[] strings)
+    public void setLoot(String _loot)
     {
-        drops = strings;
+        loot = _loot;
     }
 
     //region Movement
@@ -229,23 +237,20 @@ public class Entity extends Object
 
         if (health <= 0)
         {
-            die();
+            //die();
         }
     }
-
+/*
     private void die()
     {
         health = 0;
         setYPos(0);
         setMyImage(imgDead);
-        for (String string : drops)
+        switch (loot)
         {
-            switch (string)
-            {
-                case "healingPotion" -> World.getInstance().createPickable(new Pickable("healingPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-                case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MANA));
-            }
+            case "healingPotion" -> World.getInstance().createPickable(new Pickable("healingPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.HEAL));
+            case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MANA));
         }
         //World.getInstance().destroyEntity(this);
-    }
+    }*/
 }

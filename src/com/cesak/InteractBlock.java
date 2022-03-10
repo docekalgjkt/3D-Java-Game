@@ -3,7 +3,7 @@ package com.cesak;
 import cesak.matur.Player;
 
 /**
- * An Object the player is able to interact with
+ * An SceneObject the player is able to interact with
  * <br></br>
  * After interaction, it will do something
  */

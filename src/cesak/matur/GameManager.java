@@ -36,9 +36,9 @@ public class GameManager
         window.switchScene(sceneNames[i]);
     }
 
-    public boolean inGame()
+    public boolean notInGame()
     {
-        return currentScene == 1;
+        return currentScene != 1;
     }
 
     // ---
@@ -65,9 +65,6 @@ public class GameManager
             @Override
             public void run()
             {
-                //Player.getInstance().healthRegen();
-                //Player.getInstance().manaRegen();
-
                 Player.getInstance().move();
                 Player.getInstance().rotate();
 

@@ -1,27 +1,33 @@
-package com.cesak;
+package cesak.matur;
 
 import cesak.matur.Player;
+import cesak.matur.ResFileReader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Class which defines every type of object the player can see
  * <br></>
- * It is used as a Superclass for classes defining specific types of objects (Static, Projectile, Entity, Pickable).
+ * It is used as a Superclass for classes defining specific types of objects (Static, Projectile, Enemy, Pickable).
  */
-public class Object
+public class SceneObject
 {
+    // Position in the scene
     private double x, y;
-    private double xPos, yPos;
+    // Position on the screen
+    private double screenX, screenY;
+    // Hitbox size
     private double hitbox;
+    // Object size in the scene
     private double size;
+    // On which tile this object is standing
     private int mapX, mapY;
-    private boolean rendered;
-    private boolean lit;
 
+    // ---
 
     private BufferedImage myImage;
 
@@ -35,6 +41,7 @@ public class Object
         myImage = img;
     }
 
+    // ---
 
     public double getX()
     {
@@ -51,29 +58,19 @@ public class Object
         return size;
     }
 
-    public boolean isLit()
-    {
-        return lit;
-    }
-
-    public boolean isRendered()
-    {
-        return rendered;
-    }
-
     public int[] getTilePos()
     {
         return new int[]{mapX, mapY};
     }
 
-    public double getXPos()
+    public double getScreenX()
     {
-        return xPos;
+        return screenX;
     }
 
-    public double getYPos()
+    public double getScreenY()
     {
-        return yPos;
+        return screenY;
     }
 
     public double getHitbox()
@@ -93,42 +90,30 @@ public class Object
 
     public void setXPos(double xPos)
     {
-        this.xPos = xPos;
+        this.screenX = xPos;
     }
 
     public void setYPos(double yPos)
     {
-        this.yPos = yPos;
+        this.screenY = yPos;
     }
 
-    public void setLit(boolean lit)
+    public SceneObject(int id, int x, int y, String path)
     {
-        this.lit = lit;
-    }
+        ResFileReader rfr = new ResFileReader();
+        List<String> list = rfr.getFile(path + id + "/object.txt");
 
-    public void setRenderd(boolean b)
-    {
-        rendered = b;
-    }
-
-
-    public Object(String img, double x, double y, double size, double yPos, double hitbox)
-    {
-        this.x = x;
-        this.y = y;
-
-        this.size = size;
-
-        this.hitbox = hitbox;
-
-        mapX = (int) Math.floor(x);
-        mapY = (int) Math.floor(y);
-
-        this.yPos = yPos;
+        this.x = x + 0.5;
+        this.y = y + 0.5;
+        mapX = x;
+        mapY = y;
+        size = Double.parseDouble(list.get(0));
+        screenY = Double.parseDouble(list.get(1));
+        hitbox = Double.parseDouble(list.get(2));
 
         try
         {
-            myImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + img + ".png")));
+            myImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(path + id + "/def.png")));
 
         } catch (IOException e)
         {
@@ -141,7 +126,7 @@ public class Object
         return (int) Math.floor(this.x) == x && (int) Math.floor(this.y) == y;
     }
 
-    // Returns distance of this Object from the Player
+    // Returns distance of this SceneObject from the Player
     public double distToPlayer()
     {
         return (getX() - Player.getInstance().getX()) * (getX() - Player.getInstance().getX()) + (getY() - Player.getInstance().getY()) * (getY() - Player.getInstance().getY());
@@ -150,10 +135,10 @@ public class Object
     // Returns distance to the Player in camera view
     public double distToPlayerTan()
     {
-        double angle = (getXPos() * 90) - 45;
+        double angle = (getScreenX() * 90) - 45;
         double pos = Math.abs(Math.cos(angle / 180 * Math.PI));
 
-        if (getXPos() < 0 || getXPos() > 1) pos = Math.cos(45.0 / 180 * Math.PI);
+        if (getScreenX() < 0 || getScreenX() > 1) pos = Math.cos(45.0 / 180 * Math.PI);
 
         return Math.sqrt(distToPlayer()) * pos;
     }

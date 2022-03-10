@@ -2,7 +2,6 @@ package cesak.matur;
 
 import com.cesak.Collision;
 import com.cesak.InteractBlock;
-import com.cesak.Projectile;
 import com.cesak.World;
 
 import java.util.List;
@@ -30,21 +29,14 @@ public class Player
 
     private int health = 15;
     private int healthMax = 15;
-    private int mana = 50;
-    private int manaMax = 50;
-    private int healthRegen = 0;
-    private int healthRegenFrame;
-    private int healthRegenTick = 90;
-    private int manaRegen = 1;
-    private int manaRegenFrame;
-    private int manaRegenTick = 6;
-    private int manaCost = 15;
     private double speed = 20.0;
     private double x;
     private double y;
     private double angle = 0;
     private double nearClip = 0.3;
     private double hitbox = 0.2;
+
+    private PlayerWeapon myWeapon;
 
     // -----
 
@@ -61,11 +53,6 @@ public class Player
     public int getHealthMax()
     {
         return healthMax;
-    }
-
-    public double getManaPercent()
-    {
-        return (double) mana / manaMax;
     }
 
     public double getX()
@@ -101,6 +88,11 @@ public class Player
     }
 
     // -----
+
+    public void setUp()
+    {
+        myWeapon = new PlayerWeapon();
+    }
 
     /**
      * Tells the player to perform a move
@@ -198,51 +190,9 @@ public class Player
 
     // TODO: Add reset() after death
 
-    /**
-     * Regenerates the player X health points
-     */
-    public void healthRegen()
-    {
-        if (health == healthMax) return;
-        healthRegenFrame++;
-        if (healthRegenFrame == healthRegenTick)
-        {
-            healthRegenFrame = 0;
-            getHeal(healthRegen);
-        }
-    }
-
-    /**
-     * Regenerates the player X mana points
-     */
-    public void manaRegen()
-    {
-        if (mana == manaMax) return;
-        manaRegenFrame++;
-        if (manaRegenFrame == manaRegenTick)
-        {
-            manaRegenFrame = 0;
-            getMana(manaRegen);
-        }
-    }
-
-    /**
-     * Spawns a fireball that flies in the player's look direction damaging enemies on hit
-     */
-    public void castFireball()
-    {
-        if (mana < manaCost) return;
-
-        Projectile fireball = new Projectile("fireball", Player.getInstance().getX(), Player.getInstance().getY(), 1, 1.0 / 16, 0.05, 50, angle, 0);
-        fireball.setLit(true);
-        fireball.setPower(2);
-        World.getInstance().createProjectile(fireball);
-        mana -= manaCost;
-    }
-
     public void interact()
     {
-        // Interacting with a Wall-like Object
+        // Interacting with a Wall-like SceneObject
         int nextX = (int) (x + (Math.cos(angle * Math.PI / 180) * 0.7));
         int nextY = (int) (y + (Math.sin(angle * Math.PI / 180) * 0.7));
 
@@ -266,20 +216,6 @@ public class Player
         health += h;
         if (health > healthMax)
             health = healthMax;
-    }
-
-    /**
-     * Instant mana gain for the player
-     *
-     * @param m Amount of mana the player will get
-     */
-    public void getMana(int m)
-    {
-        mana += m;
-        if (mana > manaMax)
-        {
-            mana = manaMax;
-        }
     }
 
     /**

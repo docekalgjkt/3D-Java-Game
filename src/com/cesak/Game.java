@@ -1,7 +1,7 @@
 package com.cesak;
 
 import cesak.matur.Player;
-import cesak.matur.Renderer;
+import cesak.matur.SceneObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,7 +66,7 @@ public class Game extends JFrame implements KeyListener
         height = view.getPreferredSize().height / scale - ((isUndecorated()) ? 0 : 18);
         width = view.getPreferredSize().width / scale;
 
-        World.getInstance().setUp();
+        //World.getInstance().setUp();
         this.update();
 
         BufferedImage cImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -185,44 +185,44 @@ public class Game extends JFrame implements KeyListener
             //endregion
 
             //region Objects
-            List<Object> objects = new ArrayList<>();
+            List<SceneObject> sceneObjects = new ArrayList<>();
 
-            objects.addAll(World.getInstance().getEntities());
-            objects.addAll(World.getInstance().getStaticObjects());
-            objects.addAll(World.getInstance().getProjectiles());
-            objects.addAll(World.getInstance().getPickables());
+            sceneObjects.addAll(World.getInstance().getEntities());
+            sceneObjects.addAll(World.getInstance().getStaticObjects());
+            sceneObjects.addAll(World.getInstance().getPickables());
 
-            // Sorting objects (by distance)
-            for (int i = 1; i < objects.size(); i++)
+            // Sorting sceneObjects (by distance)
+            for (int i = 1; i < sceneObjects.size(); i++)
             {
                 for (int i1 = 0; i1 < i; i1++)
                 {
-                    if (objects.get(i).distToPlayer() > objects.get(i1).distToPlayer())
+                    if (sceneObjects.get(i).distToPlayer() > sceneObjects.get(i1).distToPlayer())
                     {
-                        objects.add(i1, objects.get(i));
-                        objects.remove(i + 1);
+                        sceneObjects.add(i1, sceneObjects.get(i));
+                        sceneObjects.remove(i + 1);
                     }
                 }
             }
 
-            // Rendering objects
-            for (Object object : objects)
+            // Rendering sceneObjects
+            for (SceneObject sceneObject : sceneObjects)
             {
-                if (!object.isRendered() || object.distToPlayer() <= Player.getInstance().getNearClip()) continue;
+                if (sceneObject.distToPlayer() <= Player.getInstance().getNearClip())
+                    continue;
 
-                int size = (int) ((height / (object.distToPlayerTan() / 1.1)) * object.getSize());
-                int sizeX = (int) (((width / (object.distToPlayerTan() / 1.1)) / (16.0 / 9)) * object.getSize());
+                int size = (int) ((height / (sceneObject.distToPlayerTan() / 1.1)) * sceneObject.getSize());
+                int sizeX = (int) (((width / (sceneObject.distToPlayerTan() / 1.1)) / (16.0 / 9)) * sceneObject.getSize());
 
                 for (int x = 0; x < sizeX; x++)
                 {
-                    int posX = -(sizeX / 2) + x + (int) (object.getXPos() * (width - (edgeLeft + edgeRight))) + edgeLeft;
-                    double yPos = (1.0 + object.getYPos()) - ((1.0 / object.getSize()) * 0.5);
+                    int posX = -(sizeX / 2) + x + (int) (sceneObject.getScreenX() * (width - (edgeLeft + edgeRight))) + edgeLeft;
+                    double yPos = (1.0 + sceneObject.getScreenY()) - ((1.0 / sceneObject.getSize()) * 0.5);
                     int y0 = (height / 2) - (int) (size * (yPos));
 
-                    if (posX < edgeLeft || posX >= walls.length + edgeRight || (walls[posX - edgeLeft] < object.distToPlayerTan() && walls[posX - edgeLeft] != 0))
+                    if (posX < edgeLeft || posX >= walls.length + edgeRight || (walls[posX - edgeLeft] < sceneObject.distToPlayerTan() && walls[posX - edgeLeft] != 0))
                         continue;
 
-                    int p = object.getMyImage().getHeight();
+                    int p = sceneObject.getMyImage().getHeight();
                     double h = (double) size / p;
 
                     double ratio = (p > size) ? (double) p / size : 1;
@@ -263,18 +263,18 @@ public class Game extends JFrame implements KeyListener
                             ySize = ((height - edgeDown) * scale) - (y1 * scale) - 1;
                         }
 
-                        double imgW = object.getMyImage().getWidth() * ((double) x / sizeX);
+                        double imgW = sceneObject.getMyImage().getWidth() * ((double) x / sizeX);
 
-                        int pixel = object.getMyImage().getRGB((int) imgW, (int) Math.floor(y * ratio));
+                        int pixel = sceneObject.getMyImage().getRGB((int) imgW, (int) Math.floor(y * ratio));
                         if (pixel == 0) continue;
 
-                        float shade = 1 - (Math.round(object.distToPlayerTan()) / (float) Player.getInstance().getCamDistance());
+                        float shade = 1 - (Math.round(sceneObject.distToPlayerTan()) / (float) Player.getInstance().getCamDistance());
                         shade = (shade < 0) ? 0 : shade;
 
                         Color color = new Color(pixel, false);
                         Color shadedColor = new Color(((float) color.getRed() / 255) * shade, ((float) color.getGreen() / 255) * shade, ((float) color.getBlue() / 255) * shade);
 
-                        g.setColor((object.isLit()) ? color : shadedColor);
+                        g.setColor(shadedColor);
                         g.fillRect(posX * scale, y1 * scale, scale, ySize);
                     }
                 }
@@ -318,31 +318,7 @@ public class Game extends JFrame implements KeyListener
             g.setColor(Color.red);
             g.fillRect(20, (height - 80 / scale) * scale + 20, (int) (300 * Player.getInstance().getHealthPercent()), 25);
 
-            // Magic bar
-
-            g.setColor(new Color(10, 10, 10));
-            g.fillRect(20, (height - 80 / scale) * scale + 45, 300, 15);
-            g.setColor(new Color(0, 40, 255));
-            g.fillRect(20, (height - 80 / scale) * scale + 45, (int) (300 * Player.getInstance().getManaPercent()), 15);
-
             //endregion
-        }
-
-        public void paintComponent(Graphics g)
-        {
-            cesak.matur.Renderer.getInstance().render3D(Player.getInstance().getX(), Player.getInstance().getY(), 1.5, Player.getInstance().getAngle(), 0, Player.getInstance().getCamDistance(), width, height);
-
-            String[][] textureHit = Renderer.getInstance().getTextureHit();
-            //double[][][] hitPoint = Renderer.getInstance().getHitPoint();
-
-            for (int y = 0; y < textureHit.length; y++)
-            {
-                for (int x = 0; x < textureHit[y].length; x++)
-                {
-                    g.setColor(colors[Integer.parseInt(textureHit[y][x])]);
-                    g.fillRect(x * scale, y * scale, scale, scale);
-                }
-            }
         }
     }
 
@@ -400,7 +376,6 @@ public class Game extends JFrame implements KeyListener
             if (!attacked)
             {
                 attacked = true;
-                Player.getInstance().castFireball();
             }
         }
     }
@@ -489,9 +464,6 @@ public class Game extends JFrame implements KeyListener
             @Override
             public void run()
             {
-                Player.getInstance().healthRegen();
-                Player.getInstance().manaRegen();
-
                 //region Player Control
 
                 int dir = 0;
@@ -517,7 +489,7 @@ public class Game extends JFrame implements KeyListener
 /*
                 //region Objects
 
-                List<Entity> entities = World.getInstance().getEntities();
+                List<Enemy> entities = World.getInstance().getEntities();
                 for (int i = 0; i < entities.size(); i++)
                 {
                     if (entities.get(i).isDead()) continue;
