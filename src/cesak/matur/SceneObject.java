@@ -107,9 +107,22 @@ public class SceneObject
         this.y = y + 0.5;
         mapX = x;
         mapY = y;
-        size = Double.parseDouble(list.get(0));
-        screenY = Double.parseDouble(list.get(1));
-        hitbox = Double.parseDouble(list.get(2));
+        //size = Double.parseDouble(list.get(0));
+        //screenY = Double.parseDouble(list.get(1));
+        //hitbox = Double.parseDouble(list.get(2));
+
+        for (String string : list)
+        {
+            String[] line = string.replaceAll(" ", "").split(":");
+
+            switch (line[0])
+            {
+                case "size" -> size = Double.parseDouble(line[1]);
+                case "screenY" -> screenY = Double.parseDouble(line[1]);
+                case "hitbox" -> hitbox = Double.parseDouble(line[1]);
+            }
+        }
+
 
         try
         {

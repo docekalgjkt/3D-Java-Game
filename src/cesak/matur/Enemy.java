@@ -52,22 +52,30 @@ public class Enemy extends SceneObject
         ResFileReader rfr = new ResFileReader();
         List<String> list = rfr.getFile("enemies/enemy" + id + "/enemy.txt");
 
-        health = Integer.parseInt(list.get(1));
-        minDmg = maxDmg = Integer.parseInt(list.get(2));
-        speed = Integer.parseInt(list.get(3));
-        attackSpeed = Integer.parseInt(list.get(4));
-        attackRange = Double.parseDouble(list.get(5));
-        loot = list.get(6);
+        for (String string : list)
+        {
+            String[] line = string.replaceAll(" ", "").split(":");
+
+            switch (line[0])
+            {
+                case "health" -> health = Integer.parseInt(line[1]);
+                case "damage" -> minDmg = maxDmg = Integer.parseInt(line[1]);
+                case "speed" -> speed = Double.parseDouble(line[1]);
+                case "attackSpeed" -> attackSpeed = Double.parseDouble(line[1]);
+                case "attackRange" -> attackRange = Double.parseDouble(line[1]);
+                case "loot" -> loot = line[1];
+            }
+        }
 
         try
         {
             imgDefault = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/def.png")));
-            imgHit = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/hit.png")));
-            imgDead = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/dead.png")));
+            imgHit = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/images/hit.png")));
+            imgDead = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/images/dead.png")));
             imgMove = new BufferedImage[2];
             for (int i = 0; i < imgMove.length; i++)
             {
-                imgMove[i] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/move" + i + ".png")));
+                imgMove[i] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/images/move" + i + ".png")));
             }
         } catch (IOException e)
         {
@@ -75,12 +83,7 @@ public class Enemy extends SceneObject
         }
     }
 
-    public void setLoot(String _loot)
-    {
-        loot = _loot;
-    }
-
-    //region Movement
+    // --- Movement ---
 
     private int moveImg;
 
@@ -134,25 +137,23 @@ public class Enemy extends SceneObject
         setMyImage(imgDefault);
     }
 
-    //endregion
+    // --- Attacking ---
 
-    //region Attacking
-
-    public boolean isAttacking()
-    {
-        return isAttacking;
-    }
-
-    public void startAttack()
+    public void attack()
     {
         if (!isAttacking && !isBeingHit)
         {
-            animsOff();
-            isAttacking = true;
+            startAttack();
         }
     }
 
-    private void attack()
+    private void startAttack()
+    {
+        animsOff();
+        isAttacking = true;
+    }
+
+    private void performAttack()
     {
         if (distToPlayer() <= attackRange * attackRange)
         {
@@ -170,7 +171,7 @@ public class Enemy extends SceneObject
         setMyImage(imgDefault);
     }
 
-    //endregion
+    // --- Animating ---
 
     private boolean isMoving;
     private boolean isAttacking;
@@ -194,7 +195,7 @@ public class Enemy extends SceneObject
             if (frame == (60 * attackSpeed))
             {
                 setMyImage(imgHit);
-                attack();
+                performAttack();
             }
             else if (frame == (60 * attackSpeed) + 25)
             {
@@ -226,8 +227,13 @@ public class Enemy extends SceneObject
         isBeingHit = false;
     }
 
-    public void getDamage(int dmg)
+    // --- Health ---
+
+    public void takeDamage(int dmg)
     {
+        if (isDead())
+            return;
+
         setMyImage(imgHit);
         animsOff();
         frame = 0;
@@ -237,20 +243,14 @@ public class Enemy extends SceneObject
 
         if (health <= 0)
         {
-            //die();
+            die();
         }
     }
-/*
+
     private void die()
     {
         health = 0;
-        setYPos(0);
+        //setYPos(0);
         setMyImage(imgDead);
-        switch (loot)
-        {
-            case "healingPotion" -> World.getInstance().createPickable(new Pickable("healingPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.HEAL));
-            case "magicPotion" -> World.getInstance().createPickable(new Pickable("magicPotion", getX(), getY(), 0.5, 0, 0.35, Pickable.Bonus.MANA));
-        }
-        //World.getInstance().destroyEntity(this);
-    }*/
+    }
 }

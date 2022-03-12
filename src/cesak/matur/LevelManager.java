@@ -5,6 +5,7 @@ import com.cesak.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,23 +27,21 @@ public class LevelManager
 
     // endregion
 
-    private final String[] wallTexs = new String[]{
-            "wall",
-            "door",
-            };
-
-    private BufferedImage[] wTexs = new BufferedImage[2];
-
-    public BufferedImage getTex(String s)
+    public BufferedImage getTexture(int i)
     {
-        return switch (s)
-                {
-                    case "#" -> wTexs[0];
-                    case "-" -> wTexs[1];
-                    default -> null;
-                };
-
+        return wallTextures.get(i);
     }
+
+    private final List<BufferedImage> wallTextures = new ArrayList<>();
+
+    public List<BufferedImage> getWallTextures()
+    {
+        return wallTextures;
+    }
+
+    // ---
+
+    private int currentLevel;
 
     private String[] map;
 
@@ -63,14 +62,28 @@ public class LevelManager
         map[y] = sb.toString();
     }
 
+    // ---
+
     public void setUp()
     {
+        currentLevel = 1;
+
         getLevelMap();
 
         try
         {
-            wTexs[0] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[0] + ".png")));
-            wTexs[1] = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("images/" + wallTexs[1] + ".png")));
+            int i = 0;
+
+            URL url = getClass().getClassLoader().getResource("textures/walls/wall" + i + ".png");
+
+            while (url != null)
+            {
+                wallTextures.add(ImageIO.read(Objects.requireNonNull(url)));
+
+                i++;
+                url = getClass().getClassLoader().getResource("textures/walls/wall" + i + ".png");
+            }
+
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -86,14 +99,14 @@ public class LevelManager
     {
         ResFileReader rfr = new ResFileReader();
 
-        List<String> list = rfr.getFile("levels/level0/map.txt");
+        List<String> list = rfr.getFile("levels/level" + currentLevel + "/map.txt");
         map = list.toArray(new String[0]);
     }
 
     private void setPlayerStartPos()
     {
         ResFileReader rfr = new ResFileReader();
-        List<String> list = rfr.getFile("levels/level0/playerStart.txt");
+        List<String> list = rfr.getFile("levels/level" + currentLevel + "/playerStart.txt");
 
         String[] playerStartPos = list.get(0).split(",");
 
@@ -106,7 +119,7 @@ public class LevelManager
     private void placeStatics()
     {
         ResFileReader rfr = new ResFileReader();
-        List<String> list = rfr.getFile("levels/level0/staticObjects.txt");
+        List<String> list = rfr.getFile("levels/level" + currentLevel + "/staticObjects.txt");
 
         for (int i = 0; i < list.size(); i++)
         {
@@ -124,7 +137,7 @@ public class LevelManager
     private void placePickables()
     {
         ResFileReader rfr = new ResFileReader();
-        List<String> list = rfr.getFile("levels/level0/pickables.txt");
+        List<String> list = rfr.getFile("levels/level" + currentLevel + "/pickables.txt");
 
         for (int i = 0; i < list.size(); i++)
         {
@@ -142,7 +155,7 @@ public class LevelManager
     private void placeEnemies()
     {
         ResFileReader rfr = new ResFileReader();
-        List<String> list = rfr.getFile("levels/level0/enemies.txt");
+        List<String> list = rfr.getFile("levels/level" + currentLevel + "/enemies.txt");
 
         for (int i = 0; i < list.size(); i++)
         {
@@ -153,7 +166,7 @@ public class LevelManager
             int x = Integer.parseInt(objectPos[0]);
             int y = Integer.parseInt(objectPos[1]);
 
-            entities.add(new Enemy(id, x, y));
+            enemies.add(new Enemy(id, x, y));
         }
     }
 
@@ -161,11 +174,16 @@ public class LevelManager
 
     //region Entities
 
-    private List<Enemy> entities = new ArrayList<>();
+    private List<Enemy> enemies = new ArrayList<>();
 
-    public List<Enemy> getEntities()
+    public List<Enemy> getEnemies()
     {
-        return entities;
+        return enemies;
+    }
+
+    public void destroyEnemy(Enemy enemy)
+    {
+        enemies.remove(enemy);
     }
 
     //endregion
@@ -188,11 +206,6 @@ public class LevelManager
     public List<Pickable> getPickables()
     {
         return pickables;
-    }
-
-    public void createPickable(Pickable p)
-    {
-        pickables.add(p);
     }
 
     public void destroyPickable(Pickable p)

@@ -29,7 +29,7 @@ public class Player
 
     private int health = 15;
     private int healthMax = 15;
-    private double speed = 20.0;
+    private double speed = 25.0;
     private double x;
     private double y;
     private double angle = 0;
@@ -78,6 +78,11 @@ public class Player
     public double getNearClip()
     {
         return nearClip * nearClip;
+    }
+
+    public PlayerWeapon getMyWeapon()
+    {
+        return myWeapon;
     }
 
     // -----
@@ -180,6 +185,14 @@ public class Player
     }
 
     /**
+     * Makes the player attack if possible
+     */
+    public void attack()
+    {
+        myWeapon.attack();
+    }
+
+    /**
      * Sets the player position
      */
     public void setPosition(double x, double y)
@@ -188,8 +201,8 @@ public class Player
         this.y = y;
     }
 
-    // TODO: Add reset() after death
 
+    // TODO: Reword Interaction system
     public void interact()
     {
         // Interacting with a Wall-like SceneObject
@@ -239,6 +252,8 @@ public class Player
     private void die()
     {
         health = 0;
-        World.getInstance().reset();
+        // TODO: Reset the player
     }
+
+    // TODO: Add reset() after death
 }

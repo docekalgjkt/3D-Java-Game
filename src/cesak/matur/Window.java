@@ -102,11 +102,11 @@ public class Window extends JFrame
             }
 
             // Ceiling
-            g.setColor(new Color(5, 5, 5)); // 0, 0, 0.1f
+            g.setColor(new Color(60, 60, 60)); // 0, 0, 0.1f
             g.fillRect(0, 0, screenWidth, screenHeight / 2);
 
             // Floors
-            g.setColor(new Color(30, 30, 30));
+            g.setColor(new Color(125, 125, 125));
             g.fillRect(0, screenHeight / 2, screenWidth, screenHeight / 2);
 
             //region Walls
@@ -125,10 +125,15 @@ public class Window extends JFrame
                 int colTopPixelY = (scaledHeight / 2) - (lineHeight / 2);
 
                 // Index of the column in the texture of the wall which was hit
-                int textureColumnIndex = (int) Math.floor((double) LevelManager.getInstance().getTex(what[i]).getWidth() * texs[i]);
+                int textureColumnIndex/* = (int) Math.floor((double) LevelManager.getInstance().getTex(what[i]).getWidth() * texs[i])*/;
+
+                int wallType = Integer.parseInt(what[i]);
+                textureColumnIndex = (int) Math.floor((double) LevelManager.getInstance().getTexture(wallType).getWidth() * texs[i]);
 
                 // Height of the texture which is about to render
-                int textureHeight = LevelManager.getInstance().getTex(what[i]).getHeight();
+                int textureHeight/* = LevelManager.getInstance().getTex(what[i]).getHeight()*/;
+
+                textureHeight = LevelManager.getInstance().getTexture(wallType).getHeight();
 
                 // Ratio of lineHeight and textureHeight
                 double ratio0 = (double) lineHeight / textureHeight;
@@ -187,7 +192,7 @@ public class Window extends JFrame
                     }
 
                     // Getting the color of particular texture pixel
-                    int pixel = LevelManager.getInstance().getTex(what[i]).getRGB(textureColumnIndex, (int) Math.floor(currentTextureRow * ratio1));
+                    int pixel = LevelManager.getInstance().getTexture(wallType).getRGB(textureColumnIndex, (int) Math.floor(currentTextureRow * ratio1));
                     Color color = new Color(pixel, false);
 
                     // Getting darker shades of the color
@@ -203,7 +208,7 @@ public class Window extends JFrame
             //region Objects
             List<SceneObject> sceneObjects = new ArrayList<>();
 
-            sceneObjects.addAll(LevelManager.getInstance().getEntities());
+            sceneObjects.addAll(LevelManager.getInstance().getEnemies());
             sceneObjects.addAll(LevelManager.getInstance().getStaticObjects());
             sceneObjects.addAll(LevelManager.getInstance().getPickables());
 
@@ -226,8 +231,8 @@ public class Window extends JFrame
                 if (sceneObject.distToPlayer() <= Player.getInstance().getNearClip())
                     continue;
 
-                int size = (int) ((scaledHeight / (sceneObject.distToPlayerTan() / 1.1)) * sceneObject.getSize() / 2);
-                int sizeX = (int) (((scaledWidth / (sceneObject.distToPlayerTan() / 1.1)) / (16.0 / 9)) * sceneObject.getSize());
+                int size = (int) ((scaledHeight / (sceneObject.distToPlayerTan())) * sceneObject.getSize());
+                int sizeX = (int) (((scaledWidth / (sceneObject.distToPlayerTan()))/* / (16.0 / 9)*/) * sceneObject.getSize());
 
                 for (int x = 0; x < sizeX; x++)
                 {
@@ -298,7 +303,7 @@ public class Window extends JFrame
 
             //endregion
 
-            //region UI
+            // --- UI ---
 
             // Cursor
 
@@ -307,14 +312,23 @@ public class Window extends JFrame
             g.fillRect(scaledWidth * scale / 2 - 1, (scaledHeight * scale) / 2, 1, 2);
             g.fillRect(scaledWidth * scale / 2 + 2, (scaledHeight * scale) / 2, 1, 2);
 
-            // Health bar
+            // Weapon
+
+            int size = 500;
+            g.drawImage(Player.getInstance().getMyWeapon().getWeaponAnimation(), (screenWidth - size) / 2, (screenHeight - size), size, size, null);
+
+            // Health
 
             g.setColor(new Color(10, 10, 10));
             g.fillRect(20, (scaledHeight - 80 / scale) * scale + 20, 300, 25);
             g.setColor(Color.red);
             g.fillRect(20, (scaledHeight - 80 / scale) * scale + 20, (int) (300 * Player.getInstance().getHealthPercent()), 25);
 
-            //endregion
+            // Ammo
+
+            g.setColor(Color.GREEN);
+            g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 50));
+            g.drawString(String.valueOf(Player.getInstance().getMyWeapon().getCurrentAmmunition()), screenWidth - 100, screenHeight - 25);
         }
     };
 

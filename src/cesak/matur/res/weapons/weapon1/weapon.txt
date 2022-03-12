@@ -1,0 +1,4 @@
+Pistol Gun
+damage: 2
+ammo: 1
+fireRate: 2

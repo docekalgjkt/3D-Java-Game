@@ -1,7 +1,7 @@
 Zombie
-10
-2
-12
-1
-0.9
-""
+health: 30
+damage: 2
+speed: 0
+attackSpeed: 1
+attackRange: 0.9
+loot: ""

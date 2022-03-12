@@ -1,0 +1,4 @@
+Rifle
+damage: 1
+ammo: 2
+fireRate: 5

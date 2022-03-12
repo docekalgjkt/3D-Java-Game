@@ -116,7 +116,7 @@ public class Renderer
 
             boolean hit = false;
 
-            what[x] = "#";
+            what[x] = "0";
 
             // Ray cycle
             while (!hit && (distX <= Player.getInstance().getCamDistance() || distY <= Player.getInstance().getCamDistance()))
@@ -132,7 +132,7 @@ public class Renderer
                     if (curY < 0 || curX < 0 || curY >= LevelManager.getInstance().getMap().length || curX >= LevelManager.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
-                        what[x] = "#";
+                        what[x] = "0";
                         break;
                     }
                     // Checks if the ray hit a wall
@@ -157,7 +157,7 @@ public class Renderer
                     if (curY < 0 || curX < 0 || curY >= LevelManager.getInstance().getMap().length || curX >= LevelManager.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
-                        what[x] = "#";
+                        what[x] = "0";
                     }
                     // Checks if the ray hit a wall
                     else if (!LevelManager.getInstance().getTile((int) Math.floor(curY) + ((stepY < 0) ? stepY : 0), (int) Math.floor(curX)).equals("."))
@@ -182,7 +182,7 @@ public class Renderer
                     if (curY < 0 || curX < 0 || curY >= LevelManager.getInstance().getMap().length || curX >= LevelManager.getInstance().getMap()[(int) Math.floor(curY)].length())
                     {
                         hit = true;
-                        what[x] = "#";
+                        what[x] = "0";
                     }
                     else if (!LevelManager.getInstance().getTile((int) Math.floor(curY), (int) Math.floor(curX)).equals("."))
                     {
@@ -252,7 +252,7 @@ public class Renderer
             else
             {
                 walls[x] = Player.getInstance().getCamDistance();
-                what[x] = "#";
+                what[x] = "0";
                 texs[x] = 0.0;
             }
         }
@@ -260,7 +260,7 @@ public class Renderer
         // SceneObject rendering
         List<SceneObject> sceneObjects = new ArrayList<>();
 
-        sceneObjects.addAll(LevelManager.getInstance().getEntities());
+        sceneObjects.addAll(LevelManager.getInstance().getEnemies());
         sceneObjects.addAll(LevelManager.getInstance().getStaticObjects());
         sceneObjects.addAll(LevelManager.getInstance().getPickables());
 

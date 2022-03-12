@@ -29,7 +29,7 @@ public class Controller implements KeyListener
     private boolean isRotateL = false; // Is rotating left?
     private boolean isRotateR = false; // Is rotating right?
 
-    private boolean attacked = false; // Has attacked?
+    private boolean attacking = false; // Is attacking?
 
     public boolean isMoveF()
     {
@@ -61,9 +61,9 @@ public class Controller implements KeyListener
         return isRotateR;
     }
 
-    public boolean isAttacked()
+    public boolean isAttacking()
     {
-        return attacked;
+        return attacking;
     }
 // ---
 
@@ -115,9 +115,17 @@ public class Controller implements KeyListener
         // Space
         if (e.getKeyCode() == 32)
         {
-            if (!attacked)
+            if (!attacking)
             {
-                attacked = true;
+                attacking = true;
+            }
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            if (e.getKeyChar() == String.valueOf((i + 1)).charAt(0))
+            {
+                Player.getInstance().getMyWeapon().equipWeapon(i);
             }
         }
     }
@@ -125,19 +133,6 @@ public class Controller implements KeyListener
     @Override
     public void keyReleased(KeyEvent e)
     {
-        // Space
-        if (e.getKeyCode() == 32)
-        {
-            attacked = false;
-            GameManager.getInstance().setScene(1);
-        }
-        // E
-        if (e.getKeyCode() == 69)
-        {
-            Player.getInstance().interact();
-            GameManager.getInstance().setScene(0);
-        }
-
         // Prevents controlling the player character while in Menu
         if (GameManager.getInstance().notInGame())
             return;
@@ -172,6 +167,12 @@ public class Controller implements KeyListener
         if (e.getKeyCode() == 39)
         {
             isRotateR = false;
+        }
+
+        // Space
+        if (e.getKeyCode() == 32)
+        {
+            attacking = false;
         }
 
         // Escape - Quits the game
