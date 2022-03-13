@@ -67,6 +67,8 @@ public class GameManager
         currentScene = 0;
         setScene(1);
 
+        SoundManager.getInstance().playLoop("music");
+
         update();
     }
 

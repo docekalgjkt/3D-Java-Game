@@ -1,7 +1,5 @@
 package cesak.matur;
 
-import com.cesak.*;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -52,7 +50,7 @@ public class LevelManager
 
     public String getTile(int y, int x)
     {
-        return (y < 0 || y >= map.length || x < 0 || x >= map[y].length()) ? "#" : String.valueOf(map[y].toCharArray()[x]);
+        return (y < 0 || y >= map.length || x < 0 || x >= map[y].length()) ? "0" : String.valueOf(map[y].toCharArray()[x]);
     }
 
     public void setTile(int y, int x, String what)
@@ -66,7 +64,7 @@ public class LevelManager
 
     public void setUp()
     {
-        currentLevel = 1;
+        currentLevel = 0;
 
         getLevelMap();
 
@@ -90,9 +88,10 @@ public class LevelManager
         }
 
         setPlayerStartPos();
-        placeStatics();
+        placeObjects();
         placePickables();
         placeEnemies();
+        placeInteractBlocks();
     }
 
     private void getLevelMap()
@@ -116,21 +115,21 @@ public class LevelManager
         Player.getInstance().setPosition(playerStartX, playerStartY);
     }
 
-    private void placeStatics()
+    private void placeObjects()
     {
         ResFileReader rfr = new ResFileReader();
-        List<String> list = rfr.getFile("levels/level" + currentLevel + "/staticObjects.txt");
+        List<String> list = rfr.getFile("levels/level" + currentLevel + "/objects.txt");
 
-        for (int i = 0; i < list.size(); i++)
+        for (String line : list)
         {
-            String[] objectProps = list.get(i).split("-");
+            String[] objectProps = line.split("-");
             String[] objectPos = objectProps[1].split(",");
 
             int id = Integer.parseInt(objectProps[0]);
             int x = Integer.parseInt(objectPos[0]);
             int y = Integer.parseInt(objectPos[1]);
 
-            staticObjects.add(new StaticObject(id, x, y));
+            objects.add(new SceneObject(id, x, y, "objects/object"));
         }
     }
 
@@ -139,9 +138,9 @@ public class LevelManager
         ResFileReader rfr = new ResFileReader();
         List<String> list = rfr.getFile("levels/level" + currentLevel + "/pickables.txt");
 
-        for (int i = 0; i < list.size(); i++)
+        for (String line : list)
         {
-            String[] objectProps = list.get(i).split("-");
+            String[] objectProps = line.split("-");
             String[] objectPos = objectProps[1].split(",");
 
             int id = Integer.parseInt(objectProps[0]);
@@ -157,9 +156,9 @@ public class LevelManager
         ResFileReader rfr = new ResFileReader();
         List<String> list = rfr.getFile("levels/level" + currentLevel + "/enemies.txt");
 
-        for (int i = 0; i < list.size(); i++)
+        for (String line : list)
         {
-            String[] objectProps = list.get(i).split("-");
+            String[] objectProps = line.split("-");
             String[] objectPos = objectProps[1].split(",");
 
             int id = Integer.parseInt(objectProps[0]);
@@ -170,38 +169,60 @@ public class LevelManager
         }
     }
 
+    private void placeInteractBlocks()
+    {
+        ResFileReader rfr = new ResFileReader();
+        List<String> list = rfr.getFile("levels/level" + currentLevel + "/doors.txt");
+
+        for (String line : list)
+        {
+            String[] objectPos = line.split(",");
+
+            int x = Integer.parseInt(objectPos[0]);
+            int y = Integer.parseInt(objectPos[1]);
+
+            doors.add(new Door(x, y));
+        }
+    }
+
     // ---
 
     //region Entities
 
-    private List<Enemy> enemies = new ArrayList<>();
+    private final List<Enemy> enemies = new ArrayList<>();
 
     public List<Enemy> getEnemies()
     {
         return enemies;
     }
 
-    public void destroyEnemy(Enemy enemy)
+    //endregion
+
+    //region Objects
+
+    private final List<SceneObject> objects = new ArrayList<>();
+
+    public List<SceneObject> getObjects()
     {
-        enemies.remove(enemy);
+        return objects;
     }
 
     //endregion
 
-    //region Static Objects
+    //region Exlopsives
 
-    private List<StaticObject> staticObjects = new ArrayList<>();
+    private final List<Explosive> explosives = new ArrayList<>();
 
-    public List<StaticObject> getStaticObjects()
+    public List<Explosive> getExplosives()
     {
-        return staticObjects;
+        return explosives;
     }
 
     //endregion
 
     //region Pickables
 
-    private List<Pickable> pickables = new ArrayList<>();
+    private final List<Pickable> pickables = new ArrayList<>();
 
     public List<Pickable> getPickables()
     {
@@ -215,13 +236,13 @@ public class LevelManager
 
     //endregion
 
-    //region InteractBlock
+    //region Door
 
-    private List<InteractBlock> interactBlocks = new ArrayList<>();
+    private final List<Door> doors = new ArrayList<>();
 
-    public List<InteractBlock> getDoors()
+    public List<Door> getDoors()
     {
-        return interactBlocks;
+        return doors;
     }
 
     //endregion

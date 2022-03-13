@@ -65,7 +65,8 @@ public class Controller implements KeyListener
     {
         return attacking;
     }
-// ---
+
+    // ---
 
     @Override
     public void keyTyped(KeyEvent e)
@@ -110,6 +111,12 @@ public class Controller implements KeyListener
         if (e.getKeyCode() == 39)
         {
             isRotateR = true;
+        }
+
+        // E
+        if (e.getKeyCode() == 69)
+        {
+            Player.getInstance().interact();
         }
 
         // Space

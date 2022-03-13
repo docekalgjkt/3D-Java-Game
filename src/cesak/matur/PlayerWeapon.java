@@ -16,12 +16,12 @@ public class PlayerWeapon
     /**
      * Boolean array which holds information about what weapons you have
      */
-    private boolean[] weaponOwned;
+    private final boolean[] weaponOwned;
 
     /**
      * Integer array which holds your amount of ammunition of each types
      */
-    private int[] ammunition;
+    private final int[] ammunition;
 
     /**
      * Index of the weapon you're holding at the moment
@@ -34,7 +34,7 @@ public class PlayerWeapon
     private double timePassed;
 
     /**
-     *
+     * How long will the shoot animation stay after the shot
      */
     private final double shootAnimDelay = 0.2;
 
@@ -65,6 +65,9 @@ public class PlayerWeapon
 
         weaponOwned = new boolean[weapons.size()];
         ammunition = new int[weapons.size()];
+
+        weaponOwned[0] = true;
+        weaponOwned[1] = true;
 
         equipped = 1;
 
@@ -182,15 +185,17 @@ public class PlayerWeapon
 
             if (distFromMiddleX <= size / 2)
             {
-                if (screenX >= 0 && screenX < Renderer.getInstance().getWalls().length)
+                if (screenX >= 0 && screenX < 1)
                     if (Renderer.getInstance().getWalls()[(int) (Renderer.getInstance().getWalls().length * screenX)] < enemy.distToPlayerTan())
                         continue;
 
 
                 enemy.takeDamage(weapons.get(equipped).getDamage());
-                return;
+                break;
             }
         }
+
+        SoundManager.getInstance().playSound("fire");
     }
 
     /**
@@ -203,8 +208,19 @@ public class PlayerWeapon
         if (timePassed < shootAnimDelay)
             return;
 
-        if (!weaponOwned[w])
+        if (w >= weapons.size())
+            return;
+
+        if (weaponOwned[w])
             equipped = w;
+    }
+
+    /**
+     * Gives the player the access to a new weapon
+     */
+    public void addWeapon(int index)
+    {
+        weaponOwned[index] = true;
     }
 
     /**

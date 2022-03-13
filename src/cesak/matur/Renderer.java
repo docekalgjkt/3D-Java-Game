@@ -1,7 +1,5 @@
 package cesak.matur;
 
-import com.cesak.MyMath;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -260,8 +258,9 @@ public class Renderer
         // SceneObject rendering
         List<SceneObject> sceneObjects = new ArrayList<>();
 
+        sceneObjects.addAll(LevelManager.getInstance().getObjects());
         sceneObjects.addAll(LevelManager.getInstance().getEnemies());
-        sceneObjects.addAll(LevelManager.getInstance().getStaticObjects());
+        sceneObjects.addAll(LevelManager.getInstance().getExplosives());
         sceneObjects.addAll(LevelManager.getInstance().getPickables());
 
         for (SceneObject sceneObject : sceneObjects)

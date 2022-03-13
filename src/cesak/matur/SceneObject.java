@@ -107,9 +107,6 @@ public class SceneObject
         this.y = y + 0.5;
         mapX = x;
         mapY = y;
-        //size = Double.parseDouble(list.get(0));
-        //screenY = Double.parseDouble(list.get(1));
-        //hitbox = Double.parseDouble(list.get(2));
 
         for (String string : list)
         {

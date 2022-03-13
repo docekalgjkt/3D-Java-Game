@@ -1,4 +1,4 @@
-package com.cesak;
+package cesak.matur;
 
 /**
  * Class containing helpful custom math methods

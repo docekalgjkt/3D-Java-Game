@@ -1,7 +1,5 @@
 package cesak.matur;
 
-import com.cesak.Collision;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,8 +20,7 @@ public class Enemy extends SceneObject
     private BufferedImage[] imgMove;
 
     private int health;
-    private int minDmg;
-    private int maxDmg;
+    private int damage;
     // Movement speed
     private double speed; // 12
     // How fast this enemy attacks
@@ -59,7 +56,7 @@ public class Enemy extends SceneObject
             switch (line[0])
             {
                 case "health" -> health = Integer.parseInt(line[1]);
-                case "damage" -> minDmg = maxDmg = Integer.parseInt(line[1]);
+                case "damage" -> damage = Integer.parseInt(line[1]);
                 case "speed" -> speed = Double.parseDouble(line[1]);
                 case "attackSpeed" -> attackSpeed = Double.parseDouble(line[1]);
                 case "attackRange" -> attackRange = Double.parseDouble(line[1]);
@@ -72,6 +69,8 @@ public class Enemy extends SceneObject
             imgDefault = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/def.png")));
             imgHit = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/images/hit.png")));
             imgDead = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/images/dead.png")));
+            imgAttack = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource("enemies/enemy" + id + "/images/attack.png")));
+
             imgMove = new BufferedImage[2];
             for (int i = 0; i < imgMove.length; i++)
             {
@@ -157,10 +156,7 @@ public class Enemy extends SceneObject
     {
         if (distToPlayer() <= attackRange * attackRange)
         {
-            int dmg;
-            if (minDmg == maxDmg) dmg = minDmg;
-            else dmg = new Random().nextInt(maxDmg - minDmg + 1) + minDmg;
-            Player.getInstance().takeDamage(dmg);
+            Player.getInstance().takeDamage(damage);
         }
     }
 
@@ -194,7 +190,7 @@ public class Enemy extends SceneObject
         {
             if (frame == (60 * attackSpeed))
             {
-                setMyImage(imgHit);
+                setMyImage(imgAttack);
                 performAttack();
             }
             else if (frame == (60 * attackSpeed) + 25)

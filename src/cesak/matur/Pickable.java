@@ -14,10 +14,13 @@ public class Pickable extends SceneObject
 {
     public enum Bonus
     {
-        HEAL
+        HEAL, AMMO, GUN
     }
 
     private Bonus bonus;
+
+    private int type;
+    private int amount;
 
     // ---
 
@@ -31,6 +34,20 @@ public class Pickable extends SceneObject
         switch (list.get(0))
         {
             case "HEAL" -> bonus = Bonus.HEAL;
+            case "AMMO" -> bonus = Bonus.AMMO;
+            case "GUN" -> bonus = Bonus.GUN;
+        }
+
+        for (String s : list)
+        {
+            String[] line = s.replaceAll(" ", "").split(":");
+
+            switch (line[0])
+            {
+                case "type" -> type = Integer.parseInt(line[1]);
+                case "amount" -> amount = Integer.parseInt(line[1]);
+                case "bonus" -> bonus = Bonus.valueOf(line[1]);
+            }
         }
     }
 
@@ -46,6 +63,11 @@ public class Pickable extends SceneObject
             case HEAL -> {
                 if (Player.getInstance().getHealthPercent() < 1) Player.getInstance().getHeal(2);
                 else return;
+            }
+            case AMMO -> Player.getInstance().getMyWeapon().addAmmunition(type, amount);
+            case GUN -> {
+                Player.getInstance().getMyWeapon().addWeapon(type);
+                Player.getInstance().getMyWeapon().addAmmunition(type, amount);
             }
         }
 

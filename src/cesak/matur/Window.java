@@ -191,8 +191,14 @@ public class Window extends JFrame
                         ySize = (scaledHeight * scale) - (pixelY * scale) - 1;
                     }
 
+                    if (textureColumnIndex == LevelManager.getInstance().getTexture(wallType).getWidth())
+                    {
+                        textureColumnIndex--;
+                    }
+
                     // Getting the color of particular texture pixel
                     int pixel = LevelManager.getInstance().getTexture(wallType).getRGB(textureColumnIndex, (int) Math.floor(currentTextureRow * ratio1));
+
                     Color color = new Color(pixel, false);
 
                     // Getting darker shades of the color
@@ -208,8 +214,9 @@ public class Window extends JFrame
             //region Objects
             List<SceneObject> sceneObjects = new ArrayList<>();
 
+            sceneObjects.addAll(LevelManager.getInstance().getObjects());
             sceneObjects.addAll(LevelManager.getInstance().getEnemies());
-            sceneObjects.addAll(LevelManager.getInstance().getStaticObjects());
+            sceneObjects.addAll(LevelManager.getInstance().getExplosives());
             sceneObjects.addAll(LevelManager.getInstance().getPickables());
 
             // Sorting sceneObjects (by distance)
@@ -232,12 +239,12 @@ public class Window extends JFrame
                     continue;
 
                 int size = (int) ((scaledHeight / (sceneObject.distToPlayerTan())) * sceneObject.getSize());
-                int sizeX = (int) (((scaledWidth / (sceneObject.distToPlayerTan()))/* / (16.0 / 9)*/) * sceneObject.getSize());
+                int sizeX = (int) (((scaledWidth / (sceneObject.distToPlayerTan()))) * sceneObject.getSize());
 
                 for (int x = 0; x < sizeX; x++)
                 {
                     int posX = -(sizeX / 2) + x + (int) (sceneObject.getScreenX() * (scaledWidth));
-                    double yPos = (1.0 + sceneObject.getScreenY()) - ((1.0 / sceneObject.getSize()) * 0.5);
+                    double yPos = (0.0 + sceneObject.getScreenY())/* - ((1.0 / sceneObject.getSize()) * 0.5)*/;
                     int y0 = (scaledHeight / 2) - (int) (size * (yPos));
 
                     if (posX < 0 || posX >= walls.length || (walls[posX] < sceneObject.distToPlayerTan() && walls[posX] != 0))
@@ -319,16 +326,23 @@ public class Window extends JFrame
 
             // Health
 
-            g.setColor(new Color(10, 10, 10));
-            g.fillRect(20, (scaledHeight - 80 / scale) * scale + 20, 300, 25);
             g.setColor(Color.red);
-            g.fillRect(20, (scaledHeight - 80 / scale) * scale + 20, (int) (300 * Player.getInstance().getHealthPercent()), 25);
+            g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
+            g.drawString("HEALTH", screenWidth - 190, screenHeight - 25);
+
+            g.setColor(Color.red);
+            g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 50));
+            g.drawString(String.valueOf(Player.getInstance().getHealth()), screenWidth - 100, screenHeight - 25);
 
             // Ammo
 
-            g.setColor(Color.GREEN);
+            g.setColor(Color.blue);
+            g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
+            g.drawString("AMMO", 190, screenHeight - 25);
+
+            g.setColor(Color.blue);
             g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 50));
-            g.drawString(String.valueOf(Player.getInstance().getMyWeapon().getCurrentAmmunition()), screenWidth - 100, screenHeight - 25);
+            g.drawString(String.valueOf(Player.getInstance().getMyWeapon().getCurrentAmmunition()), 100, screenHeight - 25);
         }
     };
 

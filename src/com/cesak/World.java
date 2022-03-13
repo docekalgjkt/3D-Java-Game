@@ -1,9 +1,6 @@
 package com.cesak;
 
-import cesak.matur.Enemy;
-import cesak.matur.Pickable;
-import cesak.matur.Player;
-import cesak.matur.StaticObject;
+import cesak.matur.*;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -185,40 +182,40 @@ public class World
             // Boss
             entities.add(new Enemy("wraith", 15.5, 24.5, 1.5, 0, 0.25, 12, 10, 10, 15, 0.4));
 
-            staticObjects.add(new StaticObject("barrel", 1.5, 2.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 2.5, 2.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 1.5, 3.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 1.5, 8.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 6.5, 8.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 7.5, 8.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 1.5, 2.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 2.5, 2.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 1.5, 3.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 1.5, 8.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 6.5, 8.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 7.5, 8.5, 1, 0, 0.35, true));
 
-            staticObjects.add(new StaticObject("barrel", 5.5, 5.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 4.5, 4.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 4.5, 6.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 5.5, 5.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 4.5, 4.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 4.5, 6.5, 1, 0, 0.35, true));
 
-            staticObjects.add(new StaticObject("barrel", 7.5, 12.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 7.5, 12.5, 1, 0, 0.35, true));
 
-            staticObjects.add(new StaticObject("barrel", 7.5, 15.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 8.5, 15.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 7.5, 15.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 8.5, 15.5, 1, 0, 0.35, true));
 
-            staticObjects.add(new StaticObject("barrel", 1.5, 15.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 1.5, 15.5, 1, 0, 0.35, true));
 
-            staticObjects.add(new StaticObject("barrel", 10.5, 19.5, 1, 0, 0.35, true));
-            staticObjects.add(new StaticObject("barrel", 11.5, 19.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 10.5, 19.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 11.5, 19.5, 1, 0, 0.35, true));
 
-            staticObjects.add(new StaticObject("barrel", 3.5, 25.5, 1, 0, 0.35, true));
+            explosives.add(new Explosive("barrel", 3.5, 25.5, 1, 0, 0.35, true));
 
-            for (int i = 0; i < staticObjects.size(); i++)
+            for (int i = 0; i < explosives.size(); i++)
             {
                 int r = new Random().nextInt(4);
 
                 if (r == 0)
                 {
-                    staticObjects.get(i).setDrops(new String[]{"healingPotion"});
+                    explosives.get(i).setDrops(new String[]{"healingPotion"});
                 }
                 else if (r == 1)
                 {
-                    staticObjects.get(i).setDrops(new String[]{"magicPotion"});
+                    explosives.get(i).setDrops(new String[]{"magicPotion"});
                 }
             }
 
@@ -228,17 +225,17 @@ public class World
             pickables.add(new Pickable("healingPotion", 3.5, 15.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
             pickables.add(new Pickable("healingPotion", 5.5, 19.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
 
-            interactBlocks.add(new InteractBlock(10, 3, InteractBlock.Effect.OPEN, new java.lang.Object[]{10, 3}));
-            interactBlocks.add(new InteractBlock(2, 9, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 9}));
-            interactBlocks.add(new InteractBlock(11, 7, InteractBlock.Effect.OPEN, new java.lang.Object[]{11, 7}));
-            interactBlocks.add(new InteractBlock(9, 12, InteractBlock.Effect.OPEN, new java.lang.Object[]{9, 12}));
-            interactBlocks.add(new InteractBlock(5, 17, InteractBlock.Effect.OPEN, new java.lang.Object[]{5, 17}));
-            interactBlocks.add(new InteractBlock(2, 22, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 22}));
-            interactBlocks.add(new InteractBlock(6, 24, InteractBlock.Effect.OPEN, new java.lang.Object[]{6, 24}));
-            interactBlocks.add(new InteractBlock(6, 24, InteractBlock.Effect.WALL, new java.lang.Object[]{5, 22}));
+            doors.add(new Door(10, 3, Door.Effect.OPEN, new java.lang.Object[]{10, 3}));
+            doors.add(new Door(2, 9, Door.Effect.OPEN, new java.lang.Object[]{2, 9}));
+            doors.add(new Door(11, 7, Door.Effect.OPEN, new java.lang.Object[]{11, 7}));
+            doors.add(new Door(9, 12, Door.Effect.OPEN, new java.lang.Object[]{9, 12}));
+            doors.add(new Door(5, 17, Door.Effect.OPEN, new java.lang.Object[]{5, 17}));
+            doors.add(new Door(2, 22, Door.Effect.OPEN, new java.lang.Object[]{2, 22}));
+            doors.add(new Door(6, 24, Door.Effect.OPEN, new java.lang.Object[]{6, 24}));
+            doors.add(new Door(6, 24, Door.Effect.WALL, new java.lang.Object[]{5, 22}));
 
             // Secret
-            interactBlocks.add(new InteractBlock(2, 27, InteractBlock.Effect.OPEN, new java.lang.Object[]{2, 27}));
+            doors.add(new Door(2, 27, Door.Effect.OPEN, new java.lang.Object[]{2, 27}));
 
             pickables.add(new Pickable("healingPotion", 4.5, 27.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
             pickables.add(new Pickable("healingPotion", 5.5, 27.5, 0.5, 0, 0.35, Pickable.Bonus.HEAL));
@@ -260,9 +257,9 @@ public class World
     public void reset()
     {
         entities = new ArrayList<>();
-        staticObjects = new ArrayList<>();
+        explosives = new ArrayList<>();
         pickables = new ArrayList<>();
-        interactBlocks = new ArrayList<>();
+        doors = new ArrayList<>();
 
         Player.getInstance().setHealth(Player.getInstance().getHealthMax());
 
@@ -282,11 +279,11 @@ public class World
 
     //region Static Objects
 
-    private List<StaticObject> staticObjects = new ArrayList<>();
+    private List<Explosive> explosives = new ArrayList<>();
 
-    public List<StaticObject> getStaticObjects()
+    public List<Explosive> getStaticObjects()
     {
-        return staticObjects;
+        return explosives;
     }
 
     //endregion
@@ -312,13 +309,13 @@ public class World
 
     //endregion
 
-    //region InteractBlock
+    //region Door
 
-    private List<InteractBlock> interactBlocks = new ArrayList<>();
+    private List<Door> doors = new ArrayList<>();
 
-    public List<InteractBlock> getDoors()
+    public List<Door> getDoors()
     {
-        return interactBlocks;
+        return doors;
     }
 
     //endregion

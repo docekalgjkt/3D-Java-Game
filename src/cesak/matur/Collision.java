@@ -1,8 +1,8 @@
-package com.cesak;
+package cesak.matur;
 
 import cesak.matur.LevelManager;
 import cesak.matur.Pickable;
-import cesak.matur.StaticObject;
+import cesak.matur.Explosive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -202,12 +202,13 @@ public class Collision
      */
     public static boolean hitObject(double x, double y, double hitbox)
     {
-        List<StaticObject> objects = LevelManager.getInstance().getStaticObjects();
+        List<SceneObject> objects = new ArrayList<>();
 
-        for (StaticObject object : objects)
+        objects.addAll(LevelManager.getInstance().getObjects());
+        //objects.addAll(LevelManager.getInstance().getEnemies());
+
+        for (SceneObject object : objects)
         {
-            if (object.isDestroyed()) continue;
-
             double difX = x - object.getX();
             double difY = y - object.getY();
 

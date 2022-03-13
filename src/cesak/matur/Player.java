@@ -1,9 +1,5 @@
 package cesak.matur;
 
-import com.cesak.Collision;
-import com.cesak.InteractBlock;
-import com.cesak.World;
-
 import java.util.List;
 
 /**
@@ -27,14 +23,13 @@ public class Player
 
     // endregion
 
-    private int health = 15;
-    private int healthMax = 15;
-    private double speed = 25.0;
+    private int health = 50;
+    private final int healthMax = 50;
+    private final double speed = 30.0;
     private double x;
     private double y;
     private double angle = 0;
-    private double nearClip = 0.3;
-    private double hitbox = 0.2;
+    private final double hitbox = 0.2;
 
     private PlayerWeapon myWeapon;
 
@@ -77,6 +72,7 @@ public class Player
 
     public double getNearClip()
     {
+        double nearClip = 0.3;
         return nearClip * nearClip;
     }
 
@@ -201,20 +197,19 @@ public class Player
         this.y = y;
     }
 
-
-    // TODO: Reword Interaction system
     public void interact()
     {
-        // Interacting with a Wall-like SceneObject
+        // Interacting with doors
         int nextX = (int) (x + (Math.cos(angle * Math.PI / 180) * 0.7));
         int nextY = (int) (y + (Math.sin(angle * Math.PI / 180) * 0.7));
 
-        List<InteractBlock> interactBlocks = World.getInstance().getDoors();
-        for (int i = 0; i < interactBlocks.size(); i++)
+        List<Door> doors = LevelManager.getInstance().getDoors();
+        for (Door door : doors)
         {
-            if (interactBlocks.get(i).getX() == nextX && interactBlocks.get(i).getY() == nextY)
+            if (door.getX() == nextX && door.getY() == nextY)
             {
-                interactBlocks.get(i).interact();
+                door.interact();
+                break;
             }
         }
     }
@@ -239,6 +234,7 @@ public class Player
     public void takeDamage(int dmg)
     {
         health -= dmg;
+        SoundManager.getInstance().playSound("hit");
 
         if (health <= 0)
         {
