@@ -4,4 +4,3 @@ damage: 5
 speed: 0
 attackSpeed: 1
 attackRange: 0.9
-loot: ""

@@ -37,6 +37,8 @@ public class SoundManager
             info = new DataLine.Info(Clip.class, format);
             clip = (Clip) AudioSystem.getLine(info);
             clip.open(stream);
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl.setValue(-5.0f);
             clip.start();
         } catch (Exception ignored)
         {

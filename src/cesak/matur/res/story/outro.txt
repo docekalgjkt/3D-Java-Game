@@ -1,0 +1,5 @@
+<html>
+<br>You managed to successfully eliminate the threat and save hundreds of civilists.
+<br>Your actions will not be forgotten.
+<br>Well done!
+</html>

@@ -1,4 +1,4 @@
 Rifle
-damage: 1
+damage: 2
 ammo: 2
 fireRate: 5

@@ -1,17 +1,19 @@
 package cesak.matur;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * Class defining individual living beings (for now hostile)
  */
-public class Enemy extends SceneObject
+public class Enemy extends LevelObject
 {
+    private boolean isHeart;
+
     // Images for each enemy state
     private BufferedImage imgDefault;
     private BufferedImage imgAttack;
@@ -27,8 +29,6 @@ public class Enemy extends SceneObject
     private double attackSpeed;
     // At what distance will this enemy start attacking
     private double attackRange = 0.9;
-    // What will drop from this enemy when killed
-    private String loot;
 
     public double getAttackRange()
     {
@@ -60,7 +60,6 @@ public class Enemy extends SceneObject
                 case "speed" -> speed = Double.parseDouble(line[1]);
                 case "attackSpeed" -> attackSpeed = Double.parseDouble(line[1]);
                 case "attackRange" -> attackRange = Double.parseDouble(line[1]);
-                case "loot" -> loot = line[1];
             }
         }
 
@@ -80,6 +79,9 @@ public class Enemy extends SceneObject
         {
             e.printStackTrace();
         }
+
+        if (id == 3)
+            isHeart = true;
     }
 
     // --- Movement ---
@@ -188,12 +190,12 @@ public class Enemy extends SceneObject
         }
         else if (isAttacking)
         {
-            if (frame == (60 * attackSpeed))
+            if (frame == (60 * (1 / attackSpeed)))
             {
                 setMyImage(imgAttack);
                 performAttack();
             }
-            else if (frame == (60 * attackSpeed) + 25)
+            else if (frame == (60 * (1 / attackSpeed)) + 25)
             {
                 stopAttack();
             }
@@ -246,7 +248,23 @@ public class Enemy extends SceneObject
     private void die()
     {
         health = 0;
-        //setYPos(0);
         setMyImage(imgDead);
+
+        // Game Ends
+        if (isHeart)
+        {
+            ResFileReader rfr = new ResFileReader();
+            List<String> list = rfr.getFile("story/outro.txt");
+
+            StringBuilder sb = new StringBuilder();
+            for (String s : list)
+            {
+                sb.append(s);
+            }
+
+            JOptionPane.showMessageDialog(null, sb.toString());
+
+            SceneManager.getInstance().endGame();
+        }
     }
 }

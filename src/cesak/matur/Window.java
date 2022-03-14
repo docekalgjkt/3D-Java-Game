@@ -10,13 +10,32 @@ import java.util.List;
  */
 public class Window extends JFrame
 {
+    // region Singleton
+
+    private static final Window WINDOW = new Window();
+
+    private Window()
+    {
+
+    }
+
+    public static Window getInstance()
+    {
+        return WINDOW;
+    }
+
+    // endregion
+
     private Container pane;
 
     private CardLayout layout;
 
+    /**
+     * Width and Height of the window in pixels
+     */
     private final int screenWidth = 800, screenHeight = 800;
 
-    private final int scale = 3;
+    private final int scale = 6;
 
     // --- Rendering Game View
 
@@ -35,8 +54,14 @@ public class Window extends JFrame
 
     public void start()
     {
-        addKeyListener(Controller.getInstance());
+        addKeyListener(MenuController.getInstance());
+        addKeyListener(GameController.getInstance());
         buildGUI();
+    }
+
+    public void switchScene(String sceneName)
+    {
+        layout.show(pane, sceneName);
     }
 
     private void buildGUI()
@@ -70,11 +95,6 @@ public class Window extends JFrame
         setVisible(true);
     }
 
-    public void switchScene(String sceneName)
-    {
-        layout.show(pane, sceneName);
-    }
-
     /**
      * Panel which represents Main Menu Scene
      */
@@ -82,8 +102,26 @@ public class Window extends JFrame
     {
         public void paintComponent(Graphics g)
         {
-            g.setColor(Color.red);
-            g.fillRect(0, 0, getWidth(), getHeight());
+            g.setColor(Color.gray);
+            g.fillRect(0, 0, screenWidth, screenHeight);
+
+            g.setColor(Color.white);
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 120));
+            g.drawString("3D GAME", screenWidth / 2 - 275, 200);
+
+            g.setFont(new Font(Font.SANS_SERIF, Font.ITALIC, 30));
+            g.drawString("Press Enter to Play", screenWidth / 2 - 150, screenHeight / 2);
+
+            g.setColor(Color.darkGray);
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
+            g.drawString("Controls:", screenWidth / 2 - 90, screenHeight / 2 + 90);
+
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 25));
+            g.drawString("Movement: W S A D", screenWidth / 2 - 170, screenHeight / 2 + 130);
+            g.drawString("Rotation: Left and Right Arrows", screenWidth / 2 - 170, screenHeight / 2 + 160);
+            g.drawString("Shooting: Space", screenWidth / 2 - 170, screenHeight / 2 + 190);
+            g.drawString("Interact: E", screenWidth / 2 - 170, screenHeight / 2 + 220);
+            g.drawString("Quit Game: Escape", screenWidth / 2 - 170, screenHeight / 2 + 250);
         }
     };
 
@@ -94,10 +132,9 @@ public class Window extends JFrame
     {
         public void paintComponent(Graphics g)
         {
-
             if (walls == null)
             {
-                redraw(1);
+                redraw();
                 return;
             }
 
@@ -212,45 +249,44 @@ public class Window extends JFrame
             //endregion
 
             //region Objects
-            List<SceneObject> sceneObjects = new ArrayList<>();
+            List<LevelObject> levelObjects = new ArrayList<>();
 
-            sceneObjects.addAll(LevelManager.getInstance().getObjects());
-            sceneObjects.addAll(LevelManager.getInstance().getEnemies());
-            sceneObjects.addAll(LevelManager.getInstance().getExplosives());
-            sceneObjects.addAll(LevelManager.getInstance().getPickables());
+            levelObjects.addAll(LevelManager.getInstance().getObjects());
+            levelObjects.addAll(LevelManager.getInstance().getEnemies());
+            levelObjects.addAll(LevelManager.getInstance().getPickables());
 
-            // Sorting sceneObjects (by distance)
-            for (int i = 1; i < sceneObjects.size(); i++)
+            // Sorting levelObjects (by distance)
+            for (int i = 1; i < levelObjects.size(); i++)
             {
                 for (int i1 = 0; i1 < i; i1++)
                 {
-                    if (sceneObjects.get(i).distToPlayer() > sceneObjects.get(i1).distToPlayer())
+                    if (levelObjects.get(i).distToPlayer() > levelObjects.get(i1).distToPlayer())
                     {
-                        sceneObjects.add(i1, sceneObjects.get(i));
-                        sceneObjects.remove(i + 1);
+                        levelObjects.add(i1, levelObjects.get(i));
+                        levelObjects.remove(i + 1);
                     }
                 }
             }
 
-            // Rendering sceneObjects
-            for (SceneObject sceneObject : sceneObjects)
+            // Rendering levelObjects
+            for (LevelObject levelObject : levelObjects)
             {
-                if (sceneObject.distToPlayer() <= Player.getInstance().getNearClip())
+                if (levelObject.distToPlayer() <= Player.getInstance().getNearClip())
                     continue;
 
-                int size = (int) ((scaledHeight / (sceneObject.distToPlayerTan())) * sceneObject.getSize());
-                int sizeX = (int) (((scaledWidth / (sceneObject.distToPlayerTan()))) * sceneObject.getSize());
+                int size = (int) ((scaledHeight / (levelObject.distToPlayerTan())) * levelObject.getSize());
+                int sizeX = (int) (((scaledWidth / (levelObject.distToPlayerTan()))) * levelObject.getSize());
 
                 for (int x = 0; x < sizeX; x++)
                 {
-                    int posX = -(sizeX / 2) + x + (int) (sceneObject.getScreenX() * (scaledWidth));
-                    double yPos = (0.0 + sceneObject.getScreenY())/* - ((1.0 / sceneObject.getSize()) * 0.5)*/;
+                    int posX = -(sizeX / 2) + x + (int) (levelObject.getScreenX() * (scaledWidth));
+                    double yPos = (0.0 + levelObject.getScreenY())/* - ((1.0 / levelObject.getSize()) * 0.5)*/;
                     int y0 = (scaledHeight / 2) - (int) (size * (yPos));
 
-                    if (posX < 0 || posX >= walls.length || (walls[posX] < sceneObject.distToPlayerTan() && walls[posX] != 0))
+                    if (posX < 0 || posX >= walls.length || (walls[posX] < levelObject.distToPlayerTan() && walls[posX] != 0))
                         continue;
 
-                    int p = sceneObject.getMyImage().getHeight();
+                    int p = levelObject.getMyImage().getHeight();
                     double h = (double) size / p;
 
                     double ratio = (p > size) ? (double) p / size : 1;
@@ -291,12 +327,12 @@ public class Window extends JFrame
                             ySize = (scaledHeight * scale) - (y1 * scale) - 1;
                         }
 
-                        double imgW = sceneObject.getMyImage().getWidth() * ((double) x / sizeX);
+                        double imgW = levelObject.getMyImage().getWidth() * ((double) x / sizeX);
 
-                        int pixel = sceneObject.getMyImage().getRGB((int) imgW, (int) Math.floor(y * ratio));
+                        int pixel = levelObject.getMyImage().getRGB((int) imgW, (int) Math.floor(y * ratio));
                         if (pixel == 0) continue;
 
-                        float shade = 1 - (Math.round(sceneObject.distToPlayerTan()) / (float) Player.getInstance().getCamDistance());
+                        float shade = 1 - (Math.round(levelObject.distToPlayerTan()) / (float) Player.getInstance().getCamDistance());
                         shade = (shade < 0) ? 0 : shade;
 
                         Color color = new Color(pixel, false);
@@ -346,8 +382,10 @@ public class Window extends JFrame
         }
     };
 
-    public void redraw(int whichScene)
+    public void redraw()
     {
+        int whichScene = SceneManager.getInstance().getCurrentScene();
+
         switch (whichScene)
         {
             case 1 -> redrawGame();

@@ -3,20 +3,20 @@ package cesak.matur;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Controller implements KeyListener
+public class GameController implements KeyListener
 {
     // region Singleton
 
-    private static final Controller controller = new Controller();
+    private static final GameController GAME_CONTROLLER = new GameController();
 
-    private Controller()
+    private GameController()
     {
 
     }
 
-    public static Controller getInstance()
+    public static GameController getInstance()
     {
-        return controller;
+        return GAME_CONTROLLER;
     }
 
     // endregion
@@ -68,6 +68,21 @@ public class Controller implements KeyListener
 
     // ---
 
+    public void reset()
+    {
+        isMoveF = false;
+        isMoveB = false;
+        isMoveL = false;
+        isMoveR = false;
+
+        isRotateL = false;
+        isRotateR = false;
+
+        attacking = false;
+    }
+
+    // ---
+
     @Override
     public void keyTyped(KeyEvent e)
     {
@@ -78,7 +93,7 @@ public class Controller implements KeyListener
     public void keyPressed(KeyEvent e)
     {
         // Prevents controlling the player character while in Menu
-        if (GameManager.getInstance().notInGame())
+        if (SceneManager.getInstance().notInGame())
             return;
 
         // W
@@ -141,7 +156,7 @@ public class Controller implements KeyListener
     public void keyReleased(KeyEvent e)
     {
         // Prevents controlling the player character while in Menu
-        if (GameManager.getInstance().notInGame())
+        if (SceneManager.getInstance().notInGame())
             return;
 
         // W
@@ -180,12 +195,6 @@ public class Controller implements KeyListener
         if (e.getKeyCode() == 32)
         {
             attacking = false;
-        }
-
-        // Escape - Quits the game
-        if (e.getKeyCode() == 27)
-        {
-            System.exit(0);
         }
     }
 }

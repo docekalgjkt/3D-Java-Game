@@ -14,7 +14,7 @@ import java.util.Objects;
  * <br></>
  * It is used as a Superclass for classes defining specific types of objects (Static, Projectile, Enemy, Pickable).
  */
-public class SceneObject
+public class LevelObject
 {
     // Position in the scene
     private double x, y;
@@ -25,7 +25,7 @@ public class SceneObject
     // Object size in the scene
     private double size;
     // On which tile this object is standing
-    private int mapX, mapY;
+    private final int mapX, mapY;
 
     // ---
 
@@ -98,7 +98,7 @@ public class SceneObject
         this.screenY = yPos;
     }
 
-    public SceneObject(int id, int x, int y, String path)
+    public LevelObject(int id, int x, int y, String path)
     {
         ResFileReader rfr = new ResFileReader();
         List<String> list = rfr.getFile(path + id + "/object.txt");
@@ -120,7 +120,6 @@ public class SceneObject
             }
         }
 
-
         try
         {
             myImage = ImageIO.read(Objects.requireNonNull(getClass().getClassLoader().getResource(path + id + "/def.png")));
@@ -131,12 +130,7 @@ public class SceneObject
         }
     }
 
-    public boolean isOnTile(int x, int y)
-    {
-        return (int) Math.floor(this.x) == x && (int) Math.floor(this.y) == y;
-    }
-
-    // Returns distance of this SceneObject from the Player
+    // Returns distance of this LevelObject from the Player
     public double distToPlayer()
     {
         return (getX() - Player.getInstance().getX()) * (getX() - Player.getInstance().getX()) + (getY() - Player.getInstance().getY()) * (getY() - Player.getInstance().getY());

@@ -1,3 +1,3 @@
-size: 0.5
-screenY: 0.4
+size: 0.60
+screenY: 0.35
 hitbox: 0.35

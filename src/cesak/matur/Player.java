@@ -92,6 +92,7 @@ public class Player
 
     public void setUp()
     {
+        health = healthMax;
         myWeapon = new PlayerWeapon();
     }
 
@@ -102,17 +103,17 @@ public class Player
     {
         int dir = 0;
 
-        if (Controller.getInstance().isMoveB()) dir = 180;
-        if (Controller.getInstance().isMoveL()) dir = 270;
-        if (Controller.getInstance().isMoveR()) dir = 90;
-        if (Controller.getInstance().isMoveF() && Controller.getInstance().isMoveL()) dir = 315;
-        if (Controller.getInstance().isMoveF() && Controller.getInstance().isMoveR()) dir = 45;
-        if (Controller.getInstance().isMoveB() && Controller.getInstance().isMoveL()) dir = 225;
-        if (Controller.getInstance().isMoveB() && Controller.getInstance().isMoveR()) dir = 135;
+        if (GameController.getInstance().isMoveB()) dir = 180;
+        if (GameController.getInstance().isMoveL()) dir = 270;
+        if (GameController.getInstance().isMoveR()) dir = 90;
+        if (GameController.getInstance().isMoveF() && GameController.getInstance().isMoveL()) dir = 315;
+        if (GameController.getInstance().isMoveF() && GameController.getInstance().isMoveR()) dir = 45;
+        if (GameController.getInstance().isMoveB() && GameController.getInstance().isMoveL()) dir = 225;
+        if (GameController.getInstance().isMoveB() && GameController.getInstance().isMoveR()) dir = 135;
 
-        if ((Controller.getInstance().isMoveF() || Controller.getInstance().isMoveB() || Controller.getInstance().isMoveL() || Controller.getInstance().isMoveR()) &&
-                !(Controller.getInstance().isMoveF() && Controller.getInstance().isMoveB()) &&
-                !(Controller.getInstance().isMoveL() && Controller.getInstance().isMoveR())
+        if ((GameController.getInstance().isMoveF() || GameController.getInstance().isMoveB() || GameController.getInstance().isMoveL() || GameController.getInstance().isMoveR()) &&
+                !(GameController.getInstance().isMoveF() && GameController.getInstance().isMoveB()) &&
+                !(GameController.getInstance().isMoveL() && GameController.getInstance().isMoveR())
         )
             performMovement(dir);
     }
@@ -124,8 +125,8 @@ public class Player
     {
         double dir = 0;
 
-        if (Controller.getInstance().isRotateR()) dir = 0.9;
-        if (Controller.getInstance().isRotateL()) dir = -0.9;
+        if (GameController.getInstance().isRotateR()) dir = 1;
+        if (GameController.getInstance().isRotateL()) dir = -1;
 
         if (dir != 0) performRotation(dir);
     }
@@ -197,12 +198,25 @@ public class Player
         this.y = y;
     }
 
+    public void setRotation(double a)
+    {
+        angle = a;
+    }
+
     public void interact()
     {
-        // Interacting with doors
+        // Coordinates of the point in front of you
         int nextX = (int) (x + (Math.cos(angle * Math.PI / 180) * 0.7));
         int nextY = (int) (y + (Math.sin(angle * Math.PI / 180) * 0.7));
 
+        // Checking for the Level End
+        if (nextX == LevelManager.getInstance().getLevelEnd()[0] && nextY == LevelManager.getInstance().getLevelEnd()[1])
+        {
+            LevelManager.getInstance().EndLevel();
+            return;
+        }
+
+        // Interacting with doors
         List<Door> doors = LevelManager.getInstance().getDoors();
         for (Door door : doors)
         {
@@ -248,8 +262,8 @@ public class Player
     private void die()
     {
         health = 0;
-        // TODO: Reset the player
+        GameController.getInstance().reset();
+        GameManager.getInstance().stop();
+        SceneManager.getInstance().setScene(0);
     }
-
-    // TODO: Add reset() after death
 }

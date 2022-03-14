@@ -1,20 +1,15 @@
 package cesak.matur;
 
-import cesak.matur.Player;
-import cesak.matur.ResFileReader;
-import cesak.matur.SceneObject;
-import com.cesak.World;
-
 import java.util.List;
 
 /**
- * Type of SceneObject triggering an effect when the player collides with it
+ * Type of LevelObject triggering an effect when the player collides with it
  */
-public class Pickable extends SceneObject
+public class Pickable extends LevelObject
 {
     public enum Bonus
     {
-        HEAL, AMMO, GUN
+        HEAL, GUN
     }
 
     private Bonus bonus;
@@ -34,7 +29,6 @@ public class Pickable extends SceneObject
         switch (list.get(0))
         {
             case "HEAL" -> bonus = Bonus.HEAL;
-            case "AMMO" -> bonus = Bonus.AMMO;
             case "GUN" -> bonus = Bonus.GUN;
         }
 
@@ -54,7 +48,7 @@ public class Pickable extends SceneObject
     // ---
 
     /**
-     * Method called when this SceneObject is "Picked Up"
+     * Method called when this LevelObject is "Picked Up"
      */
     public void pick()
     {
@@ -64,13 +58,13 @@ public class Pickable extends SceneObject
                 if (Player.getInstance().getHealthPercent() < 1) Player.getInstance().getHeal(2);
                 else return;
             }
-            case AMMO -> Player.getInstance().getMyWeapon().addAmmunition(type, amount);
             case GUN -> {
                 Player.getInstance().getMyWeapon().addWeapon(type);
                 Player.getInstance().getMyWeapon().addAmmunition(type, amount);
             }
         }
 
+        SoundManager.getInstance().playSound("pickup");
         LevelManager.getInstance().destroyPickable(this);
     }
 }

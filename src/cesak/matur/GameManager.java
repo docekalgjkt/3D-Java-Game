@@ -8,7 +8,7 @@ public class GameManager
 {
     // region Singleton
 
-    private static final GameManager gameManager = new GameManager();
+    private static final GameManager GAME_MANAGER = new GameManager();
 
     private GameManager()
     {
@@ -17,59 +17,28 @@ public class GameManager
 
     public static GameManager getInstance()
     {
-        return gameManager;
+        return GAME_MANAGER;
     }
 
     // endregion
 
-    private Window window;
-
-    private final String[] sceneNames = {
-            "Menu",
-            "Game"
-    };
+    java.util.Timer timer;
 
     public int frameRate()
     {
         return 60;
     }
 
-    /**
-     * Index of currently running scene
-     */
-    private int currentScene;
-
-    /**
-     * Loads chosen scene
-     *
-     * @param i index of the scene you wish to load
-     */
-    public void setScene(int i)
-    {
-        currentScene = i;
-        window.switchScene(sceneNames[i]);
-    }
-
-    /**
-     * @return Returns whether the game scene is loaded or not to prevent controlling the player when another scene is loaded
-     */
-    public boolean notInGame()
-    {
-        return currentScene != 1;
-    }
-
     // ---
 
     public void start()
     {
-        window = new Window();
-        window.start();
-        currentScene = 0;
-        setScene(1);
-
-        SoundManager.getInstance().playLoop("music");
-
         update();
+    }
+
+    public void stop()
+    {
+        timer.cancel();
     }
 
     /**
@@ -79,7 +48,7 @@ public class GameManager
      */
     void update()
     {
-        java.util.Timer timer = new Timer();
+        timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask()
         {
             @Override
@@ -91,7 +60,7 @@ public class GameManager
 
                 updateEnemies();
 
-                window.redraw(currentScene);
+                Window.getInstance().redraw();
             }
         }, 0, 1000 / frameRate());
     }

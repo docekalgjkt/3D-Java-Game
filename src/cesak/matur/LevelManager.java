@@ -1,6 +1,7 @@
 package cesak.matur;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -41,6 +42,23 @@ public class LevelManager
 
     private int currentLevel;
 
+    private int lastLevel()
+    {
+        ResFileReader rfr = new ResFileReader();
+
+        int i = 0;
+
+        List<String> list = rfr.getFile("levels/level" + i + "/map.txt");
+
+        while (list != null)
+        {
+            i++;
+            list = rfr.getFile("levels/level" + i + "/map.txt");
+        }
+
+        return i - 1;
+    }
+
     private String[] map;
 
     public String[] getMap()
@@ -60,12 +78,23 @@ public class LevelManager
         map[y] = sb.toString();
     }
 
+    private int[] levelEnd;
+
+    public int[] getLevelEnd()
+    {
+        return levelEnd;
+    }
+
     // ---
+
+    public void loadLevel(int level)
+    {
+        currentLevel = level;
+        setUp();
+    }
 
     public void setUp()
     {
-        currentLevel = 0;
-
         getLevelMap();
 
         try
@@ -91,7 +120,7 @@ public class LevelManager
         placeObjects();
         placePickables();
         placeEnemies();
-        placeInteractBlocks();
+        placeDoors();
     }
 
     private void getLevelMap()
@@ -105,20 +134,28 @@ public class LevelManager
     private void setPlayerStartPos()
     {
         ResFileReader rfr = new ResFileReader();
-        List<String> list = rfr.getFile("levels/level" + currentLevel + "/playerStart.txt");
+        List<String> list = rfr.getFile("levels/level" + currentLevel + "/startEnd.txt");
 
         String[] playerStartPos = list.get(0).split(",");
 
         double playerStartX = Integer.parseInt(playerStartPos[0]) + 0.5;
         double playerStartY = Integer.parseInt(playerStartPos[1]) + 0.5;
+        double playerStartAngle = Double.parseDouble(playerStartPos[2]);
 
         Player.getInstance().setPosition(playerStartX, playerStartY);
+        Player.getInstance().setRotation(playerStartAngle);
+
+        levelEnd = new int[2];
+        levelEnd[0] = Integer.parseInt(list.get(1).split(",")[0]);
+        levelEnd[1] = Integer.parseInt(list.get(1).split(",")[1]);
     }
 
     private void placeObjects()
     {
         ResFileReader rfr = new ResFileReader();
         List<String> list = rfr.getFile("levels/level" + currentLevel + "/objects.txt");
+
+        objects = new ArrayList<>();
 
         for (String line : list)
         {
@@ -129,7 +166,7 @@ public class LevelManager
             int x = Integer.parseInt(objectPos[0]);
             int y = Integer.parseInt(objectPos[1]);
 
-            objects.add(new SceneObject(id, x, y, "objects/object"));
+            objects.add(new LevelObject(id, x, y, "objects/object"));
         }
     }
 
@@ -137,6 +174,8 @@ public class LevelManager
     {
         ResFileReader rfr = new ResFileReader();
         List<String> list = rfr.getFile("levels/level" + currentLevel + "/pickables.txt");
+
+        pickables = new ArrayList<>();
 
         for (String line : list)
         {
@@ -156,6 +195,8 @@ public class LevelManager
         ResFileReader rfr = new ResFileReader();
         List<String> list = rfr.getFile("levels/level" + currentLevel + "/enemies.txt");
 
+        enemies = new ArrayList<>();
+
         for (String line : list)
         {
             String[] objectProps = line.split("-");
@@ -169,10 +210,12 @@ public class LevelManager
         }
     }
 
-    private void placeInteractBlocks()
+    private void placeDoors()
     {
         ResFileReader rfr = new ResFileReader();
         List<String> list = rfr.getFile("levels/level" + currentLevel + "/doors.txt");
+
+        doors = new ArrayList<>();
 
         for (String line : list)
         {
@@ -185,11 +228,30 @@ public class LevelManager
         }
     }
 
+    public void EndLevel()
+    {
+        GameController.getInstance().reset();
+
+        String[] options = new String[]{
+                "Next Level"
+        };
+
+        int n = JOptionPane.showOptionDialog(null, "LEVEL FINISHED!", "Good job!", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, 0);
+
+        if (n == 0)
+        {
+            if (currentLevel != lastLevel())
+            {
+                loadLevel(currentLevel + 1);
+            }
+        }
+    }
+
     // ---
 
     //region Entities
 
-    private final List<Enemy> enemies = new ArrayList<>();
+    private List<Enemy> enemies = new ArrayList<>();
 
     public List<Enemy> getEnemies()
     {
@@ -200,29 +262,18 @@ public class LevelManager
 
     //region Objects
 
-    private final List<SceneObject> objects = new ArrayList<>();
+    private List<LevelObject> objects = new ArrayList<>();
 
-    public List<SceneObject> getObjects()
+    public List<LevelObject> getObjects()
     {
         return objects;
     }
 
     //endregion
 
-    //region Exlopsives
-
-    private final List<Explosive> explosives = new ArrayList<>();
-
-    public List<Explosive> getExplosives()
-    {
-        return explosives;
-    }
-
-    //endregion
-
     //region Pickables
 
-    private final List<Pickable> pickables = new ArrayList<>();
+    private List<Pickable> pickables = new ArrayList<>();
 
     public List<Pickable> getPickables()
     {
@@ -238,7 +289,7 @@ public class LevelManager
 
     //region Door
 
-    private final List<Door> doors = new ArrayList<>();
+    private List<Door> doors = new ArrayList<>();
 
     public List<Door> getDoors()
     {

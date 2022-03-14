@@ -140,7 +140,7 @@ public class PlayerWeapon
             return;
 
         // If the player is not attacking then the attack will not be performed
-        if (!Controller.getInstance().isAttacking())
+        if (!GameController.getInstance().isAttacking())
             return;
 
         performAttack();
@@ -168,7 +168,7 @@ public class PlayerWeapon
         {
             for (int i1 = 0; i1 < i; i1++)
             {
-                if (enemies.get(i).distToPlayer() > enemies.get(i1).distToPlayer())
+                if (enemies.get(i).distToPlayer() < enemies.get(i1).distToPlayer())
                 {
                     enemies.add(i1, enemies.get(i));
                     enemies.remove(i + 1);
@@ -179,6 +179,9 @@ public class PlayerWeapon
         // Cycles through the enemies and damaging the nearest enemy standing in front of the player if there is such an enemy
         for (Enemy enemy : enemies)
         {
+            if (enemy.isDead())
+                continue;
+
             double screenX = enemy.getScreenX();
             double size = 1.0 / enemy.distToPlayerTan() * enemy.getSize();
             double distFromMiddleX = Math.abs(screenX - 0.5);
@@ -186,9 +189,8 @@ public class PlayerWeapon
             if (distFromMiddleX <= size / 2)
             {
                 if (screenX >= 0 && screenX < 1)
-                    if (Renderer.getInstance().getWalls()[(int) (Renderer.getInstance().getWalls().length * screenX)] < enemy.distToPlayerTan())
+                    if (Renderer.getInstance().getWalls()[(int) (Renderer.getInstance().getWalls().length * screenX)] < Math.sqrt(enemy.distToPlayer()))
                         continue;
-
 
                 enemy.takeDamage(weapons.get(equipped).getDamage());
                 break;

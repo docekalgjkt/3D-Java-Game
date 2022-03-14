@@ -3,7 +3,7 @@ package cesak.matur;
 import cesak.matur.LevelManager;
 
 /**
- * An SceneObject the player is able to interact with
+ * An LevelObject the player is able to interact with
  * <br></br>
  * After interaction, it will do something
  */

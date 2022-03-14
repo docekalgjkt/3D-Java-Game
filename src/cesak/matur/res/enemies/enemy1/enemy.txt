@@ -1,7 +1,6 @@
-Mutant Roots
-health: 5
-damage: 5
-speed: 0
-attackSpeed: 1
+Bloodthirsty Plant
+health: 9
+damage: 8
+speed: 7
+attackSpeed: 1.2
 attackRange: 0.9
-loot: ""

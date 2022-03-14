@@ -1,9 +1,5 @@
 package cesak.matur;
 
-import cesak.matur.LevelManager;
-import cesak.matur.Pickable;
-import cesak.matur.Explosive;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,23 +187,23 @@ public class Collision
     }
 
     /**
-     * Checks whether the player walked into a Static SceneObject and if he/she did he/she is pushed away from the SceneObject.
+     * Checks whether the player walked into a Static LevelObject and if he/she did he/she is pushed away from the LevelObject.
      * <br><br/>
      * Both hitboxes are considered to be cylinder-shaped.
      *
      * @param x      Player's X position
      * @param y      Player's Y position
      * @param hitbox Player's hitbox radius
-     * @return True if the player collided with a Static SceneObject
+     * @return True if the player collided with a Static LevelObject
      */
     public static boolean hitObject(double x, double y, double hitbox)
     {
-        List<SceneObject> objects = new ArrayList<>();
+        List<LevelObject> objects = new ArrayList<>();
 
         objects.addAll(LevelManager.getInstance().getObjects());
         //objects.addAll(LevelManager.getInstance().getEnemies());
 
-        for (SceneObject object : objects)
+        for (LevelObject object : objects)
         {
             double difX = x - object.getX();
             double difY = y - object.getY();
@@ -233,14 +229,14 @@ public class Collision
     }
 
     /**
-     * Checks whether the player stepped on a Pickable SceneObject and if he/she did they are saved in a list for their effect to be applied.
+     * Checks whether the player stepped on a Pickable LevelObject and if he/she did they are saved in a list for their effect to be applied.
      * <br><br/>
      * Both hitboxes are considered to be cylinder-shaped.
      *
      * @param x      Player's X position
      * @param y      Player's Y position
      * @param hitbox Player's hitbox radius
-     * @return True when the player stepped on a Pickable SceneObject
+     * @return True when the player stepped on a Pickable LevelObject
      */
     public static boolean hitPickable(double x, double y, double hitbox)
     {

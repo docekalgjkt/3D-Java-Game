@@ -255,31 +255,30 @@ public class Renderer
             }
         }
 
-        // SceneObject rendering
-        List<SceneObject> sceneObjects = new ArrayList<>();
+        // LevelObject rendering
+        List<LevelObject> levelObjects = new ArrayList<>();
 
-        sceneObjects.addAll(LevelManager.getInstance().getObjects());
-        sceneObjects.addAll(LevelManager.getInstance().getEnemies());
-        sceneObjects.addAll(LevelManager.getInstance().getExplosives());
-        sceneObjects.addAll(LevelManager.getInstance().getPickables());
+        levelObjects.addAll(LevelManager.getInstance().getObjects());
+        levelObjects.addAll(LevelManager.getInstance().getEnemies());
+        levelObjects.addAll(LevelManager.getInstance().getPickables());
 
-        for (SceneObject sceneObject : sceneObjects)
+        for (LevelObject levelObject : levelObjects)
         {
             double[] opos = new double[2];
-            opos[0] = sceneObject.getX() - Player.getInstance().getX();
-            opos[1] = sceneObject.getY() - Player.getInstance().getY();
+            opos[0] = levelObject.getX() - Player.getInstance().getX();
+            opos[1] = levelObject.getY() - Player.getInstance().getY();
 
             double angle = ((opos[0] == 0)
                     ? ((opos[1] > 0) ? 90 : 270)
                     : (Math.atan(opos[1] / opos[0])) * 180 / Math.PI) + ((opos[0] < 0) ? 180 : 0);
             double angleDif = MyMath.angleDist(angle, Player.getInstance().getAngle());
 
-            if (Math.abs(angleDif) >= fov || sceneObject.distToPlayer() > Player.getInstance().getCamDistance() * Player.getInstance().getCamDistance())
+            if (Math.abs(angleDif) >= fov || levelObject.distToPlayer() > Player.getInstance().getCamDistance() * Player.getInstance().getCamDistance())
                 continue;
 
             double xPos = (Math.tan(angleDif / 180 * Math.PI) + screenHalf) / (screenHalf * 2);
 
-            sceneObject.setXPos(xPos);
+            levelObject.setXPos(xPos);
         }
     }
 }

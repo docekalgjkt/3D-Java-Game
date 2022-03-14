@@ -1,0 +1,2 @@
+bonus: HEAL
+amount: 5
