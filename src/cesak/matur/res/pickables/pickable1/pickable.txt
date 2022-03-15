@@ -1,0 +1,3 @@
+bonus: GUN
+amount: 20
+type: 2

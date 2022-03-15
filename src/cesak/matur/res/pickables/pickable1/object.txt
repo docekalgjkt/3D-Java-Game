@@ -1,0 +1,3 @@
+size: 0.4
+screenY: 0.2
+hitbox: 0.35
